@@ -1,0 +1,6 @@
+{
+  "name": "NRBCOR - Protection Civile & Risques NRBC",
+  "description": "Application citoyenne hors-ligne de protection civile, protocoles réflexes d'urgence et résilience face aux risques technologiques et NRBC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

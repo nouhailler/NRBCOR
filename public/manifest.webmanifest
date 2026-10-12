@@ -1,0 +1,24 @@
+{
+  "name": "NRBCOR - Protection Civile & Risques NRBC",
+  "short_name": "NRBCOR",
+  "description": "Application PWA citoyenne 100% hors-ligne de préparation aux risques nucléaires, radiologiques, biologiques et chimiques.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#001126",
+  "theme_color": "#001126",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23001126'/%3E%3Cpath d='M50 15 L80 30 L80 60 C80 75 50 88 50 88 C50 88 20 75 20 60 L20 30 Z' fill='%2398f6c5'/%3E%3Ccircle cx='50' cy='48' r='10' fill='%23001126'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23001126'/%3E%3Cpath d='M50 15 L80 30 L80 60 C80 75 50 88 50 88 C50 88 20 75 20 60 L20 30 Z' fill='%2398f6c5'/%3E%3Ccircle cx='50' cy='48' r='10' fill='%23001126'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
