@@ -5,8 +5,13 @@ interface HeaderProps {
   subtitle?: string;
   showBack?: boolean;
   onBack?: () => void;
+  onOpenMenu: () => void;
   onOpenSources?: () => void;
   onOpenSettings?: () => void;
+  onInstallClick?: () => void;
+  canInstall?: boolean;
+  theme?: 'light' | 'dark' | 'system';
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,49 +19,96 @@ export const Header: React.FC<HeaderProps> = ({
   subtitle = 'Protection Civile & Risques NRBC',
   showBack = false,
   onBack,
+  onOpenMenu,
   onOpenSources,
   onOpenSettings,
+  onInstallClick,
+  canInstall = false,
+  theme = 'light',
+  onToggleTheme,
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e4efff]">
-      <div className="h-20 px-4 flex items-center justify-between gap-2 max-w-4xl mx-auto">
+    <header className="fixed top-0 w-full z-40 bg-[#f8f9ff]/95 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e4efff]">
+      <div className="h-20 px-3 sm:px-4 flex items-center justify-between gap-2 max-w-4xl mx-auto">
         <div className="flex items-center gap-2 min-w-0 flex-1">
+          {/* Bouton Hamburger ou Retour */}
           {showBack && onBack ? (
             <button
               aria-label="Retour"
               onClick={onBack}
-              className="w-11 h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded transition-colors flex-shrink-0"
+              className="w-11 h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0"
               type="button"
             >
               <span className="material-symbols-outlined text-[24px]">arrow_back</span>
             </button>
-          ) : null}
+          ) : (
+            <button
+              aria-label="Ouvrir le menu complet"
+              onClick={onOpenMenu}
+              className="w-11 h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0 border border-[#c4c6ce] shadow-xs"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-[24px]">menu</span>
+            </button>
+          )}
 
-          <img
-            alt="NRBCOR Logo"
-            className="h-8 w-auto object-contain flex-shrink-0"
-            src="https://lh3.googleusercontent.com/aida/AEtjO1Xo7U3HPKKmxnuJ96QQVw3LocJQOQGQAc9MYQczqZ25Oo8mlGMbO-OR53n0hMxJA8fqrdD1ozfwJRvQ1dZm7c_wp0ujLf0mOArc2MLxvGFwt1jMirwa4uK6cs3YdWVkCOHTLVqg7aEPB0Mlvj3zfB22on0L1IQ2rtALIWf45wj1i-7XcC0u15i6-1-CkXDcsbZETv5XuC1UuJSHTrZWcN0tipJvD2rKul1mT9UyHlimt59WpYnGhaYUgw"
-          />
+          {/* Logo vectoriel SVG */}
+          <div className="flex items-center gap-2 min-w-0">
+            <img
+              alt="NRBCOR Logo"
+              className="h-8 w-auto object-contain shrink-0"
+              src="/logo.svg"
+            />
 
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-['Space_Grotesk'] text-[14px] text-[#001126] tracking-wide uppercase font-bold truncate">
-                NRBCOR
-              </span>
-              <span className="font-['Space_Grotesk'] text-[11px] px-1.5 py-0.5 rounded bg-[#98f6c5] text-[#005236] uppercase font-semibold">
-                ACTIF
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#3f9d73] truncate">
-              <span>● Guides 100% Hors ligne</span>
-              <span className="text-[#c4c6ce]">•</span>
-              <span className="text-[#001126] font-medium truncate">{currentTitle}</span>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-['Space_Grotesk'] text-[14px] text-[#001126] tracking-wide uppercase font-bold truncate">
+                  NRBCOR
+                </span>
+                <span className="font-['Space_Grotesk'] text-[10px] px-1.5 py-0.5 rounded bg-[#98f6c5] text-[#005236] uppercase font-bold">
+                  ACTIF
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#3f9d73] truncate">
+                <span>● 100% Hors-Ligne</span>
+                <span className="text-[#c4c6ce]">•</span>
+                <span className="text-[#001126] font-medium truncate">{currentTitle}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        {/* Actions Droite */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Bouton Installer PWA (Accessible et toujours pratique pour novices) */}
+          {onInstallClick && (
+            <button
+              onClick={onInstallClick}
+              title="Installer l'application sur votre écran mobile ou ordinateur"
+              className="h-9 px-2.5 rounded-lg bg-[#001258] hover:bg-[#0024a8] text-white flex items-center gap-1.5 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shadow-xs"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-[16px]">install_mobile</span>
+              <span className="hidden sm:inline">Installer</span>
+            </button>
+          )}
+
+          {/* Bouton Thème Clair / Sombre */}
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              title={theme === 'dark' ? 'Basculer en Thème Clair' : 'Basculer en Thème Sombre'}
+              className="w-9 h-9 rounded-full bg-white hover:bg-[#e4efff] text-[#001126] flex items-center justify-center transition-colors shadow-xs border border-[#c4c6ce]"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+          )}
+
+          {/* Bouton Sources */}
           <button
             onClick={onOpenSources}
             title="Sources & Traçabilité (v2.4)"
@@ -65,10 +117,12 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span className="material-symbols-outlined text-[18px]">policy</span>
           </button>
+
+          {/* Bouton Paramètres Système */}
           {onOpenSettings && (
             <button
               onClick={onOpenSettings}
-              title="Paramètres, Accessibilité & Données"
+              title="Paramètres Système & Mises à jour"
               className="w-9 h-9 rounded-full bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] flex items-center justify-center transition-colors shadow-sm"
               type="button"
             >

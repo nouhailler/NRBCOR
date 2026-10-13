@@ -15,6 +15,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   onToggleItem,
   onResetItems,
   onAddItem,
+  onOpenInventory,
 }) => {
   const [peopleCount, setPeopleCount] = useState<number>(3);
   const [durationDays, setDurationDays] = useState<number>(3);

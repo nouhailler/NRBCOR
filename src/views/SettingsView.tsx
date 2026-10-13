@@ -8,6 +8,8 @@ interface SettingsViewProps {
   onTriggerOnboarding: () => void;
   textScale: 'normal' | 'large' | 'extraLarge';
   onChangeTextScale: (scale: 'normal' | 'large' | 'extraLarge') => void;
+  theme?: 'light' | 'dark' | 'system';
+  onChangeTheme?: (theme: 'light' | 'dark' | 'system') => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -15,7 +17,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onOpenWipeModal,
   onTriggerOnboarding,
   textScale,
-  onChangeTextScale
+  onChangeTextScale,
+  theme = 'light',
+  onChangeTheme,
 }) => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [importStatus, setImportStatus] = useState<{ message: string; isError: boolean } | null>(null);
@@ -223,6 +227,57 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           ))}
         </div>
       </section>
+
+      {/* Section 2b : Thème Clair / Sombre / Système */}
+      {onChangeTheme && (
+        <section className="bg-white p-4 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col gap-3">
+          <h2 className="text-[16px] font-bold text-[#001126] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0036ce]">palette</span>
+            <span>Thème Visuel (Mode Clair / Sombre)</span>
+          </h2>
+          <p className="text-[12px] text-[#44474d]">
+            Basculez entre le Thème Clair (recommandé de jour et sous le soleil) et le Thème Sombre (confinement et faible luminosité) :
+          </p>
+          <div className="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              onClick={() => onChangeTheme('light')}
+              className={`min-h-[44px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+                theme === 'light'
+                  ? 'bg-[#001126] text-white shadow-sm'
+                  : 'bg-[#f0f4f9] text-[#001126]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">light_mode</span>
+              <span>Clair</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeTheme('dark')}
+              className={`min-h-[44px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+                theme === 'dark'
+                  ? 'bg-[#001126] text-white shadow-sm'
+                  : 'bg-[#f0f4f9] text-[#001126]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">dark_mode</span>
+              <span>Sombre</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeTheme('system')}
+              className={`min-h-[44px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+                theme === 'system'
+                  ? 'bg-[#001126] text-white shadow-sm'
+                  : 'bg-[#f0f4f9] text-[#001126]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">settings_brightness</span>
+              <span>Auto</span>
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Section 3 : Sauvegarde & Import / Export Local (SEC-02) */}
       <section className="bg-white p-4 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col gap-3">

@@ -11,7 +11,8 @@ export type SubScreen =
   | { type: 'confinement-guide' }
   | { type: 'siren-guide' }
   | { type: 'inventory' }
-  | { type: 'settings' };
+  | { type: 'settings' }
+  | { type: 'system-settings' };
 
 export interface EmergencyCall {
   number: string;

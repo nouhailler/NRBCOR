@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SubScreen, EmergencyCall } from '../types';
+import { Tooltip } from '../components/Tooltip';
 
 interface ReagirViewProps {
   onOpenSubScreen: (screen: SubScreen) => void;
@@ -294,9 +295,15 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
                 <span className="font-['Space_Grotesk'] text-[11px] text-[#ba1a1a] uppercase font-bold tracking-wider">
                   Action Physique Urgente
                 </span>
-                <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
-                  Je suis face à un danger immédiat
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
+                    Je suis face à un danger immédiat
+                  </h3>
+                  <Tooltip
+                    title="Pourquoi se confiner ?"
+                    content="Un bâtiment en dur calfeutré réduit de plus de 90% l'inhalation d'aérosols toxiques ou de particules radioactives par rapport à l'extérieur."
+                  />
+                </div>
               </div>
             </div>
             <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#ffdad6] text-[#93000a] font-bold flex-shrink-0">
@@ -362,9 +369,15 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
                 <span className="font-['Space_Grotesk'] text-[11px] text-[#0036ce] uppercase font-bold tracking-wider">
                   Ordre Préfectoral
                 </span>
-                <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
-                  Une alerte officielle a été reçue
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
+                    Une alerte officielle a été reçue
+                  </h3>
+                  <Tooltip
+                    title="Laissez les lignes libres"
+                    content="Ne saturez pas les réseaux mobiles. Les secours (15, 18, 112) ont besoin de la bande passante. Informez-vous par la radio publique."
+                  />
+                </div>
               </div>
             </div>
             <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#dee1ff] text-[#001258] font-bold flex-shrink-0">
@@ -434,9 +447,15 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
                 <span className="font-['Space_Grotesk'] text-[11px] text-[#3f9d73] uppercase font-bold tracking-wider">
                   Décontamination
                 </span>
-                <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
-                  Je suspecte une contamination
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-[16px] text-[#001126] font-bold leading-tight truncate">
+                    Je suspecte une contamination
+                  </h3>
+                  <Tooltip
+                    title="80% à 90% d'efficacité"
+                    content="Retirer avec précaution les couches externes de vêtements élimine la quasi-totalité des contaminants déposés en surface."
+                  />
+                </div>
               </div>
             </div>
             <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold flex-shrink-0">

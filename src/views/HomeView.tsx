@@ -1,16 +1,21 @@
 import React from 'react';
 import { TabType, SubScreen } from '../types';
+import { Tooltip } from '../components/Tooltip';
 
 interface HomeViewProps {
   onNavigateTab: (tab: TabType) => void;
   onOpenSubScreen: (screen: SubScreen) => void;
   kitCompletionPercent?: number;
+  canInstall?: boolean;
+  onInstallClick?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
   onNavigateTab,
   onOpenSubScreen,
   kitCompletionPercent = 68,
+  canInstall = false,
+  onInstallClick,
 }) => {
   return (
     <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
@@ -26,12 +31,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </span>
           </div>
           <div className="flex flex-col min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#002c1b] bg-[#98f6c5]/60 px-2 py-0.5 rounded">
-                Mode local actif
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-1.5">
+                <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#002c1b] bg-[#98f6c5]/60 px-2 py-0.5 rounded">
+                  Mode local actif
+                </span>
+                <Tooltip
+                  title="Architecture 100% Locale"
+                  content="Les 4 fiches NRBC, le plan familial, la checklist et les guides de déshabillage sont enregistrés directement dans votre appareil. Aucun compte ni connexion nécessaires."
+                />
+              </div>
               <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
-                Version V1.0 (Oct. 2026)
+                PWA v1.2.0 (Oct. 2026)
               </span>
             </div>
             <p className="text-[13px] text-[#0f1c2b] leading-snug">
@@ -40,6 +51,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
       </section>
+
+      {/* Raccourci Installation PWA sur l'écran d'accueil pour utilisateurs novices */}
+      {onInstallClick && (
+        <section className="w-full bg-[#dee1ff] text-[#001258] rounded-xl p-3.5 shadow-sm border border-[#b9c3ff] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-[#001258] text-white flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[20px]">install_mobile</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wide truncate">
+                Installer l'application
+              </span>
+              <span className="text-[11px] text-[#44474d] truncate">
+                Ajoutez NRBCOR sur votre écran mobile ou bureau
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={onInstallClick}
+            type="button"
+            className="h-10 px-3.5 rounded-lg bg-[#001258] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0 transition-colors shadow-xs"
+          >
+            Installer
+          </button>
+        </section>
+      )}
 
       {/* 2. Bloc prioritaire d'urgence 'RÉAGIR MAINTENANT' */}
       <section className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-md relative overflow-hidden border border-[#ffb4ab]">
