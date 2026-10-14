@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KitItem } from '../types';
 import { KIT_CATEGORIES } from '../data/kitData';
+import { Tooltip } from '../components/Tooltip';
 
 interface PreparationViewProps {
   items: KitItem[];
@@ -180,9 +181,15 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <span className="font-['Space_Grotesk'] text-[11px] uppercase font-semibold text-[#44474d]">
-                  Eau Vitale Recommandée
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-['Space_Grotesk'] text-[11px] uppercase font-semibold text-[#44474d]">
+                    Eau Vitale Recommandée
+                  </span>
+                  <Tooltip
+                    title="Norme Sécurité Civile (3L/jour/personne)"
+                    content="Prévoir au minimum 2 litres pour l'hydratation quotidienne vitale et 1 litre pour l'hygiène minimale ou la réhydratation alimentaire. Stocker en bouteilles scellées fermées à l'abri de la lumière."
+                  />
+                </div>
                 <span className="font-['Space_Grotesk'] text-[15px] text-[#001126] font-bold">
                   {totalWaterLitres} Litres
                 </span>
@@ -199,9 +206,15 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <span className="font-['Space_Grotesk'] text-[11px] uppercase font-semibold text-[#44474d]">
-                  Alimentation De Survie
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-['Space_Grotesk'] text-[11px] uppercase font-semibold text-[#44474d]">
+                    Alimentation De Survie
+                  </span>
+                  <Tooltip
+                    title="Aliments sans cuisson"
+                    content="Privilégier les conserves à ouverture facile (sans ouvre-boîte), barres énergétiques, fruits secs et repas prêts à consommer froids sans gaz ni électricité."
+                  />
+                </div>
                 <span className="font-['Space_Grotesk'] text-[15px] text-[#001126] font-bold">
                   {totalRations} Rations
                 </span>

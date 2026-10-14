@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Tooltip } from '../components/Tooltip';
 
 interface FicheIodeViewProps {
   onBack: () => void;
@@ -136,9 +137,15 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
             <span className="font-['Space_Grotesk'] text-[11px] uppercase tracking-wider font-bold text-[#ba1a1a]">
               Avertissement Sanitaire & Légal Majeur
             </span>
-            <h2 className="text-[16px] font-bold text-[#93000a] leading-tight">
-              NE PRENEZ JAMAIS D'IODE SANS ORDRE DU PRÉFET
-            </h2>
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-[16px] font-bold text-[#93000a] leading-tight">
+                NE PRENEZ JAMAIS D'IODE SANS ORDRE DU PRÉFET
+              </h2>
+              <Tooltip
+                title="Consigne ASN & Ministère de la Santé"
+                content="L'ingestion d'iode stable n'a d'utilité que pendant une fenêtre de 2 à 8 heures avant ou immédiatement après le passage du panache radioactif. Une prise trop précoce est éliminée par les urines sans protéger la thyroïde."
+              />
+            </div>
           </div>
         </div>
 

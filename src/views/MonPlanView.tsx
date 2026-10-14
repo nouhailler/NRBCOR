@@ -8,6 +8,7 @@ import {
   PlanTask,
 } from '../data/familyPlanData';
 import { EmergencyCall, FamilyMember, ContactPerson } from '../types';
+import { Tooltip } from '../components/Tooltip';
 
 interface MonPlanViewProps {
   onOpenCallModal: (call: EmergencyCall) => void;
@@ -414,9 +415,15 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
               >
                 hub
               </span>
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#98f6c5] tracking-wide">
-                Contact Relais Hors Zone Prioritaire
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#98f6c5] tracking-wide">
+                  Contact Relais Hors Zone Prioritaire
+                </span>
+                <Tooltip
+                  title="Pourquoi un contact à +50 km ?"
+                  content="Lors d'un incident majeur (nucléaire, SEVESO, tempête), les antennes cellulaires locales sont saturées ou coupées. Un proche vivant loin peut recevoir vos SMS et servir de standard central pour informer tous les membres du foyer."
+                />
+              </div>
             </div>
             <span className="font-['Space_Grotesk'] text-[10px] bg-white/20 px-2 py-0.5 rounded text-white font-medium">
               {outZoneContact.dist}

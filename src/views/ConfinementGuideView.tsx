@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Tooltip } from '../components/Tooltip';
 
 interface ConfinementGuideViewProps {
   onBack: () => void;
@@ -213,10 +214,16 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
       {/* Simulateur Volume & Autonomie d'Air de la Pièce */}
       <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-[15px] font-bold text-[#001126] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce]">air</span>
-            <span>Simulateur d'Air & Volume de Confinement</span>
-          </h2>
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-[15px] font-bold text-[#001126] flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#0036ce]">air</span>
+              <span>Simulateur d'Air & Volume de Confinement</span>
+            </h2>
+            <Tooltip
+              title="Autonomie respiratoire d'une pièce close"
+              content="En pièce close calfeutrée, le volume d'oxygène diminue et le taux de CO2 s'élève. Ce calculateur applique la formule de sécurité (volume / consommation moyenne au repos) pour estimer la fenêtre sécuritaire avant aération contrôlée."
+            />
+          </div>
           <span className="font-['Space_Grotesk'] text-[11px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
             Estimatif
           </span>
