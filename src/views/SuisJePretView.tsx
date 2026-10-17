@@ -501,15 +501,19 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                     </div>
                   </div>
                   <span
-                    className={`font-['Space_Grotesk'] text-[12px] font-bold px-2 py-0.5 rounded ${
+                    className={`font-['Space_Grotesk'] text-[11px] font-bold px-2 py-0.5 rounded ${
                       autonomy.water.status === 'optimal'
                         ? 'bg-[#98f6c5] text-[#005236]'
                         : autonomy.water.status === 'warning'
                         ? 'bg-[#fff0c2] text-[#855300]'
+                        : autonomy.water.status === 'insufficient_data'
+                        ? 'bg-[#dee1ff] text-[#001258]'
                         : 'bg-[#ffdad6] text-[#ba1a1a]'
                     }`}
                   >
-                    {autonomy.water.autonomyHours} Heures
+                    {autonomy.water.status === 'insufficient_data'
+                      ? 'Données insuffisantes'
+                      : `${autonomy.water.autonomyHours} Heures`}
                   </span>
                 </div>
 
@@ -521,16 +525,26 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                         ? 'bg-[#005236]'
                         : autonomy.water.status === 'warning'
                         ? 'bg-[#855300]'
+                        : autonomy.water.status === 'insufficient_data'
+                        ? 'bg-[#0036ce]'
                         : 'bg-[#ba1a1a]'
                     }`}
                     style={{
-                      width: `${Math.min(100, (autonomy.water.currentValue / Math.max(1, autonomy.water.targetValue)) * 100)}%`
+                      width: autonomy.water.hasInsufficientData
+                        ? '25%'
+                        : `${Math.min(100, (autonomy.water.currentValue / Math.max(1, autonomy.water.targetValue)) * 100)}%`
                     }}
                   />
                 </div>
 
+                {autonomy.water.hypothesis && (
+                  <p className="text-[10px] text-[#555962] bg-[#f8f9ff] p-1.5 rounded border border-[#d6e4f8] leading-tight">
+                    📋 {autonomy.water.hypothesis}
+                  </p>
+                )}
+
                 <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#eef4ff]">
-                  <span className="text-[#44474d] truncate">{autonomy.water.details}</span>
+                  <span className="text-[#44474d] text-[11px] leading-snug">{autonomy.water.details}</span>
                   <button
                     type="button"
                     onClick={handleAddWaterPack}
@@ -559,20 +573,24 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                         />
                       </div>
                       <span className="text-[11px] text-[#44474d]">
-                        {autonomy.food.currentValue} rations / {autonomy.food.targetValue} requises
+                        {autonomy.food.hasInsufficientData ? 'Quantité non mesurée' : `${autonomy.food.currentValue} rations`} / {autonomy.food.targetValue} requises
                       </span>
                     </div>
                   </div>
                   <span
-                    className={`font-['Space_Grotesk'] text-[12px] font-bold px-2 py-0.5 rounded ${
+                    className={`font-['Space_Grotesk'] text-[11px] font-bold px-2 py-0.5 rounded ${
                       autonomy.food.status === 'optimal'
                         ? 'bg-[#98f6c5] text-[#005236]'
                         : autonomy.food.status === 'warning'
                         ? 'bg-[#fff0c2] text-[#855300]'
+                        : autonomy.food.status === 'insufficient_data'
+                        ? 'bg-[#dee1ff] text-[#001258]'
                         : 'bg-[#ffdad6] text-[#ba1a1a]'
                     }`}
                   >
-                    {autonomy.food.autonomyHours} Heures
+                    {autonomy.food.status === 'insufficient_data'
+                      ? 'Données insuffisantes'
+                      : `${autonomy.food.autonomyHours} Heures`}
                   </span>
                 </div>
 
@@ -583,16 +601,26 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                         ? 'bg-[#005236]'
                         : autonomy.food.status === 'warning'
                         ? 'bg-[#855300]'
+                        : autonomy.food.status === 'insufficient_data'
+                        ? 'bg-[#0036ce]'
                         : 'bg-[#ba1a1a]'
                     }`}
                     style={{
-                      width: `${Math.min(100, (autonomy.food.currentValue / Math.max(1, autonomy.food.targetValue)) * 100)}%`
+                      width: autonomy.food.hasInsufficientData
+                        ? '25%'
+                        : `${Math.min(100, (autonomy.food.currentValue / Math.max(1, autonomy.food.targetValue)) * 100)}%`
                     }}
                   />
                 </div>
 
+                {autonomy.food.hypothesis && (
+                  <p className="text-[10px] text-[#555962] bg-[#f8f9ff] p-1.5 rounded border border-[#d6e4f8] leading-tight">
+                    📋 {autonomy.food.hypothesis}
+                  </p>
+                )}
+
                 <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#eef4ff]">
-                  <span className="text-[#44474d] truncate">{autonomy.food.details}</span>
+                  <span className="text-[#44474d] text-[11px] leading-snug">{autonomy.food.details}</span>
                   <button
                     type="button"
                     onClick={() => onOpenInventory?.()}

@@ -14,15 +14,15 @@ export interface SystemUpdateStatus {
 }
 
 const STORAGE_KEY_LAST_CHECK = 'nrbcor_last_update_check';
-const DEFAULT_APP_VERSION = 'v1.2.0 PWA';
-const RELEASE_DATE = '14 Octobre 2026';
+const INITIAL_APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__} PWA` : 'v1.2.0 PWA';
+const INITIAL_RELEASE_DATE = typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : '17 Octobre 2026';
 
 class UpdateService {
   private lastCheckedDate: string = '';
   private updateListeners: ((status: SystemUpdateStatus) => void)[] = [];
   private currentStatus: SystemUpdateStatus = {
-    appVersion: DEFAULT_APP_VERSION,
-    releaseDate: RELEASE_DATE,
+    appVersion: INITIAL_APP_VERSION,
+    releaseDate: INITIAL_RELEASE_DATE,
     lastCheckedDate: '',
     isChecking: false,
     hasUpdate: false,
@@ -36,11 +36,31 @@ class UpdateService {
   }
 
   /**
-   * Résout dynamiquement la version depuis le manifest PWA ou l'environnement
+   * Résout dynamiquement la version et date de livraison depuis version.json ou le manifest PWA
    */
   private async resolveDeployedVersion() {
     try {
       if (typeof window !== 'undefined') {
+        // 1. Tenter de lire version.json généré au déploiement
+        try {
+          const vRes = await fetch('/version.json', { cache: 'no-store' });
+          if (vRes.ok) {
+            const vData = await vRes.json();
+            let changed = false;
+            if (vData.version) {
+              this.currentStatus.appVersion = `v${vData.version} PWA`;
+              changed = true;
+            }
+            if (vData.buildDate) {
+              this.currentStatus.releaseDate = vData.buildDate;
+              changed = true;
+            }
+            if (changed) this.notify();
+            return;
+          }
+        } catch (e) {}
+
+        // 2. Repli sur le manifest PWA
         const res = await fetch('/manifest.webmanifest', { cache: 'no-store' });
         if (res.ok) {
           const manifest = await res.json();
@@ -250,8 +270,11 @@ class UpdateService {
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          this.currentStatus.hasUpdate = true;
-          this.currentStatus.statusMessage = 'Nouvelle version activée avec succès.';
+          // La nouvelle version est maintenant active et contrôle la page
+          this.currentStatus.hasUpdate = false;
+          this.currentStatus.isChecking = false;
+          this.currentStatus.statusMessage = 'Nouvelle version activée et prête à l’emploi.';
+          this.resolveDeployedVersion();
           this.notify();
         });
       }

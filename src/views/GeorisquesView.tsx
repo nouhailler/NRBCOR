@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { SubScreen, EmergencyCall } from '../types';
 import { CURRENT_COMMUNE, AVAILABLE_COMMUNES, GEORISQUES_ITEMS, CommuneInfo, findClosestCommune } from '../data/georisquesData';
-import { searchCommunesOnline, reverseGeocodeOnline, fetchGeorisquesOnline, GeorisquesReport, CommuneSearchResult } from '../services/external/georisquesClient';
+import {
+  searchCommunesOnline,
+  reverseGeocodeOnline,
+  fetchGeorisquesOnline,
+  getPedagogicalSampleRisks,
+  GeorisquesReport,
+  CommuneSearchResult
+} from '../services/external/georisquesClient';
+import { fetchMairieContact, MairieContact } from '../services/external/mairieDirectoryService';
 
 interface GeorisquesViewProps {
   onBack: () => void;
@@ -20,6 +28,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   const [searchResults, setSearchResults] = useState<CommuneSearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   
+  // Real Mairie Directory Contact State
+  const [mairieContact, setMairieContact] = useState<MairieContact | null>(null);
+  const [mairieLoading, setMairieLoading] = useState<boolean>(false);
+
   // Real GPS Geolocation State
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsStatusMessage, setGpsStatusMessage] = useState<{ type: 'success' | 'warning' | 'error'; text: string } | null>(null);
@@ -49,6 +61,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    let isMounted = true;
+    let foundCache = false;
+
     // Initial check in local storage cache
     try {
       const cacheKey = `georisques_cache_${activeCommune.insee}`;
@@ -56,6 +71,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       if (saved) {
         const parsed: GeorisquesReport = JSON.parse(saved);
         setLiveReport(parsed);
+        foundCache = true;
         if (parsed.retrievedAt) {
           const d = new Date(parsed.retrievedAt);
           setLastUpdated(`${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
@@ -63,11 +79,46 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       }
     } catch (e) {}
 
+    // Si aucun cache pour cette commune, ne JAMAIS conserver les données de la commune précédente !
+    if (!foundCache) {
+      setLiveReport(null);
+      setLastUpdated('');
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        setRefreshing(true);
+        fetchGeorisquesOnline(activeCommune.insee, activeCommune.name)
+          .then((report) => {
+            if (isMounted) {
+              setLiveReport(report);
+              setRefreshing(false);
+              const d = new Date(report.retrievedAt);
+              setLastUpdated(`${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
+            }
+          })
+          .catch(() => {
+            if (isMounted) setRefreshing(false);
+          });
+      }
+    }
+
+    // Récupération authentifiée du contact officiel de la Mairie
+    setMairieLoading(true);
+    fetchMairieContact(activeCommune.insee, activeCommune.name)
+      .then((contact) => {
+        if (isMounted) {
+          setMairieContact(contact);
+          setMairieLoading(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setMairieLoading(false);
+      });
+
     return () => {
+      isMounted = false;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [activeCommune.insee]);
+  }, [activeCommune.insee, activeCommune.name]);
 
   // RECHERCHE EN LIGNE RÉELLE
   const handleSearchChange = async (val: string) => {
@@ -87,21 +138,42 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   };
 
   const handleSelectSearchedCommune = (c: CommuneSearchResult) => {
+    // Coordonnées réelles issues de l'API officielle geo.api.gouv.fr (centre.coordinates = [lng, lat])
+    let realLat = c.centre?.coordinates?.[1];
+    let realLng = c.centre?.coordinates?.[0];
+
+    if (typeof realLat !== 'number' || typeof realLng !== 'number') {
+      const preset = AVAILABLE_COMMUNES.find((ac) => ac.insee === c.code);
+      if (preset) {
+        realLat = preset.lat;
+        realLng = preset.lng;
+      } else {
+        // Coordonnées du centre géographique métropolitain pour éviter toute fausse attribution à la région lyonnaise
+        realLat = 46.6033;
+        realLng = 1.8883;
+      }
+    }
+
+    // Réinitialisation immédiate des états pour isoler la nouvelle commune
+    setLiveReport(null);
+    setLastUpdated('');
+    setRefreshMessage(null);
+
     setActiveCommune({
       name: c.nom,
       postalCode: c.codesPostaux?.[0] || '00000',
       insee: c.code,
-      lat: 45.76, // Coordonnées par défaut
-      lng: 4.83,
+      lat: realLat,
+      lng: realLng,
       departement: c.codeDepartement,
-      description: `Commune officielle (INSEE ${c.code}, Dép. ${c.codeDepartement}).`
+      description: `Commune officielle (INSEE ${c.code}, Dép. ${c.codeDepartement}) - Coordonnées réelles : ${realLat.toFixed(4)}, ${realLng.toFixed(4)}.`
     });
     setIsEditingCommune(false);
     setSearchQuery('');
     setSearchResults([]);
     setGpsStatusMessage({
       type: 'success',
-      text: `Commune sélectionnée : ${c.nom} (${c.codesPostaux?.[0] || c.code})`
+      text: `Commune sélectionnée : ${c.nom} (${c.codesPostaux?.[0] || c.code}) - Coordonnées réelles : ${realLat.toFixed(4)}, ${realLng.toFixed(4)}.`
     });
   };
 
@@ -225,8 +297,33 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
   // 3. EXPORT RÉEL D'UN INSTANTANÉ (OPÉRATIONNEL TÉLÉCHARGEABLE)
   const handleRealExportSnapshot = () => {
-    const displayedRisks = liveReport?.risks || GEORISQUES_ITEMS;
-    
+    const isAuthenticLive = liveReport?.dataSourceType === 'live_api';
+    const isAuthenticCache = liveReport?.dataSourceType === 'cached_official';
+    const isPedagogical = liveReport?.dataSourceType === 'pedagogical_sample';
+    const isLyonPreset = activeCommune.insee === '69383';
+
+    let exportRisks: any[] = [];
+    let exportStatus = 'NON_SYNCHRONISE';
+    let exportSource = 'Aucune donnée officielle authentifiée en cache';
+
+    if (liveReport && (isAuthenticLive || isAuthenticCache)) {
+      exportRisks = liveReport.risks;
+      exportStatus = isAuthenticLive ? 'OFFICIEL_DIRECT_API_GEORISQUES' : 'OFFICIEL_CACHE_LOCAL_GEORISQUES';
+      exportSource = liveReport.source;
+    } else if (isPedagogical) {
+      exportRisks = liveReport?.risks || [];
+      exportStatus = 'ECHANTILLON_PEDAGOGIQUE_DIDACTIQUE';
+      exportSource = 'Échantillon didactique d’entraînement (non représentatif des arrêtés de la commune)';
+    } else if (isLyonPreset) {
+      exportRisks = GEORISQUES_ITEMS;
+      exportStatus = 'ECHANTILLON_REFERENCE_LYON';
+      exportSource = 'Base de référence pré-embarquée pour Lyon 3e / Rhône';
+    } else {
+      exportRisks = [];
+      exportStatus = 'NON_SYNCHRONISE';
+      exportSource = `Aucun arrêté préfectoral synchronisé en cache pour ${activeCommune.name} (${activeCommune.insee}).`;
+    }
+
     const snapshotPayload = {
       application: 'NRBCOR Protection Civile',
       version: '1.2.0 PWA',
@@ -235,21 +332,31 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       dateExportFormatee: new Date().toLocaleString('fr-FR'),
       commune: activeCommune,
       connectiviteLorsDeExport: navigator.onLine ? 'EN_LIGNE' : 'HORS_LIGNE',
-      sourceDonnees: liveReport?.source || 'Base locale intégrée NRBCOR (Cache certifié hors-ligne)',
-      statutSecurite: 'DOCUMENT_SCELLÉ_POUR_URGENCE_HORS_LIGNE',
-      risquesTerritoriaux: displayedRisks,
+      sourceDonnees: exportSource,
+      statutAuthenticite: exportStatus,
+      estDonneesAuthentifiees: isAuthenticLive || isAuthenticCache,
+      avertissementAuthenticite:
+        exportRisks.length === 0
+          ? `ATTENTION : Ce dossier territorial n'a pas encore été synchronisé en ligne avec l'API Géorisques pour ${activeCommune.name}. Aucun risque préfectoral fictif n'a été inséré pour prévenir toute fausse information.`
+          : isPedagogical
+          ? `AVERTISSEMENT PÉDAGOGIQUE : Les risques inclus dans cet export constituent un échantillon didactique d'entraînement et ne correspondent pas aux arrêtés préfectoraux réels de la commune de ${activeCommune.name}.`
+          : 'Ce document contient la synthèse officielle des aléas issus des bases publiques d’État Géorisques (BRGM / Ministère de la Transition Écologique). Il ne remplace pas les arrêtés préfectoraux ou municipaux de crise, ni les directives diffusées en direct par FR-Alert.',
+      risquesTerritoriaux: exportRisks,
       documentsDeSauvegarde: [
         {
           id: 'dicrim',
-          nom: `DICRIM de la commune de ${activeCommune.name}`,
-          description: 'Document d’Information Communal sur les Risques Majeurs',
-          statut: 'Embarqué dans l’application'
+          nom: `DICRIM - Document d'Information Communal sur les Risques Majeurs (${activeCommune.name})`,
+          nature: 'Synthèse réglementaire des risques recensés (Code de l’Environnement Art. R125-9 à R125-14)',
+          portailOfficielGouv: `https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`,
+          statutAuthenticite: 'Consulter l’exemplaire complet paraphé par le Maire sur le site de la commune ou en Mairie.'
         },
         {
           id: 'pcs',
-          nom: 'PCS - Plan Communal de Sauvegarde',
-          description: 'Protocoles d’évacuation et hébergement d’urgence',
-          statut: 'Embarqué dans l’application'
+          nom: `PCS - Plan Communal de Sauvegarde (${activeCommune.name})`,
+          nature: 'Cadre municipal d’organisation des secours sous l’autorité du Maire (Code de la Sécurité Intérieure Art. L731-3)',
+          autoriteMunicipale: mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`,
+          siteInternetMairie: mairieContact?.siteInternet || null,
+          statutAuthenticite: 'Consulter la cellule de crise municipale pour les plans de réquisition d’urgence.'
         }
       ],
       lignesUrgenceSecuriteCivile: {
@@ -257,17 +364,60 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         pompiers: '18',
         policeSecours: '17',
         urgenceEuropeenne: '112',
-        posteCommandementCommunal: '04 72 10 30 30'
+        posteCommandementCommunal: mairieContact?.telephone || 'Non synchronisé en local (se référer à votre Mairie ou le 112)',
+        nomMairieOfficielle: mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`,
+        sourceAnnuaire: mairieContact?.sourceUrl || 'Annuaire du Service Public (DILA / Premier ministre)'
       },
-      consignesImmediatesSousStress: [
-        '1. Se confiner immédiatement dans un local en dur clos',
-        '2. Couper VMC, hottes et climatisation sans délai',
-        '3. Calfeutrer portes et fenêtres avec du linge humide ou ruban adhésif toilé',
-        '4. Écouter la radio France Bleu ou France Inter',
-        '5. Ne jamais prendre d’iode sans ordre formel du Préfet',
-        '6. Ne pas aller chercher les enfants à l’école (protégés par le PPMS scolaire)',
-        '7. Ne pas téléphoner (garder les réseaux disponibles pour les secours)'
-      ]
+      consignesOfficiellesParScenario: {
+        cadreJuridique: 'Code de la Sécurité Intérieure (Art. L741-1 à L741-5) & Circulaire DGSCGC relative au confinement d’urgence.',
+        avertissementPriorite: 'Les ordres diffusés en direct par le Préfet de département (via FR-Alert et la radio de service public) prévalent sur toute consigne préétablie.',
+        chimique: {
+          organismeSource: 'Ineris & DGSCGC (Fiches de Données de Sécurité d’Urgence)',
+          scenarios: [
+            {
+              cas: 'Confinement d’urgence ordonné (Panache toxique sans incendie immédiat)',
+              instructions: [
+                'Rejoindre immédiatement un bâtiment en dur clos et calfeutrer tous les ouvrants',
+                'Couper impérativement VMC, hottes et climatisation (arrêt de toute aspiration d’air extérieur)',
+                'Différenciation produit/densité : éviter sous-sols et caves si gaz lourd (chlore, GPL, phosgène) ; éviter combles si gaz léger (ammoniac, cyanure)',
+                'Zéro flamme nue : risque ATEX (atmosphère explosive) et consommation de l’oxygène résiduel',
+                'ZÉRO comprimé d’iode : les comprimés d’iode stable sont strictement inefficaces contre les produits chimiques'
+              ]
+            },
+            {
+              cas: 'Évacuation réflexe / Dégagement immédiat ordonné',
+              instructions: [
+                'Suivre scrupuleusement les axes de dégagement fléchés par les forces de l’ordre',
+                'Se déplacer impérativement perpendiculairement à l’axe du vent pour sortir du panache',
+                'Ne jamais tenter de traverser un nuage toxique ou opaque',
+                'Protéger les voies respiratoires à l’aide d’un linge épais humide'
+              ]
+            }
+          ]
+        },
+        nucleaire: {
+          organismeSource: 'IRSN & SGDSN (Plan National d’Urgence Radiologique)',
+          instructions: [
+            'Confinement immédiat dans un local en dur aux murs épais (le sous-sol offre un écran gamma 10 à 20 fois supérieur à un étage)',
+            'Fermer portes, fenêtres et volets ; calfeutrer les aérations',
+            'Écouter France Bleu / France Inter (radio de service public prioritaire)',
+            'INTERDICTION FORMELLE D’AUTOMÉDICATION : ne jamais prendre de comprimés d’iode de sa propre initiative sans ordre formel et explicite du Préfet de département au moment du passage du panache'
+          ]
+        },
+        biologique: {
+          organismeSource: 'DGSCGC & Santé Publique France',
+          instructions: [
+            'Mise à l’isolement avec point d’eau sanitaire permettant un sas d’hygiène',
+            'Port d’un masque de protection respiratoire FFP2 ou FFP3 ajusté',
+            'Arrêt des flux mécaniques partagés et séparation des flux d’air'
+          ]
+        },
+        reglesCommunesTousScenarios: [
+          'Ne pas aller chercher les enfants à l’école : ils sont protégés et confinés sous protocole PPMS par le personnel scolaire',
+          'Ne pas téléphoner : laisser les réseaux disponibles et désengorgés pour les appels de détresse (15, 18, 112)',
+          'Attendre l’ordre officiel de fin d’alerte (sirène continue 30s ou message préfectoral) pour aérer largement le logement'
+        ]
+      }
     };
 
     const jsonStr = JSON.stringify(snapshotPayload, null, 2);
@@ -862,17 +1012,99 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* Categorized Inventory of Territorial Risks */}
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[18px] text-[#001126] font-bold">
-              Inventaire des Risques Notifiés
-            </h2>
-            <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-              {liveReport?.risksCount || GEORISQUES_ITEMS.length} RISQUES RÉPERTORIÉS
-            </span>
-          </div>
+        {(() => {
+          const isLyonPreset = activeCommune.insee === '69383';
+          const hasOfficialRisks = !!(liveReport && liveReport.risks && liveReport.risks.length > 0 && liveReport.dataSourceType !== 'pedagogical_sample');
+          const isPedagogical = liveReport?.dataSourceType === 'pedagogical_sample';
+          const isUnverifiedEmpty = !hasOfficialRisks && !isPedagogical && !isLyonPreset;
 
-          {(liveReport?.risks || GEORISQUES_ITEMS).map((item: any, idx: number) => {
+          const displayedRisks = hasOfficialRisks
+            ? liveReport!.risks
+            : isPedagogical
+            ? liveReport!.risks
+            : isLyonPreset
+            ? GEORISQUES_ITEMS
+            : [];
+
+          return (
+            <section className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[18px] text-[#001126] font-bold">
+                  Inventaire des Risques Notifiés
+                </h2>
+                <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
+                  {displayedRisks.length} RISQUE{displayedRisks.length > 1 ? 'S' : ''} RÉPERTORIÉ{displayedRisks.length > 1 ? 'S' : ''}
+                </span>
+              </div>
+
+              {/* Badge de statut documentaire officiel / cache / pédagogique / non synchronisé */}
+              {hasOfficialRisks && (
+                <div className="p-2.5 rounded-lg bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] text-[12px] flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
+                    <span>{liveReport?.dataSourceType === 'live_api' ? 'Données officielles en direct (API Géorisques / BRGM)' : 'Données officielles issues du cache local certifié'}</span>
+                  </span>
+                  <span className="text-[10px] text-[#15803d] font-['Space_Grotesk'] uppercase font-bold">Arrêtés vérifiés</span>
+                </div>
+              )}
+
+              {isPedagogical && (
+                <div className="p-3 rounded-lg bg-[#fff0ed] border border-[#ffdad6] text-[#93000a] text-[12px] flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">school</span>
+                  <div>
+                    <strong className="font-bold">Échantillon Pédagogique Actif :</strong> Ces risques sont affichés à des fins didactiques d'entraînement civil. Ils ne représentent pas l'inventaire officiel de la commune de <strong>{activeCommune.name}</strong>.
+                  </div>
+                </div>
+              )}
+
+              {isUnverifiedEmpty && (
+                <div className="bg-white p-5 rounded-xl border-2 border-dashed border-[#c4c6ce] flex flex-col items-center text-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#f1f3f9] text-[#555962] flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[26px]">travel_explore</span>
+                  </div>
+                  <div className="flex flex-col gap-1 max-w-md">
+                    <h3 className="font-['Space_Grotesk'] text-[15px] font-bold text-[#001126]">
+                      Aucun risque officiel synchronisé pour {activeCommune.name}
+                    </h3>
+                    <p className="text-[12px] text-[#44474d] leading-relaxed">
+                      Pour garantir l'intégrité de vos protocoles, NRBCOR n'injecte aucun risque fictif par défaut. Connectez-vous à Internet pour interroger les arrêtés préfectoraux de votre commune via l'API d'État, ou chargez l'échantillon didactique d'entraînement.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleRealRefreshData}
+                      disabled={refreshing}
+                      className="h-10 px-4 rounded-lg bg-[#0036ce] text-white font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 hover:bg-[#002ba8] transition-colors disabled:opacity-60"
+                    >
+                      <span className={`material-symbols-outlined text-[16px] ${refreshing ? 'animate-spin' : ''}`}>sync</span>
+                      <span>Interroger l'API Géorisques</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const pedago = getPedagogicalSampleRisks();
+                        setLiveReport({
+                          communeName: activeCommune.name,
+                          inseeCode: activeCommune.insee,
+                          retrievedAt: new Date().toISOString(),
+                          source: 'Échantillon pédagogique didactique (exercice & formation civile)',
+                          isOfflineCache: true,
+                          dataSourceType: 'pedagogical_sample',
+                          risksCount: pedago.length,
+                          risks: pedago
+                        });
+                      }}
+                      className="h-10 px-3.5 rounded-lg bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors border border-[#c4c6ce]"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">school</span>
+                      <span>Charger l'échantillon pédagogique</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {displayedRisks.map((item: any, idx: number) => {
             const isCustom = !item.distance;
             return (
               <article
@@ -935,19 +1167,24 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     </button>
                   )}
                 </div>
-              </article>
-            );
-          })}
-        </section>
+                </article>
+              );
+            })}
+          </section>
+        );
+      })()}
 
-        {/* Documents Communaux Enregistrés (100% Hors-Ligne) */}
+        {/* Cadre Réglementaire Communal & Synthèse des Risques (DICRIM & PCS) */}
         <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] text-[#001126] font-bold">Documents Communaux Enregistrés</h2>
-            <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold uppercase">
-              100% EMBARQUÉS
+            <h2 className="text-[18px] text-[#001126] font-bold">Cadre Réglementaire & Documents Communaux</h2>
+            <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#eef4ff] text-[#0036ce] font-bold uppercase border border-[#d6e4f8]">
+              SYNTHÈSE GÉORISQUES
             </span>
           </div>
+          <p className="text-[12px] text-[#44474d] -mt-1">
+            Synthèse opérationnelle des aléas majeurs et accès aux démarches officielles de la commune de {activeCommune.name}.
+          </p>
 
           <div className="flex flex-col gap-2.5">
             {/* DICRIM */}
@@ -958,17 +1195,17 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </span>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[14px] font-bold text-[#001126] truncate">
-                    DICRIM ({activeCommune.name})
+                    Synthèse DICRIM ({activeCommune.name})
                   </span>
                   <span className="text-[12px] text-[#44474d] truncate">
-                    Document d'Information Communal sur les Risques Majeurs
+                    Document d'Information Communal sur les Risques Majeurs (Code Env. R125-9)
                   </span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveModalDoc('dicrim')}
-                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce]"
+                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce] cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 Consulter
@@ -983,51 +1220,97 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </span>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[14px] font-bold text-[#001126] truncate">
-                    PCS - Plan Communal de Sauvegarde
+                    Dispositif PCS ({activeCommune.name})
                   </span>
                   <span className="text-[12px] text-[#44474d] truncate">
-                    Protocoles municipaux d'évacuation et hébergement d'urgence
+                    Plan Communal de Sauvegarde & organisation de crise municipale
                   </span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveModalDoc('pcs')}
-                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce]"
+                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce] cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 Consulter
               </button>
             </div>
 
-            {/* PC Communal */}
+            {/* PC Communal & Mairie Dynamique */}
             <div className="bg-[#e4efff] p-3.5 rounded-lg flex flex-col gap-1.5 border border-[#d6e4f8]">
-              <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold">
-                <span className="material-symbols-outlined text-[18px]">emergency_home</span>
-                Poste de Commandement de Crise Municipal
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold">
+                  <span className="material-symbols-outlined text-[18px]">emergency_home</span>
+                  <span>Poste de Commandement & Mairie</span>
+                </div>
+                {mairieContact?.isAuthentifie && (
+                  <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-1.5 py-0.5 rounded font-bold uppercase">
+                    Vérifié DILA
+                  </span>
+                )}
               </div>
-              <span className="text-[13px] text-[#0f1c2b]">
-                Hôtel de Ville / Mairie ({activeCommune.name})
+
+              <span className="text-[13px] font-bold text-[#001126]">
+                {mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`}
               </span>
-              <div className="flex items-center justify-between pt-1">
-                <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-                  Ligne crise non-urgence : 04 72 10 30 30
+
+              {mairieContact?.adressePostale?.ligne && (
+                <span className="text-[11px] text-[#44474d]">
+                  📍 {mairieContact.adressePostale.ligne}, {mairieContact.adressePostale.codePostal} {mairieContact.adressePostale.nomCommune}
                 </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenCallModal({
-                      number: '04 72 10 30 30',
-                      name: `Poste de Commandement Communal (${activeCommune.name})`,
-                      subtitle: 'Ligne crise non-urgence',
-                      desc: `Mairie pour les informations et directives officielles de la commune de ${activeCommune.name}.`,
-                    })
-                  }
-                  className="h-10 px-3 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-[16px]">call</span>
-                  Appeler
-                </button>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-[#d6e4f8]/70 mt-1">
+                {mairieContact?.telephone ? (
+                  <>
+                    <div className="flex flex-col">
+                      <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-semibold">
+                        Standard officiel : <strong>{mairieContact.telephone}</strong>
+                      </span>
+                      {mairieContact.telephoneDescription && (
+                        <span className="text-[10px] text-[#555962]">{mairieContact.telephoneDescription}</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onOpenCallModal({
+                          number: mairieContact.telephone!,
+                          name: mairieContact.nomOfficiel,
+                          subtitle: 'Standard officiel vérifié',
+                          desc: `Poste de commandement / Mairie pour la commune de ${activeCommune.name}. Source : Annuaire de l'Administration (DILA / Premier ministre).`,
+                        })
+                      }
+                      className="h-10 px-3.5 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">call</span>
+                      Appeler la Mairie
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex flex-col text-[11px] text-[#555962]">
+                      <span>Numéro direct non synchronisé pour {activeCommune.name}.</span>
+                      <span className="text-[#ba1a1a] font-semibold">En cas de détresse vitale : composer le 18 ou le 112.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onOpenCallModal({
+                          number: '112',
+                          name: `Ligne d'Urgence Européenne (112)`,
+                          subtitle: 'Secours d’Urgence',
+                          desc: `Numéro d'urgence prioritaire accessible gratuitement sur tout terminal en cas d'accident sur la commune de ${activeCommune.name}.`,
+                        })
+                      }
+                      className="h-10 px-3.5 rounded bg-[#ba1a1a] hover:bg-[#93000a] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">emergency</span>
+                      Appeler 112
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1038,7 +1321,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             onClick={handleExportSnapshot}
             type="button"
-            className="w-full h-12 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors"
+            className="w-full h-12 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             <span>Exporter l'Instantané Territorial (Fichier JSON Réel)</span>
@@ -1047,7 +1330,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             onClick={handleExportPDF}
             type="button"
-            className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce]"
+            className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce] cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
             <span>Imprimer la Fiche de Préparation Communale (PDF / Papier)</span>
@@ -1078,25 +1361,142 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       {activeModalDoc && (
         <div
           role="dialog"
+          aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">
-              {activeModalDoc === 'dicrim' ? `DICRIM - ${activeCommune.name}` : `PCS - ${activeCommune.name}`}
-            </h3>
-            <p className="text-[13px] text-[#0f1c2b] leading-relaxed">
-              {activeModalDoc === 'dicrim'
-                ? `Document d'Information Communal sur les Risques Majeurs recensant les aléas technologiques, inondations, transports de matières dangereuses et plans de prévention (PPRT/PPI) applicables sur la commune de ${activeCommune.name}.`
-                : `Plan Communal de Sauvegarde organisant la cellule de crise municipale, les itinéraires d’évacuation, les centres de regroupement d’urgence et la distribution des secours pour ${activeCommune.name}.`}
-            </p>
-            <div className="bg-[#eef4ff] p-3 rounded-lg border border-[#d6e4f8] text-[12px] text-[#44474d]">
-              Document officiel scellé en cache hors-ligne • Consultation autonome garantie.
-            </div>
-            <div className="flex justify-end pt-2">
+          <div className="bg-white max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-[#e0e2eb]">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0036ce] text-[22px]">
+                  {activeModalDoc === 'dicrim' ? 'menu_book' : 'corporate_fare'}
+                </span>
+                <h3 className="text-[17px] font-bold text-[#001126]">
+                  {activeModalDoc === 'dicrim' ? `Synthèse DICRIM • ${activeCommune.name}` : `Dispositif PCS • ${activeCommune.name}`}
+                </h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setActiveModalDoc(null)}
-                className="h-11 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase"
+                aria-label="Fermer"
+                className="w-8 h-8 rounded-full bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] flex items-center justify-center cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Avertissement d'authenticité documentaire formel */}
+            <div className="p-3 bg-[#fff0ed] rounded-xl border border-[#ffdad6] text-[#93000a] text-[11px] flex items-start gap-2">
+              <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">verified_user</span>
+              <div className="flex flex-col gap-0.5 leading-snug">
+                <span className="font-bold uppercase tracking-wide">
+                  Statut Documentaire & Authenticité
+                </span>
+                <p>
+                  Ce volet présente la <strong>synthèse réglementaire officielle des aléas</strong> issus des bases de l’État Géorisques (BRGM / Ministère de la Transition Écologique). Pour consulter l’exemplaire complet paraphé et arrêté par le Maire, référez-vous au site officiel de la commune ou au recueil des actes administratifs de la mairie.
+                </p>
+              </div>
+            </div>
+
+            {/* Contenu spécifique DICRIM ou PCS */}
+            {activeModalDoc === 'dicrim' ? (
+              <div className="flex flex-col gap-2.5 text-[12px] text-[#0f1c2b]">
+                <p className="leading-relaxed">
+                  Le <strong>DICRIM (Document d'Information Communal sur les Risques Majeurs)</strong> recense les risques naturels et technologiques prévisibles sur la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}).
+                </p>
+
+                <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1.5">
+                  <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase">
+                    Aléas répertoriés pour {activeCommune.name} :
+                  </span>
+                    {(() => {
+                      const isLyon = activeCommune.insee === '69383';
+                      const list = (liveReport && liveReport.risks && liveReport.risks.length > 0)
+                        ? liveReport.risks
+                        : isLyon
+                        ? GEORISQUES_ITEMS
+                        : [];
+                      
+                      if (list.length === 0) {
+                        return (
+                          <div className="col-span-2 p-3 bg-white rounded border border-[#e0e2eb] text-[#555962] text-[11px] text-center">
+                            Aucun aléa majeur officiellement synchronisé en local pour {activeCommune.name}. Consultez le dossier communal officiel ci-dessous.
+                          </div>
+                        );
+                      }
+
+                      return list.map((r: any) => {
+                        const isHigh = ('severity' in r && r.severity === 'high') || r.category?.toLowerCase().includes('seveso') || r.category?.toLowerCase().includes('nucleaire');
+                        const isMed = ('severity' in r && r.severity === 'medium') || r.category?.toLowerCase().includes('tmd') || r.category?.toLowerCase().includes('inondation');
+                        return (
+                          <div key={r.id} className="flex items-center gap-1.5 text-[11px] text-[#001126] bg-white p-2 rounded border border-[#e0e2eb]">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${isHigh ? 'bg-[#ba1a1a]' : isMed ? 'bg-[#0036ce]' : 'bg-[#3f9d73]'}`}></span>
+                            <span className="font-medium truncate">{r.title}</span>
+                          </div>
+                        );
+                      });
+                    })()}
+                </div>
+
+                <div className="bg-[#eef4ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1 text-[11px] text-[#44474d]">
+                  <span className="font-bold text-[#001126]">Moyens d'alerte communaux :</span>
+                  <span>Sirène d'alerte aux populations SAIP (3 séquences d'1 min 41 s), système FR-Alert (diffusion cellulaire sans application), relais sonores municipaux.</span>
+                </div>
+
+                <a
+                  href={`https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-3 rounded-lg bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 hover:bg-[#12263f] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  <span>Ouvrir le dossier Géorisques officiel de {activeCommune.name}</span>
+                </a>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5 text-[12px] text-[#0f1c2b]">
+                <p className="leading-relaxed">
+                  Le <strong>PCS (Plan Communal de Sauvegarde)</strong> organise les moyens d'alerte, de protection et de soutien des populations sous l'autorité du Maire de <strong>{activeCommune.name}</strong> (Art. L731-3 du Code de la Sécurité Intérieure).
+                </p>
+
+                <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1.5">
+                  <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase">
+                    Dispositions d'organisation opérationnelle :
+                  </span>
+                  <ul className="list-disc list-inside space-y-1.5 text-[11px] text-[#44474d]">
+                    <li><strong>Poste de Commandement Communal (PCC) :</strong> activé à l'Hôtel de Ville ou en salle de crise municipale dès réception de l'alerte préfectorale.</li>
+                    <li><strong>Missions municipales :</strong> relayer les consignes préfectorales, interdire les accès aux zones dangereuses, organiser le ravitaillement d'urgence.</li>
+                    <li><strong>Centres d'Accueil et de Regroupement :</strong> gymnases ou bâtiments publics communaux réquisitionnés si une évacuation est ordonnée.</li>
+                  </ul>
+                </div>
+
+                {mairieContact && (
+                  <div className="bg-[#eef4ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1 text-[11px]">
+                    <span className="font-bold text-[#001126]">Coordonnées officielles de la Mairie :</span>
+                    <span className="font-medium text-[#0f1c2b]">{mairieContact.nomOfficiel}</span>
+                    {mairieContact.telephone && (
+                      <span className="text-[#001126]">Standard : <strong>{mairieContact.telephone}</strong></span>
+                    )}
+                    {mairieContact.siteInternet && (
+                      <a
+                        href={mairieContact.siteInternet}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#0036ce] underline flex items-center gap-1 mt-0.5"
+                      >
+                        Site officiel de la mairie ({mairieContact.siteInternet})
+                        <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2 border-t border-[#e0e2eb]">
+              <button
+                type="button"
+                onClick={() => setActiveModalDoc(null)}
+                className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase cursor-pointer"
               >
                 Fermer
               </button>

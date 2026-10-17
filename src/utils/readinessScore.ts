@@ -10,8 +10,11 @@ export interface AutonomyMetric {
   targetUnit: string;
   autonomyHours: number;
   autonomyDays: number;
-  status: 'optimal' | 'warning' | 'critical';
+  status: 'optimal' | 'warning' | 'critical' | 'insufficient_data';
+  isEstimatedFromCheckboxOnly?: boolean;
+  hasInsufficientData?: boolean;
   details: string;
+  hypothesis?: string;
   recommendation?: string;
 }
 
@@ -48,25 +51,30 @@ export interface RecommendedAction {
   urgency: 'high' | 'medium' | 'low';
 }
 
+export interface HouseholdSummaryInfo {
+  totalPersons: number;
+  adults: number;
+  children: number;
+  infants: number;
+  elderly: number;
+  pets: number;
+  targetDays: number;
+  hasPmr: boolean;
+  hasChronicCondition: boolean;
+}
+
 export interface ReadinessDashboardData {
   scoreResult: ReadinessScoreResult;
   autonomy: HouseholdAutonomySummary;
   missingItems: MissingKitItemEntry[];
   expiries: ExpiryAuditEntry;
   recommendedActions: RecommendedAction[];
-  householdSummary: {
-    totalPersons: number;
-    adults: number;
-    children: number;
-    infants: number;
-    elderly: number;
-    pets: number;
-    targetDays: number;
-  };
+  householdSummary: HouseholdSummaryInfo;
 }
 
 /**
- * Calcule l'autonomie en eau potable à partir de l'inventaire et des paramètres du foyer
+ * Calcule l'autonomie en eau potable à partir de l'inventaire mesuré et des paramètres du foyer.
+ * Distingue rigoureusement les quantités mesurées en litres des simples cases cochées dans le kit.
  */
 export function calculateWaterAutonomy(
   config: SpecificNeedsConfig,
@@ -74,20 +82,22 @@ export function calculateWaterAutonomy(
   kitItems: KitItem[]
 ): AutonomyMetric {
   const totalPersons = Math.max(1, config.adultsCount + config.childrenCount + config.infantsCount + config.elderlyCount);
-  // Norme Sécurité Civile : 3L/jour/personne (2L hydratation vitale + 1L hygiène minimale) + 0.5L/jour/animal
+  // Norme Sécurité Civile : 3.0 L/jour/personne (2L hydratation vitale + 1L hygiène minimale et réhydratation) + 0.5 L/jour/animal
   const dailyNeedLitres = totalPersons * 3.0 + config.petsCount * 0.5;
   const targetLitres = dailyNeedLitres * config.targetDurationDays;
 
-  // Détection des réserves d'eau dans l'inventaire
+  // Détection des réserves d'eau réelles et mesurées dans l'inventaire
   let stockLitres = 0;
+  let itemsCount = 0;
   for (const item of inventoryItems) {
     const cat = (item.category || '').toLowerCase();
     const name = (item.name || '').toLowerCase();
     const unit = (item.unit || '').toLowerCase();
 
     if (cat.includes('eau') || name.includes('eau') || name.includes('pack')) {
+      itemsCount++;
       // Détection de packs "6x1.5L" (= 9L par pack)
-      if (name.includes('6x1.5') || unit.includes('27l') || name.includes('packs d\'eau')) {
+      if (name.includes('6x1.5') || unit.includes('27l') || name.includes("packs d'eau") || unit.includes('pack (9l)')) {
         stockLitres += item.quantity * 9;
       } else if (unit.includes('l') || unit.includes('litres')) {
         const match = unit.match(/(\d+(?:\.\d+)?)\s*l/i);
@@ -102,42 +112,82 @@ export function calculateWaterAutonomy(
     }
   }
 
-  // Si l'inventaire ne contient pas d'eau mais le kit k1 est coché
   const waterKitItem = kitItems.find((it) => it.id === 'k1');
-  if (stockLitres === 0 && waterKitItem?.completed) {
-    stockLitres = targetLitres;
-  }
-
-  const hours = dailyNeedLitres > 0 ? Math.round((stockLitres / dailyNeedLitres) * 24) : 0;
-  const days = Math.round((hours / 24) * 10) / 10;
   const targetHours = config.targetDurationDays * 24;
+  const hypothesis = `Hypothèse réglementaire : 3,0 L/j/personne (2L boisson vitale + 1L hygiène minimale) + 0,5 L/j/animal domestique sur ${config.targetDurationDays} jours.`;
 
-  let status: 'optimal' | 'warning' | 'critical' = 'critical';
-  if (hours >= targetHours) {
-    status = 'optimal';
-  } else if (hours >= 24) {
-    status = 'warning';
+  // 1. Cas où l'utilisateur a renseigné des articles mesurés dans l'inventaire
+  if (stockLitres > 0) {
+    const hours = dailyNeedLitres > 0 ? Math.round((stockLitres / dailyNeedLitres) * 24) : 0;
+    const days = Math.round((hours / 24) * 10) / 10;
+    let status: 'optimal' | 'warning' | 'critical' = 'critical';
+    if (hours >= targetHours) {
+      status = 'optimal';
+    } else if (hours >= 24) {
+      status = 'warning';
+    }
+
+    return {
+      title: 'Eau Potable Vitale',
+      currentValue: Math.round(stockLitres * 10) / 10,
+      currentUnit: 'Litres mesurés',
+      targetValue: Math.round(targetLitres * 10) / 10,
+      targetUnit: 'Litres requis',
+      autonomyHours: hours,
+      autonomyDays: days,
+      status,
+      isEstimatedFromCheckboxOnly: false,
+      hasInsufficientData: false,
+      details: `${Math.round(stockLitres)}L mesurés pour ${totalPersons} pers. + ${config.petsCount} animal(aux) (${dailyNeedLitres}L/jour requis).`,
+      hypothesis,
+      recommendation:
+        stockLitres < targetLitres
+          ? `Ajouter ${Math.ceil(targetLitres - stockLitres)}L d'eau scellée dans l'inventaire pour sécuriser ${targetHours}h.`
+          : undefined
+    };
   }
 
+  // 2. Cas où l'utilisateur a coché la case k1 ("Pack d'eau") mais sans article mesuré dans l'inventaire
+  // ATTENTION : Ne JAMAIS considérer que l'objectif est atteint par magie ! Signaler explicitement "données insuffisantes"
+  if (waterKitItem?.completed) {
+    return {
+      title: 'Eau Potable Vitale',
+      currentValue: 0,
+      currentUnit: 'Litres non quantifiés',
+      targetValue: Math.round(targetLitres * 10) / 10,
+      targetUnit: 'Litres requis',
+      autonomyHours: 0,
+      autonomyDays: 0,
+      status: 'insufficient_data',
+      isEstimatedFromCheckboxOnly: true,
+      hasInsufficientData: true,
+      details: 'Données insuffisantes : élément coché dans la liste du kit mais aucun volume mesuré dans l’inventaire. Renseignez vos packs d’eau pour calculer l’autonomie réelle en heures.',
+      hypothesis,
+      recommendation: 'Ajouter vos packs d\'eau (ex: 6x1.5L) dans l\'onglet Inventaire pour certifier votre autonomie réelle.'
+    };
+  }
+
+  // 3. Aucun stock mesuré et case k1 non cochée
   return {
     title: 'Eau Potable Vitale',
-    currentValue: Math.round(stockLitres * 10) / 10,
+    currentValue: 0,
     currentUnit: 'Litres',
     targetValue: Math.round(targetLitres * 10) / 10,
-    targetUnit: 'Litres',
-    autonomyHours: hours,
-    autonomyDays: days,
-    status,
-    details: `${Math.round(stockLitres)}L disponibles pour ${totalPersons} pers. (${dailyNeedLitres}L/jour requis).`,
-    recommendation:
-      stockLitres < targetLitres
-        ? `Ajouter ${Math.ceil(targetLitres - stockLitres)}L d'eau scellée pour sécuriser ${config.targetDurationDays * 24}h.`
-        : undefined
+    targetUnit: 'Litres requis',
+    autonomyHours: 0,
+    autonomyDays: 0,
+    status: 'critical',
+    isEstimatedFromCheckboxOnly: false,
+    hasInsufficientData: false,
+    details: `Aucune réserve d'eau potable recensée pour ${totalPersons} personne(s). Risque vital dès 24h de coupure.`,
+    hypothesis,
+    recommendation: `Constituer immédiatement une réserve scellée d'au moins ${Math.ceil(targetLitres)}L (3L/pers/jour).`
   };
 }
 
 /**
- * Calcule l'autonomie en nourriture sans cuisson
+ * Calcule l'autonomie en nourriture prête sans cuisson à partir de l'inventaire mesuré.
+ * Ne confond pas le nombre d'articles avec des rations complètes équilibrées (2 000 kcal/adulte/jour).
  */
 export function calculateFoodAutonomy(
   config: SpecificNeedsConfig,
@@ -145,50 +195,91 @@ export function calculateFoodAutonomy(
   kitItems: KitItem[]
 ): AutonomyMetric {
   const adultsAndKids = Math.max(1, config.adultsCount + config.childrenCount + config.elderlyCount);
-  // 2 repas/rations par personne et par jour sans cuisson
+  // Hypothèse : 2 portions énergétiques complètes sans cuisson/adulte et enfant/jour (~2 000 kcal)
+  // + 3 rations spécifiques (laits infantiles prêts, petits pots) si nourrisson présent
   const dailyRationsNeeded = adultsAndKids * 2 + config.infantsCount * 3;
   const targetRations = dailyRationsNeeded * config.targetDurationDays;
+  const targetHours = config.targetDurationDays * 24;
 
   let rationsInStock = 0;
   for (const item of inventoryItems) {
     const cat = (item.category || '').toLowerCase();
     const name = (item.name || '').toLowerCase();
-    if (cat.includes('aliment') || name.includes('conserve') || name.includes('ration') || name.includes('barre')) {
+    if (cat.includes('aliment') || name.includes('conserve') || name.includes('ration') || name.includes('barre') || name.includes('repas')) {
+      // Une boîte de conserve standard ou une barre énergétique = 1 ration / portion énergétique
       rationsInStock += item.quantity;
     }
   }
 
-  // Si aucun inventaire mais kit k3 coché
   const foodKitItem = kitItems.find((it) => it.id === 'k3');
-  if (rationsInStock === 0 && foodKitItem?.completed) {
-    rationsInStock = targetRations;
+  const hypothesis = `Hypothèse nutritionnelle : 2 rations complètes sans cuisson (conserves prêtes, barres denses ~2 000 kcal/j) par adulte/enfant + 3 portions adaptées/jour par nourrisson.`;
+
+  // 1. Stock mesuré présent dans l'inventaire
+  if (rationsInStock > 0) {
+    const days = dailyRationsNeeded > 0 ? Math.round((rationsInStock / dailyRationsNeeded) * 10) / 10 : 0;
+    const hours = Math.round(days * 24);
+    let status: 'optimal' | 'warning' | 'critical' = 'critical';
+    if (hours >= targetHours) {
+      status = 'optimal';
+    } else if (hours >= 24) {
+      status = 'warning';
+    }
+
+    return {
+      title: 'Alimentation de Survie',
+      currentValue: rationsInStock,
+      currentUnit: 'rations mesurées',
+      targetValue: targetRations,
+      targetUnit: 'rations requises',
+      autonomyHours: hours,
+      autonomyDays: days,
+      status,
+      isEstimatedFromCheckboxOnly: false,
+      hasInsufficientData: false,
+      details: `${rationsInStock} portions prêtes sans cuisson (${dailyRationsNeeded}/jour nécessaires pour le foyer).`,
+      hypothesis,
+      recommendation:
+        rationsInStock < targetRations
+          ? `Compléter avec ${targetRations - rationsInStock} rations ou conserves prêtes sans réchauffage.`
+          : undefined
+    };
   }
 
-  const days = dailyRationsNeeded > 0 ? Math.round((rationsInStock / dailyRationsNeeded) * 10) / 10 : 0;
-  const hours = Math.round(days * 24);
-  const targetHours = config.targetDurationDays * 24;
-
-  let status: 'optimal' | 'warning' | 'critical' = 'critical';
-  if (hours >= targetHours) {
-    status = 'optimal';
-  } else if (hours >= 24) {
-    status = 'warning';
+  // 2. Case cochée k3 ("Nourriture non périssable") sans article mesuré dans l'inventaire
+  // Ne pas inventer que le foyer a ses 72h de vivres !
+  if (foodKitItem?.completed) {
+    return {
+      title: 'Alimentation de Survie',
+      currentValue: 0,
+      currentUnit: 'non quantifié',
+      targetValue: targetRations,
+      targetUnit: 'rations requises',
+      autonomyHours: 0,
+      autonomyDays: 0,
+      status: 'insufficient_data',
+      isEstimatedFromCheckboxOnly: true,
+      hasInsufficientData: true,
+      details: 'Données insuffisantes : vivres cochés dans le kit sans quantité mesurée dans l’inventaire. Une boîte ou un sachet ne correspond pas nécessairement à un repas complet pour une personne.',
+      hypothesis,
+      recommendation: 'Ajouter vos conserves, barres et petits pots dans l’Inventaire pour évaluer précisément la couverture calorique du foyer.'
+    };
   }
 
+  // 3. Aucun aliment mesuré et non coché
   return {
     title: 'Alimentation de Survie',
-    currentValue: rationsInStock,
-    currentUnit: 'rations / boîtes',
+    currentValue: 0,
+    currentUnit: 'rations',
     targetValue: targetRations,
-    targetUnit: 'rations',
-    autonomyHours: hours,
-    autonomyDays: days,
-    status,
-    details: `${rationsInStock} rations prêtes sans cuisson (${dailyRationsNeeded}/jour nécessaires).`,
-    recommendation:
-      rationsInStock < targetRations
-        ? `Compléter avec ${targetRations - rationsInStock} conserves ou barres énergétiques.`
-        : undefined
+    targetUnit: 'rations requises',
+    autonomyHours: 0,
+    autonomyDays: 0,
+    status: 'critical',
+    isEstimatedFromCheckboxOnly: false,
+    hasInsufficientData: false,
+    details: 'Aucune ration sans cuisson renseignée. Nécessité de vivres consommables sans gaz ni électricité.',
+    hypothesis,
+    recommendation: `Constituer un stock de ${targetRations} rations (conserves ouverture facile, fruits secs, barres).`
   };
 }
 
@@ -357,11 +448,36 @@ export function calculateReadinessScore(
   // 4. Calcul des 5 Piliers Explicites
   // --- PILIER 1 : Réserves Vitales (25 points max) ---
   const waterTargetHours = config.targetDurationDays * 24;
-  const waterRatio = Math.min(1, waterAutonomy.autonomyHours / Math.max(1, waterTargetHours));
-  const waterPoints = Math.round(waterRatio * 15);
+  let waterPoints = 0;
+  let waterComment = '';
 
-  const foodRatio = Math.min(1, foodAutonomy.autonomyHours / Math.max(1, waterTargetHours));
-  const foodPoints = Math.round(foodRatio * 7);
+  if (waterAutonomy.hasInsufficientData) {
+    // Case cochée dans le kit mais sans inventaire mesuré : points déclaratifs partiels plafonnés à 4/15
+    waterPoints = 4;
+    waterComment = 'Coché dans le kit mais volume non mesuré en inventaire (4/15 pts déclaratifs). Renseignez vos packs d’eau pour valider les 15 pts.';
+  } else if (waterAutonomy.autonomyHours > 0) {
+    const waterRatio = Math.min(1, waterAutonomy.autonomyHours / Math.max(1, waterTargetHours));
+    waterPoints = Math.round(waterRatio * 15);
+    waterComment = `${waterAutonomy.currentValue}L mesurés • ${waterAutonomy.autonomyHours}h d'autonomie certifiée (${waterPoints}/15 pts).`;
+  } else {
+    waterPoints = 0;
+    waterComment = `Aucune réserve d'eau (0/15 pts) - Risque vital dès 24h.`;
+  }
+
+  let foodPoints = 0;
+  let foodComment = '';
+  if (foodAutonomy.hasInsufficientData) {
+    // Vivres cochés dans le kit mais sans inventaire mesuré : points déclaratifs partiels plafonnés à 2/7
+    foodPoints = 2;
+    foodComment = 'Coché dans le kit sans quantification en inventaire (2/7 pts déclaratifs). Renseignez vos rations pour valider les 7 pts.';
+  } else if (foodAutonomy.autonomyHours > 0) {
+    const foodRatio = Math.min(1, foodAutonomy.autonomyHours / Math.max(1, waterTargetHours));
+    foodPoints = Math.round(foodRatio * 7);
+    foodComment = `${foodAutonomy.currentValue} portions mesurées • ${foodAutonomy.autonomyHours}h de repas sécurisés (${foodPoints}/7 pts).`;
+  } else {
+    foodPoints = 0;
+    foodComment = 'Aucune ration sans cuisson renseignée (0/7 pts).';
+  }
 
   const hasWaterPurification = kitItems.find((it) => it.id === 'k2')?.completed ?? false;
   const purificationPoints = hasWaterPurification ? 3 : 0;
@@ -375,25 +491,25 @@ export function calculateReadinessScore(
     icon: 'water_drop',
     status: pillar1Score >= 20 ? 'optimal' : pillar1Score >= 12 ? 'warning' : 'critical',
     formulaExplanation:
-      'Dimensionnement proportionnel aux personnes du foyer (3L/jour/pers) et aux rations sans cuisson sur la durée cible.',
+      'Dimensionnement proportionnel aux personnes du foyer (3L/jour/pers) et aux rations sans cuisson. Distingue rigoureusement les quantités mesurées en inventaire des simples cases cochées.',
     details: [
       {
         label: `Eau Potable (${waterAutonomy.currentValue}L / ${waterAutonomy.targetValue}L requis)`,
         earned: waterPoints,
         max: 15,
-        comment: `${waterAutonomy.autonomyHours}h d'autonomie calculée.`
+        comment: waterComment
       },
       {
         label: `Nourriture sans cuisson (${foodAutonomy.currentValue} / ${foodAutonomy.targetValue} rations)`,
         earned: foodPoints,
         max: 7,
-        comment: `${foodAutonomy.autonomyHours}h de repas froids sécurisés.`
+        comment: foodComment
       },
       {
         label: 'Purification d\'eau de secours (Micropur)',
         earned: purificationPoints,
         max: 3,
-        comment: hasWaterPurification ? 'Pastilles présentes.' : 'Pastilles non validées.'
+        comment: hasWaterPurification ? 'Pastilles présentes dans le kit.' : 'Pastilles non validées.'
       }
     ]
   };
@@ -788,7 +904,9 @@ export function calculateReadinessScore(
       infants: config.infantsCount,
       elderly: config.elderlyCount,
       pets: config.petsCount,
-      targetDays: config.targetDurationDays
+      targetDays: config.targetDurationDays,
+      hasPmr: !!config.hasPmr,
+      hasChronicCondition: !!config.hasChronicCondition
     }
   };
 }

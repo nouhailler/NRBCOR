@@ -6,6 +6,10 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    define: {
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.2.0'),
+      __BUILD_DATE__: JSON.stringify(new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
