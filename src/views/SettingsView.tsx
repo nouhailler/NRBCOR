@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppSettings } from '../services/storage/StorageRepository';
+import { AppSettings, StorageDiagnostics } from '../services/storage/StorageRepository';
 import { storageService, DEFAULT_SETTINGS } from '../services/storage/IndexedDbStorage';
 
 interface SettingsViewProps {
@@ -10,6 +10,7 @@ interface SettingsViewProps {
   onChangeTextScale: (scale: 'normal' | 'large' | 'extraLarge') => void;
   theme?: 'light' | 'dark' | 'system';
   onChangeTheme?: (theme: 'light' | 'dark' | 'system') => void;
+  onDataReloaded?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -20,15 +21,31 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onChangeTextScale,
   theme = 'light',
   onChangeTheme,
+  onDataReloaded,
 }) => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [diagnostics, setDiagnostics] = useState<StorageDiagnostics | null>(null);
+  const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
   const [importStatus, setImportStatus] = useState<{ message: string; isError: boolean } | null>(null);
   const [saveToast, setSaveToast] = useState(false);
+
+  const refreshDiagnostics = async () => {
+    setDiagnosticsLoading(true);
+    try {
+      const diag = await storageService.getDiagnostics();
+      setDiagnostics(diag);
+    } catch (e) {
+      console.warn('Diagnostics error', e);
+    } finally {
+      setDiagnosticsLoading(false);
+    }
+  };
 
   useEffect(() => {
     storageService.getSettings().then((s) => {
       setSettings(s);
     });
+    refreshDiagnostics();
   }, []);
 
   const handleUpdate = async (patch: Partial<AppSettings>) => {
@@ -41,6 +58,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     await storageService.saveSettings(updated);
     setSaveToast(true);
     setTimeout(() => setSaveToast(false), 2000);
+    refreshDiagnostics();
   };
 
   const handleExportJSON = async () => {
@@ -48,10 +66,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backup, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `NRBCOR_Sauvegarde_Locale_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute('download', `NRBCOR_Sauvegarde_Unifiee_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    refreshDiagnostics();
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +83,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         const json = JSON.parse(event.target?.result as string);
         const res = await storageService.importAllData(json);
         if (res.success) {
-          setImportStatus({ message: 'Restauration réussie ! Les données ont été actualisées.', isError: false });
+          setImportStatus({ message: 'Restauration réussie ! Tous les magasins (Kit, Plan, Vivres, Préférences) ont été réinjectés.', isError: false });
           const refreshed = await storageService.getSettings();
           setSettings(refreshed);
+          if (onDataReloaded) {
+            onDataReloaded();
+          }
+          refreshDiagnostics();
         } else {
           setImportStatus({ message: res.error || 'Fichier JSON invalide', isError: true });
         }
@@ -279,14 +302,91 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
       )}
 
-      {/* Section 3 : Sauvegarde & Import / Export Local (SEC-02) */}
+      {/* Section 3 : Architecture & Santé de la Persistance Unifiée (Priorité 4) */}
+      <section className="bg-white p-4 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[16px] font-bold text-[#001126] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0036ce]">database</span>
+            <span>Persistance Locale Unifiée & IndexedDB</span>
+          </h2>
+          <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold uppercase">
+            {diagnostics?.activeEngine || 'IndexedDB Actif'}
+          </span>
+        </div>
+
+        {/* Explication doctrinale de la stratégie unifiée */}
+        <div className="p-3 bg-[#f0fdf4] rounded-lg border border-[#bbf7d0] flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#16a34a] text-[18px]">verified_user</span>
+            <span className="text-[12px] font-bold text-[#14532d] font-['Space_Grotesk'] uppercase">
+              Stratégie de Fiabilisation à Deux Niveaux
+            </span>
+          </div>
+          <p className="text-[11px] text-[#166534] leading-relaxed">
+            • <strong>IndexedDB (Niveau 1 - Autorité)</strong> : Stockage asynchrone volumineux dédié aux listes du Kit 72h, au Plan Familial, à l'Inventaire des vivres et aux instantanés Géorisques. Protège contre les limites d'espace (5 Mo) et l'éviction de mémoire.<br />
+            • <strong>Miroir Local (Niveau 2 - Boot immédiat)</strong> : Cache synchrone garantissant un démarrage instantané du thème et des préférences sans clignotement d'écran, même hors-ligne.<br />
+            • <strong>Zéro Transit Réseau</strong> : Aucune donnée personnelle ne quitte ce navigateur.
+          </p>
+        </div>
+
+        {/* Tableau de bord des magasins de données */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#44474d]">
+              État des Magasins de Données :
+            </span>
+            <button
+              type="button"
+              onClick={refreshDiagnostics}
+              disabled={diagnosticsLoading}
+              className="text-[11px] text-[#0036ce] font-['Space_Grotesk'] font-bold flex items-center gap-1 hover:underline"
+            >
+              <span className={`material-symbols-outlined text-[14px] ${diagnosticsLoading ? 'animate-spin' : ''}`}>
+                sync
+              </span>
+              <span>Actualiser diagnostic</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
+            {diagnostics?.stores.map((store) => (
+              <div
+                key={store.name}
+                className="p-2.5 rounded-lg border border-[#e4efff] bg-[#f8f9ff] flex items-center justify-between"
+              >
+                <div className="flex flex-col min-w-0 pr-2">
+                  <span className="font-bold text-[#001126] truncate">{store.label}</span>
+                  <span className="text-[10px] text-[#74777f] font-mono">{store.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="font-['Space_Grotesk'] font-bold text-[#001126] text-[11px]">
+                    {store.itemCount} {store.itemCount > 1 ? 'éléments' : 'élément'}
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {diagnostics?.quotaEstimate && (
+            <div className="text-[11px] text-[#74777f] flex items-center justify-between pt-1">
+              <span>Espace alloué par le navigateur :</span>
+              <span className="font-mono font-semibold text-[#001126]">
+                {(diagnostics.quotaEstimate.usageBytes / (1024 * 1024)).toFixed(2)} Mo utilisés / {(diagnostics.quotaEstimate.quotaBytes / (1024 * 1024 * 1024)).toFixed(1)} Go alloués
+              </span>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Section 4 : Sauvegarde & Restauration Intégrale Unifiée (SEC-02) */}
       <section className="bg-white p-4 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col gap-3">
         <h2 className="text-[16px] font-bold text-[#001126] flex items-center gap-2">
           <span className="material-symbols-outlined text-[#0036ce]">save</span>
-          <span>Gestion des Données Locales (Sans Cloud)</span>
+          <span>Sauvegarde & Restauration Intégrale (Format V2)</span>
         </h2>
         <p className="text-[12px] text-[#44474d]">
-          Exportez un fichier de sauvegarde au format JSON sur votre appareil, ou restaurez un fichier existant :
+          Exportez une archive complète scellée (Kit 72h, Plan Familial, Inventaire, Paramètres) ou réinjectez une sauvegarde existante en cas de changement de terminal :
         </p>
 
         {importStatus && (
@@ -307,12 +407,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             className="min-h-[46px] rounded-lg bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
-            <span>Exporter JSON</span>
+            <span>Exporter Archive V2</span>
           </button>
 
           <label className="min-h-[46px] rounded-lg bg-[#eef4ff] hover:bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-[#d6e4f8] cursor-pointer">
             <span className="material-symbols-outlined text-[18px]">upload</span>
-            <span>Importer JSON</span>
+            <span>Restaurer Fichier</span>
             <input
               type="file"
               accept=".json"
@@ -322,17 +422,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </label>
         </div>
 
-        <button
-          onClick={onOpenWipeModal}
-          type="button"
-          className="min-h-[44px] w-full rounded-lg bg-[#ffdad6]/40 hover:bg-[#ffdad6] text-[#ba1a1a] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-[#ffdad6] transition-colors mt-1"
-        >
-          <span className="material-symbols-outlined text-[18px]">delete_forever</span>
-          <span>Purger toutes les données locales</span>
-        </button>
+        <div className="pt-2 border-t border-[#eef4ff] flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+              Cycle de vie des données du prototype
+            </span>
+            <span className="font-['Space_Grotesk'] text-[10px] bg-[#e4efff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
+              100% Local
+            </span>
+          </div>
+          <p className="text-[11px] text-[#44474d]">
+            Effacez toutes les données d'exemple pour partir d'une feuille blanche avec vos véritables informations, ou rechargez le scénario pédagogique :
+          </p>
+          <button
+            onClick={onOpenWipeModal}
+            type="button"
+            className="min-h-[44px] w-full rounded-lg bg-[#ffdad6]/50 hover:bg-[#ffdad6] text-[#ba1a1a] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-[#ffb4ab] transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">restart_alt</span>
+            <span>Gérer / Effacer les données du prototype (Partir propre)</span>
+          </button>
+        </div>
       </section>
 
-      {/* Section 4 : Mentions de Confidentialité & Limites Légales (Section 9.5) */}
+      {/* Section 5 : Mentions de Confidentialité & Limites Légales */}
       <section className="bg-[#12263f] text-white p-4 rounded-xl border border-[#001126] flex flex-col gap-2.5">
         <h2 className="text-[15px] font-bold flex items-center gap-2">
           <span className="material-symbols-outlined text-[#98f6c5]">lock</span>
@@ -351,7 +464,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-[#b4c8e8] font-['Space_Grotesk']">
-          <span>PWA Version : 1.0 (Octobre 2026)</span>
+          <span>PWA Version : 1.2.0 (Octobre 2026)</span>
           <span>Corpus Doctrinal : v2.4</span>
         </div>
 

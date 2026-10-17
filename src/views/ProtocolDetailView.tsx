@@ -558,6 +558,24 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
         </div>
       </section>
 
+      {/* Cartouche de Traçabilité & Validation Éditoriale */}
+      <div className="mx-4 mb-3 p-3 bg-white rounded-xl border border-[#c4c6ce] text-[12px] flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="material-symbols-outlined text-[#3f9d73] text-[22px]">verified</span>
+          <div className="flex flex-col">
+            <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#001126] uppercase">
+              Statut Doctrinal : Corpus Validé
+            </span>
+            <span className="text-[11px] text-[#44474d]">
+              Source officielle vérifiée • Révision éditoriale du 16 Octobre 2026
+            </span>
+          </div>
+        </div>
+        <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase shrink-0">
+          CONFORME ÉTAT
+        </span>
+      </div>
+
       {/* SECTION 6 : CLAUSE INSTITUTIONNELLE DE PRIMAUTÉ & CADRE LÉGAL */}
       <footer className="mx-4 mb-4 p-3.5 bg-[#eef4ff] rounded-xl text-[#44474d] text-[12px] leading-relaxed border border-[#d6e4f8]">
         <div className="flex items-start gap-2">

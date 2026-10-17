@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { KitItem } from '../types';
+import { KitItem, SubScreen, TabType } from '../types';
 import { KIT_CATEGORIES } from '../data/kitData';
 import { Tooltip } from '../components/Tooltip';
+import { SuisJePretView } from './SuisJePretView';
 
 interface PreparationViewProps {
   items: KitItem[];
@@ -9,6 +10,9 @@ interface PreparationViewProps {
   onResetItems: () => void;
   onAddItem: (item: KitItem) => void;
   onOpenInventory?: () => void;
+  onNavigateTab?: (tab: TabType) => void;
+  onOpenSubScreen?: (screen: SubScreen) => void;
+  defaultMode?: 'suis-je-pret' | 'kit';
 }
 
 export const PreparationView: React.FC<PreparationViewProps> = ({
@@ -17,7 +21,11 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   onResetItems,
   onAddItem,
   onOpenInventory,
+  onNavigateTab,
+  onOpenSubScreen,
+  defaultMode = 'suis-je-pret',
 }) => {
+  const [viewMode, setViewMode] = useState<'suis-je-pret' | 'kit'>(defaultMode);
   const [peopleCount, setPeopleCount] = useState<number>(3);
   const [durationDays, setDurationDays] = useState<number>(3);
   const [filterMode, setFilterMode] = useState<'all' | 'todo'>('all');
@@ -57,8 +65,54 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
     window.print();
   };
 
+  const switcher = (
+    <div className="flex items-center gap-1.5 bg-[#f0f4f9] p-1.5 rounded-xl border border-[#c4c6ce]">
+      <button
+        type="button"
+        onClick={() => setViewMode('suis-je-pret')}
+        className={`flex-1 min-h-[42px] px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all ${
+          viewMode === 'suis-je-pret'
+            ? 'bg-[#001126] text-white shadow-xs'
+            : 'text-[#44474d] hover:text-[#001126] hover:bg-white/60'
+        }`}
+      >
+        <span className="material-symbols-outlined text-[18px]">speed</span>
+        <span>Tableau de bord « Suis-je prêt ? »</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setViewMode('kit')}
+        className={`flex-1 min-h-[42px] px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all ${
+          viewMode === 'kit'
+            ? 'bg-[#001126] text-white shadow-xs'
+            : 'text-[#44474d] hover:text-[#001126] hover:bg-white/60'
+        }`}
+      >
+        <span className="material-symbols-outlined text-[18px]">backpack</span>
+        <span>Kit 72h détaillé ({completedCount}/{totalItems})</span>
+      </button>
+    </div>
+  );
+
+  if (viewMode === 'suis-je-pret') {
+    return (
+      <SuisJePretView
+        items={items}
+        onToggleItem={onToggleItem}
+        onOpenInventory={onOpenInventory}
+        onNavigateTab={onNavigateTab}
+        onOpenSubScreen={onOpenSubScreen}
+        headerSlot={switcher}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
+      {/* Sélecteur de vue : Suis-je prêt ? vs Kit détaillé */}
+      {switcher}
+
       {/* Sentinel Bandeau Hors-Ligne & Souveraineté Locale */}
       <div className="py-2.5 px-3 bg-[#e4efff] text-[#0f1c2b] flex items-center justify-between gap-2 rounded-lg border border-[#d6e4f8]">
         <div className="flex items-center gap-1.5 min-w-0">

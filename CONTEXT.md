@@ -54,3 +54,59 @@ Le contenu de l'application s'appuie scrupuleusement sur la doctrine publique fr
 - L'éditeur et l'auteur rappellent formellement qu'ils **ne sont pas responsables des données, des approximations cartographiques ou des conséquences d'actions menées par les utilisateurs**.
 - L'application **ne se substitue aucunement aux canaux officiels de l'État** (FR-Alert, préfectures, radios de service public France Bleu / France Inter) ni aux services de secours (112, 15, 18, 17).
 - Un écran d'onboarding obligatoire matérialise cette décharge juridique dès le premier lancement.
+
+---
+
+## 5. Fiabilisation des Consignes de Sécurité (Priorité 1)
+
+Face aux risques de confusion entre une simulation théorique et une consigne opérationnelle de crise :
+1. **Confinement contextualisé** :
+   - Risque chimique : interdiction formelle des caves et sous-sols (accumulation de gaz denses au sol) et des combles (gaz légers). Confinement à mi-hauteur.
+   - Risque radiologique / nucléaire : le sous-sol bétonné offre une barrière physique d'atténuation contre le rayonnement gamma (facteur de réduction 10 à 20x supérieur aux étages hauts).
+2. **Calculateur d'air disponible non opérationnel** :
+   - Les durées affichées sont des estimations de cinétique d'accumulation de CO2 (< 1%).
+   - Rappel impératif que le confinement civil d'urgence dure généralement entre 2 et 4 heures (temps de passage du panache).
+   - Une simulation ne justifie en aucun cas de refuser l'aération immédiate dès la fin d'alerte officielle ou l'ordre d'évacuation préfectoral.
+3. **Iode stable (KI 65mg)** :
+   - Prise conditionnée exclusivement à l'ordre du Préfet.
+   - Fenêtre temporelle critique (1-2h avant le nuage, inutile après 24h).
+   - Avertissement formel contre les faux remèdes mortels (ingestion de Bétadine ou de sel de table).
+4. **Risques chimiques** :
+   - Fuite à 90° de la direction du vent en extérieur.
+   - Clarification sur l'inefficacité totale des masques FFP2/FFP3 contre les gaz et vapeurs toxiques.
+
+---
+
+## 6. Audit & Opérationnalité du Module Géorisques
+
+Pour garantir l'intégrité technique face aux exigences citoyennes de sécurité civile :
+1. **Fonctions réellement opérationnelles** :
+   - *Géolocalisation GPS W3C* : Récupération des coordonnées réelles matérielles via l'API navigateur `navigator.geolocation`. Reverse-geocoding dynamique en direct auprès de `geo.api.gouv.fr` ou association géodésique hors-ligne (formule de Haversine) sans aucun appel réseau.
+   - *Recherche de communes* : Requêtes réelles auprès du référentiel géographique officiel de l'État français (35 000 communes).
+   - *Export d'instantané* : Génération et téléchargement réel d'un fichier JSON structuré contenant l'état complet du dossier territorial communal, ses risques notifiés et ses consignes de sauvegarde.
+   - *Consultation hors-ligne* : Accès autonome aux documents DICRIM, PCS et fiches réflexes certifiées.
+2. **Démonstration & schéma pédagogique** :
+   - *Carte vectorielle SVG locale* : Schéma didactique représentant les cercles d'incidence PPI, les axes TMD et l'orientation des installations à risque, évitant la dépendance à un serveur cartographique externe qui s'effondrerait en cas de crise.
+3. **Fonctionnalités indisponibles hors-connexion** :
+   - *Actualisation en direct de l'API Géorisques* (`georisques.gouv.fr / GASPAR`) : Nécessite une connectivité Internet. En cas de coupure réseau, l'application bloque explicitement la requête sans planter et affiche un avertissement clair informant que les données du cache local font foi.
+
+---
+
+## 7. Unification de la Persistance Locale & Stratégie Double-Niveau (Priorité 4)
+
+Face aux risques de fragmentation et de perte de données entre `localStorage` et `IndexedDB` :
+1. **Rôle d'autorité conféré à IndexedDB** :
+   - `IndexedDB` stocke de façon asynchrone, structurée et durable toutes les données à volumétrie variable (magasins `settings`, `checklistItems`, `familyPlans`, `inventoryItems`, `localRiskSnapshots`, `quizProgress`).
+   - Supprime le risque de saturation ou de corruption du quota strict de 5 Mo de `localStorage`.
+2. **Cache miroir synchrone (`localStorage`)** :
+   - Utilisé exclusivement comme cache d'amorçage pour le thème et l'état visuel initial, garantissant une absence totale de scintillement au premier rendu sans bloquer le fil d'exécution.
+3. **Format d'export / import unifié V2 (`NRBCOR_BACKUP_V2`)** :
+   - Intègre l'ensemble de l'état de l'application en une seule archive JSON vérifiable.
+   - Validation stricte de structure (vérification de schéma à l'import) et rétrocompatibilité avec les versions antérieures.
+4. **Purge atomique sécurisée (Wipe)** :
+   - Réinitialisation complète et simultanée d'IndexedDB et des clés de cache miroir sur confirmation utilisateur.
+5. **Observabilité & Diagnostic** :
+   - Suivi en direct du statut de chaque magasin et estimation du quota alloué par le navigateur dans l'écran Paramètres.
+
+
+

@@ -1,6 +1,7 @@
 /**
  * Service de gestion des mises à jour système et de vérification en arrière-plan.
- * Conforme aux directives PWA et aux spécifications du cahier des charges.
+ * Détecte dynamiquement la version déployée, l'état réel du Service Worker et l'existence
+ * d'une nouvelle version sans chaînes figées en dur.
  */
 
 export interface SystemUpdateStatus {
@@ -13,24 +14,43 @@ export interface SystemUpdateStatus {
 }
 
 const STORAGE_KEY_LAST_CHECK = 'nrbcor_last_update_check';
-const STORAGE_KEY_RELEASE_DATE = '13 Octobre 2026';
-const CURRENT_APP_VERSION = 'v1.2.0 PWA';
+const DEFAULT_APP_VERSION = 'v1.2.0 PWA';
+const RELEASE_DATE = '14 Octobre 2026';
 
 class UpdateService {
   private lastCheckedDate: string = '';
   private updateListeners: ((status: SystemUpdateStatus) => void)[] = [];
   private currentStatus: SystemUpdateStatus = {
-    appVersion: CURRENT_APP_VERSION,
-    releaseDate: STORAGE_KEY_RELEASE_DATE,
+    appVersion: DEFAULT_APP_VERSION,
+    releaseDate: RELEASE_DATE,
     lastCheckedDate: '',
     isChecking: false,
     hasUpdate: false,
-    statusMessage: 'Application à jour'
+    statusMessage: 'Application initialisée'
   };
 
   constructor() {
     this.lastCheckedDate = this.loadLastChecked();
     this.currentStatus.lastCheckedDate = this.lastCheckedDate;
+    this.resolveDeployedVersion();
+  }
+
+  /**
+   * Résout dynamiquement la version depuis le manifest PWA ou l'environnement
+   */
+  private async resolveDeployedVersion() {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch('/manifest.webmanifest', { cache: 'no-store' });
+        if (res.ok) {
+          const manifest = await res.json();
+          if (manifest.version) {
+            this.currentStatus.appVersion = `v${manifest.version} PWA`;
+            this.notify();
+          }
+        }
+      }
+    } catch (e) {}
   }
 
   private loadLastChecked(): string {
@@ -79,11 +99,13 @@ class UpdateService {
    */
   public async checkForUpdates(manual: boolean = false): Promise<SystemUpdateStatus> {
     this.currentStatus.isChecking = true;
-    this.currentStatus.statusMessage = 'Vérification des mises à jour en cours...';
+    this.currentStatus.statusMessage = 'Vérification du statut du Service Worker et du serveur...';
     this.notify();
 
-    // Délai ergonomique pour retour visuel
-    await new Promise((resolve) => setTimeout(resolve, manual ? 900 : 300));
+    // Délai ergonomique pour retour visuel si déclenché manuellement
+    if (manual) {
+      await new Promise((resolve) => setTimeout(resolve, 700));
+    }
 
     const nowStr = new Date().toLocaleString('fr-FR', {
       day: '2-digit',
@@ -93,16 +115,50 @@ class UpdateService {
       minute: '2-digit'
     });
 
+    // 1. Détection hors-connexion
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      this.currentStatus.hasUpdate = false;
+      this.currentStatus.isChecking = false;
+      this.currentStatus.statusMessage = `Mode 100% hors-ligne : version locale ${this.currentStatus.appVersion} active et certifiée.`;
+      this.saveLastChecked(nowStr);
+      return this.getStatus();
+    }
+
     try {
+      let swWaitingOrInstalling = false;
+
+      // 2. Interrogation réelle du Service Worker
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
+          // Attachement de listener si mise à jour trouvée
+          registration.addEventListener('updatefound', () => {
+            const installingWorker = registration.installing;
+            if (installingWorker) {
+              installingWorker.addEventListener('statechange', () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  this.currentStatus.hasUpdate = true;
+                  this.currentStatus.statusMessage = 'Une nouvelle version a été téléchargée et est prête à être activée.';
+                  this.notify();
+                }
+              });
+            }
+          });
+
           // Déclenche la vérification du SW par le navigateur
           await registration.update();
 
-          if (registration.waiting || registration.installing) {
+          if (registration.waiting) {
+            swWaitingOrInstalling = true;
             this.currentStatus.hasUpdate = true;
-            this.currentStatus.statusMessage = 'Nouvelle version v1.2.1 détectée et prête !';
+            this.currentStatus.statusMessage = 'Une nouvelle version est en attente d’activation.';
+            this.currentStatus.isChecking = false;
+            this.saveLastChecked(nowStr);
+            return this.getStatus();
+          } else if (registration.installing) {
+            swWaitingOrInstalling = true;
+            this.currentStatus.hasUpdate = true;
+            this.currentStatus.statusMessage = 'Installation d’une nouvelle version en cours en arrière-plan...';
             this.currentStatus.isChecking = false;
             this.saveLastChecked(nowStr);
             return this.getStatus();
@@ -110,14 +166,28 @@ class UpdateService {
         }
       }
 
-      this.currentStatus.hasUpdate = false;
-      this.currentStatus.statusMessage = 'Votre version v1.2.0 est la plus récente (Corpus v2.4 Intègre).';
+      // 3. Vérification réseau du manifest / index.html
+      try {
+        const manifestRes = await fetch(`/manifest.webmanifest?_t=${Date.now()}`, { cache: 'no-store' });
+        if (manifestRes.ok) {
+          const manifest = await manifestRes.json();
+          if (manifest.version) {
+            this.currentStatus.appVersion = `v${manifest.version} PWA`;
+          }
+        }
+      } catch (e) {}
+
+      if (!swWaitingOrInstalling) {
+        this.currentStatus.hasUpdate = false;
+        this.currentStatus.statusMessage = `Votre application est à jour (${this.currentStatus.appVersion} - Service Worker actif).`;
+      }
+
       this.currentStatus.isChecking = false;
       this.saveLastChecked(nowStr);
       return this.getStatus();
     } catch (err) {
       this.currentStatus.hasUpdate = false;
-      this.currentStatus.statusMessage = 'Vérification hors-ligne effectuée (Cache local intègre).';
+      this.currentStatus.statusMessage = 'Vérification terminée (cache local autonome préservé).';
       this.currentStatus.isChecking = false;
       this.saveLastChecked(nowStr);
       return this.getStatus();
@@ -128,14 +198,22 @@ class UpdateService {
    * Force le rechargement et la purge des anciens caches statiques
    */
   public async forceUpdate(): Promise<void> {
-    this.currentStatus.statusMessage = 'Purge du cache et installation immédiate...';
+    this.currentStatus.statusMessage = 'Activation de la nouvelle version et purge du cache...';
     this.notify();
 
     try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration && registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      }
+
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map((name) => caches.delete(name)));
       }
+
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const reg of registrations) {
@@ -151,13 +229,13 @@ class UpdateService {
   }
 
   /**
-   * Active la surveillance automatique en tâche de fond (toutes les 15 minutes et au retour sur l'onglet)
+   * Active la surveillance automatique en tâche de fond
    */
   public startBackgroundUpdater(intervalMinutes: number = 15) {
-    // Vérification immédiate discrète
+    // Vérification initiale discrète
     setTimeout(() => {
       this.checkForUpdates(false).catch(() => {});
-    }, 5000);
+    }, 4000);
 
     // Intervalle régulier
     setInterval(() => {
@@ -170,11 +248,10 @@ class UpdateService {
         this.checkForUpdates(false).catch(() => {});
       });
 
-      // Écoute de l'événement natif de mise à jour du Service Worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           this.currentStatus.hasUpdate = true;
-          this.currentStatus.statusMessage = 'Mise à jour installée en arrière-plan avec succès.';
+          this.currentStatus.statusMessage = 'Nouvelle version activée avec succès.';
           this.notify();
         });
       }

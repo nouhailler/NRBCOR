@@ -79,6 +79,75 @@
   * Sur **Ordinateur (Desktop)** : Guide l'utilisateur vers l'icône d'installation dans la barre d'adresse.
   * Idéal pour les utilisateurs novices voulant retrouver l'application directement parmi leurs icônes de smartphone.
 
+### 🛡️ 7. Priorité 1 — Fiabilisation des Consignes de Sécurité & Non-Substitution Opérationnelle
+* **Confinement contextualisé par scénario précis** :
+  * *Accident Chimique* : Confinement impératif à l'étage intermédiaire (1er/2e) ; interdiction absolue des caves et sous-sols où s'accumulent les gaz denses (chlore, GPL, dioxyde de soufre) et des combles (gaz légers comme l'ammoniac). Si pris dehors : fuite impérative à 90° de la direction du vent (jamais en voiture).
+  * *Accident Nucléaire / Radiologique* : Le sous-sol ou la pièce centrale en dur offre l'écran radiologique le plus dense contre les rayonnements gamma (atténuation 10 à 20x supérieure à un étage sous toiture).
+  * *Accident Biologique* : Pièce isolée avec point d'eau, masque FFP3 ajusté, arrêt immédiat des VMC non filtrées.
+* **Simulateur d'air disponible fiabilisé** :
+  * Calcul basé sur la cinétique d'accumulation du CO2 (< 1% seuil de vigilance) et la consommation respiratoire au repos.
+  * Encadré d'avertissement formel : **modèle mathématique indicatif non opérationnel**. Rappel que le confinement civil d'urgence dure généralement **2 à 4 heures** (temps de dispersion du panache) et qu'une simulation ne doit JAMAIS inciter à différer l'ordre d'aération ou d'évacuation préfectorale.
+* **Fiche Iode Stable (KI 65mg) rigoureusement conforme ASN / IRSN** :
+  * **Ordre préfectoral formel obligatoire** : Aucune ingestion préventive sauvage.
+  * **Fenêtre temporelle d'efficacité** : Optimale 1 à 2h avant le panache (~100%), résiduelle jusqu'à 6h, inutile et déconseillée après 24h.
+  * **Contre-indications médicales officielles** : Allergie avérée, maladies thyroïdiennes actives graves, maladies cutanées auto-immunes (dermatite herpétiforme).
+  * **Avertissement contre les faux remèdes mortels** : Interdiction formelle de boire de la Bétadine (corrosif digestif létal) ou de surconsommer du sel de cuisine (hypernatrémie mortelle).
+* **Risques Chimiques fiabilisés** :
+  * Rappel capital : **les masques FFP2 / FFP3 ne protègent PAS contre les gaz et vapeurs chimiques** (chlore, ammoniac, CO).
+  * Le linge humide n'est qu'un **moyen de fortune d'ultime recours** (filtration partielle pendant 2-3 min des seuls gaz hydrosolubles).
+  * Interdiction absolue de prendre de l'iode pour un risque chimique.
+
+---
+
+### 🗺️ 8. Audit de Fonctionnement & Transparence Géorisques
+* **🟢 Fonctions Réellement Opérationnelles** :
+  * **Géolocalisation GPS W3C Réelle** : Récupération des coordonnées physiques matérielles du terminal (latitude, longitude, précision). Géocodage inverse officiel automatique via l'API `geo.api.gouv.fr` ou projection géodésique hors-ligne (Haversine) sur les bassins de référence sans aucun transit serveur.
+  * **Recherche de Communes en Direct** : Recherche instantanée parmi les 35 000 communes françaises via l'API publique nationale.
+  * **Export d'un Instantané Territorial Réel** : Génération et téléchargement effectif d'un fichier normé `instantane-georisques-[commune]-[date].json` sur votre terminal, doublé d'une sauvegarde locale.
+  * **Documents Communaux 100% Embarqués** : Consultation hors-ligne des arrêtés préfectoraux, fiches réflexes, DICRIM et Plan Communal de Sauvegarde (PCS).
+* **🟡 Démonstration & Schéma Pédagogique** :
+  * **Carte Vectorielle Schématique** : Modélisation didactique légère des périmètres PPI, couloirs TMD et CNPE en SVG natif, conçue pour un fonctionnement ultra-rapide et autonome sans SIG lourd.
+* **🔵 Fonctionnalités Indisponibles Hors-Connexion** :
+  * **Actualisation en direct de l'API Géorisques** (`georisques.gouv.fr / GASPAR`) et **liens sortants** vers les rapports ministériels complets : nécessitent une connexion Internet active et basculent automatiquement sur le cache scellé en cas d'absence de réseau.
+
+---
+
+### 💾 9. Priorité 4 — Unification de la Persistance Locale & Stratégie Double-Niveau
+* **Architecture à Double Niveau (IndexedDB Prioritaire + Cache Miroir)** :
+  * **IndexedDB (Autorité Principale)** : Moteur asynchrone robuste sans contrainte de quota (magasins dédiés : `settings`, `checklistItems`, `familyPlans`, `inventoryItems`, `localRiskSnapshots`, `quizProgress`). Tous les éléments du kit 72h, le plan familial complet, l'inventaire des vivres et les données de profil y sont conservés durablement.
+  * **Miroir Local Synchrone (`localStorage`)** : Cache d'amorçage immédiat pour le thème clair/sombre et les éléments critiques évitant tout flash ou sursaut au rechargement de page.
+* **Sauvegarde & Restauration Intégrale V2 (`NRBCOR_BACKUP_V2`)** :
+  * Fichier d'archive JSON scellé contenant l'intégralité des données (Kit personnalisé, Plan familial, Membres, Contacts, Inventaire des stocks, Préférences).
+  * Validation stricte du schéma avec rétrocompatibilité V1.
+* **Purge Sécurisée Totale (Wipe)** :
+  * Réinitialisation atomique de l'ensemble des magasins IndexedDB et des clés de cache local sans laisser de résidu.
+* **Tableau de Bord & Santé du Stockage** :
+  * Diagnostic en direct dans l'écran Paramètres avec monitoring des magasins, estimation de l'espace alloué (`navigator.storage.estimate`) et bouton de vérification d'intégrité.
+
+---
+
+### 📊 10. Priorité 5 — Tableau de bord « Suis-je prêt ? » (Parcours Concret & Mesurable)
+* **Score de Préparation Transparent (100 Pts)** :
+  * Repose sur **5 piliers audités sans boîte noire** :
+    1. *Réserves Vitales (Eau & Alimentation)* — 25 pts (3L/jour/pers + 0,5L/jour/animal, rations sans cuisson, purification).
+    2. *Énergie, Éclairage & Communication* — 20 pts (Radio FM/DAB+ indépendante, torches LED, Powerbanks, piles de rechange).
+    3. *Santé, Hygiène & Besoins Spécifiques* — 20 pts (Trousse normée, couverture médicale/ordonnances, adaptation PMR/nourrisson).
+    4. *Plan Familial & Procédures de Repli* — 20 pts (Contact relais hors-zone > 100 km, point de ralliement, vannes d'arrêt).
+    5. *Vigilance Logistique & Maintenance* — 15 pts (Contrôle semestriel, 0 produit périmé, kit calfeutrage hermétique).
+  * **Avertissement déontologique rigoureux** : Le score mesure un niveau d'anticipation matérielle selon les guides de la Sécurité Civile mais n'offre aucune garantie d'immunité face aux aléas exceptionnels. Les ordres diffusés par les autorités restent toujours prioritaires.
+* **Personnalisation & Besoins Spécifiques** :
+  * Prise en compte dynamique de la composition réelle du foyer : adultes, enfants (4-12 ans, PPMS école), nourrissons (lait infantile, couches, sérum physiologique), personnes âgées et animaux de compagnie.
+  * Prise en compte explicite des vulnérabilités : personnes à mobilité réduite (PMR), affections de longue durée (stock 15-30j ordonnances), et voisinage d'installations Seveso ou centrales nucléaires (périmètre PPI).
+* **Jauges d'Autonomie en Coupure Totale** :
+  * *Eau potable* : Heures et jours réels calculés selon les personnes et animaux (+ bouton rapide d'ajout de packs de 9L).
+  * *Alimentation de survie* : Rations consommables froides sans cuisson ni électricité.
+  * *Éclairage* : Heures d'éclairage LED disponibles avec les piles en réserve.
+  * *Énergie & Info* : Recharges smartphone possibles et radio manivelle d'alerte.
+* **Éléments Manquants & Actions de Progrès** :
+  * Liste triée par criticité (Vital, Sécurité, Logistique) avec bouton d'acquisition en 1 clic mettant à jour IndexedDB et le score en direct.
+  * Suivi des échéances de péremption avec alertes à 60 jours et validation de l'audit semestriel ce jour.
+  * Actions recommandées hiérarchisées avec estimation du gain de points (+3 à +8 pts).
+
 ---
 
 ## 🏛️ Corpus Doctrinal et Risques Couverts

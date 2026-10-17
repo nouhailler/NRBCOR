@@ -408,23 +408,23 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
     reflexes: [
       {
         num: 1,
-        title: 'Rejoindre immédiatement un bâtiment clos',
-        description: "Mise à l'abri sans délai. Ne restez pas en plein air, ne cherchez pas à observer le panache toxique."
+        title: "Rejoindre immédiatement un bâtiment clos (Mise à l'abri prioritaire)",
+        description: "Mise à l'abri sans délai. Attention : aucune direction de fuite ni aucun abri n'est universellement sûr. Si surpris dehors sans abri immédiat et avant formation du nuage au-dessus de vous, un dégagement transversal au vent peut être envisagé. Dès qu'un bâtiment en dur est accessible, confinez-vous et appliquez strictement les ordres diffusés par la Préfecture et FR-Alert."
       },
       {
         num: 2,
-        title: 'Calfeutrer portes, fenêtres et couper la VMC',
-        description: "Arrêtez climatisation, chauffage et bouchez les aérations avec ruban adhésif ou linges humides."
+        title: 'Calfeutrer portes, fenêtres et couper impérativement la VMC',
+        description: "Arrêtez ventilation, climatisation, hottes et chauffage. Bouchez les aérations avec du ruban adhésif toilé épais ou des linges humides."
       },
       {
         num: 3,
-        title: 'Écouter France Bleu & préfecture',
-        description: "Radio publique (FM ou radio à manivelle) et notifications officielles FR-Alert sur smartphone."
+        title: 'Écouter France Bleu, France Inter & Préfecture',
+        description: "Radio publique d'urgence (FM ou manivelle) et notifications officielles FR-Alert sur smartphone pour connaître la nature exacte du toxique et les consignes sectorielles."
       },
       {
         num: 4,
-        title: 'Ne pas téléphoner',
-        description: "Laissez les réseaux cellulaires et filaires intégralement disponibles pour les services de secours."
+        title: 'Ne pas téléphoner (garder le réseau libre)',
+        description: "Laissez les réseaux cellulaires et filaires intégralement disponibles pour les régulations des services de secours (15, 18, 112)."
       }
     ],
     phases: {
@@ -447,19 +447,19 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       ],
       pendant: [
         {
-          title: '1. Rester confiné à l\'intérieur',
+          title: '1. Choix de la pièce selon le produit et les ordres reçus',
           icon: 'door_front',
-          desc: "Choisissez si possible une pièce centrale, sans ouverture vers l'extérieur ou avec le moins de fenêtres possible. Évitez les sous-sols et caves (certains gaz toxiques plus lourds que l'air s'y accumulent)."
+          desc: "Rejoignez une pièce centrale, sans ouverture vers l'extérieur. Attention : l'emplacement optimal dépend de la densité du gaz (les gaz denses type chlore s'infiltrent dans les caves et dépressions, tandis que les gaz volatils type ammoniac montent). Appliquez impérativement les consignes préfectorales diffusées pour votre secteur."
         },
         {
-          title: '2. Respirer à travers un tissu humide',
+          title: '2. Tissu humide : pis-aller d\'ultime recours',
           icon: 'masks',
-          desc: "En présence d'une odeur piquante ou suspecte à l'intérieur, appliquez immédiatement un tissu ou une serviette imbibée d'eau sur le nez et la bouche pour absorber temporairement une fraction des vapeurs solubles."
+          desc: "En cas d'odeur piquante ou suspecte à l'intérieur, appliquez un linge humide sur le nez et la bouche. Attention : ceci n'est qu'un filtre de fortune n'absorbant qu'une fraction des gaz solubles pendant 2-3 minutes. Cela ne protège pas contre le monoxyde de carbone ou les cyanures."
         },
         {
           title: '3. Flammes et étincelles strictement proscrites',
           icon: 'no_photography',
-          desc: "Ne fumez pas, n'allumez aucune bougie ni appareil électrique produisant une étincelle. De nombreux gaz industriels présentent une double toxicité explosive et inflammable."
+          desc: "Ne fumez pas, n'allumez aucune bougie ni appareil électrique produisant une étincelle. De nombreux gaz industriels présentent une toxicité doublée d'un risque explosif (ATEX)."
         },
         {
           title: '4. Ne pas aller chercher les enfants à l\'école',
@@ -471,7 +471,7 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
         {
           title: '1. Attendre l\'annonce officielle pour aérer',
           icon: 'air',
-          desc: "Ne retirez les bandes adhésives et n'ouvrez les fenêtres qu'après la diffusion du message de fin d'alerte par la préfecture ou par signal continu de sirène (30 secondes). Créez ensuite un courant d'air complet."
+          desc: "Ne retirez les bandes adhésives et n'ouvrez les fenêtres qu'après la diffusion formelle du message de fin d'alerte par la préfecture (sirène continue 30s ou radio). Créez ensuite un courant d'air complet pour assainir l'air intérieur."
         },
         {
           title: '2. Consulter en cas d\'irritation persistante',
@@ -496,19 +496,44 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       },
       {
         title: "Ne JAMAIS utiliser un simple masque FFP2/FFP3 contre les gaz",
-        description: "Les masques FFP2 ne filtrent que les poussières et aérosols mécaniques. Ils n'offrent strictement aucune protection contre les vapeurs, chlore, ammoniac ou gaz acides toxiques."
+        description: "Les masques FFP2/FFP3 ne filtrent que les poussières mécaniques. Ils n'offrent STRICTEMENT AUCUNE protection contre les vapeurs, chlore, ammoniac ou gaz acides toxiques."
       },
       {
-        title: "Ne JAMAIS tenter d'identifier une substance ou odeur",
+        title: "Ne JAMAIS prendre d'iode stable (KI 65mg)",
+        description: "L'iode stable ne protège QUE la thyroïde contre l'iode radioactif (accident nucléaire). Il ne possède strictement aucun effet contre les gaz chimiques et risquerait de déclencher des effets indésirables graves."
+      },
+      {
+        title: "Ne JAMAIS tenter d'identifier une substance à l'odeur",
         description: "Ne cherchez pas à approcher, humer ou goûter une nappe de gaz ou un liquide suspect. Plusieurs composés neutralisent l'odorat dès les premières inspirations (ex: H2S)."
       }
     ],
+    pedagogy: {
+      title: 'Typologie des Gaz Industriels & Consignes Géométriques',
+      cards: [
+        {
+          title: 'Gaz Plus Lourds que l\'Air (Densité > 1)',
+          tag: 'STAGNATION AU SOL',
+          tagClass: 'bg-primary text-white',
+          examples: 'Chlore (Cl2), Dioxyde de soufre (SO2), Phosgène, GPL / Propane / Butane.',
+          specificity: "Ces gaz rampent au ras du sol et s'accumulent dans les dépressions, caves, sous-sols et rez-de-chaussée bas. CONFINEMENT IMPÉRATIF AUX ÉTAGES INTERMÉDIAIRES.",
+          icon: 'south'
+        },
+        {
+          title: 'Gaz Plus Légers que l\'Air (Densité < 1)',
+          tag: 'ASCENSION EN TOITURE',
+          tagClass: 'bg-secondary-fixed text-on-secondary-fixed',
+          examples: 'Ammoniac (NH3), Méthane (CH4), Hydrogène (H2), Monoxyde de carbone (CO).',
+          specificity: "Ces gaz s'élèvent rapidement dans l'atmosphère et sous les toitures. Éviter les pièces sous combles ou greniers. Choisir une pièce centrale à mi-hauteur.",
+          icon: 'north'
+        }
+      ]
+    },
     emergencySymptoms: {
       title: "Quand contacter les secours ?",
       intro: "Afin de ne pas encombrer les standards de régulation, réservez vos appels téléphoniques exclusivement aux critères d'intoxication avérée ci-dessous :",
       symptoms: [
         'Gêne respiratoire aiguë (étouffement, sifflements, brûlure trachéale, cyanose)',
-        'Brûlures chimiques cutanées ou oculaires (rincer 15 min à l\'eau tempérée)',
+        'Brûlures chimiques cutanées ou oculaires (rincer 15 min à l\'eau tempérée sans frotter)',
         'Confusion mentale, somnolence brutale ou perte de conscience'
       ]
     },
@@ -649,14 +674,14 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
         authority: 'Santé Publique France',
         desc: "Comprimés de Iodure de Potassium (65 mg). À dissoudre dans de l'eau, du lait ou du jus de fruits.",
         rows: [
-          { label: 'Adulte & enfant > 12 ans', value: '2 comprimés (100 mg)' },
-          { label: 'Enfant de 3 à 12 ans', value: '1 comprimé (50 mg)' },
-          { label: 'Nourrisson (1 mois à 3 ans)', value: '1/2 comprimé (25 mg)' },
-          { label: 'Nouveau-né (< 1 mois)', value: '1/4 comprimé (12.5 mg)' },
-          { label: 'Femmes enceintes / allaitantes', value: '2 comprimés (priorité)', isHighlighted: true },
-          { label: 'Adultes de plus de 45 ans', value: 'Prise déconseillée*', isWarning: true }
+          { label: 'Adulte & enfant > 12 ans', value: '2 comprimés (130 mg KI / 100 mg d’iode)' },
+          { label: 'Enfant de 3 à 12 ans', value: '1 comprimé (65 mg KI / 50 mg d’iode)' },
+          { label: 'Nourrisson (1 mois à 3 ans)', value: '1/2 comprimé (32,5 mg KI / 25 mg d’iode)' },
+          { label: 'Nouveau-né (< 1 mois)', value: '1/4 comprimé (16,25 mg KI / 12,5 mg d’iode)' },
+          { label: 'Femmes enceintes / allaitantes', value: '2 comprimés (priorité vitale fœtale)', isHighlighted: true },
+          { label: 'Adultes de plus de 40 ans', value: 'Prise NON recommandée*', isWarning: true }
         ],
-        footnote: "*Risque d'effets secondaires supérieur au bénéfice (vulnérabilité très faible au cancer thyroïdien radio-induit à cet âge)."
+        footnote: "*Recommandation ASN/IRSN/OMS : le risque d'effets secondaires cardiaques et thyroïdiens est supérieur au bénéfice (vulnérabilité quasi nulle au cancer thyroïdien radio-induit après 40 ans)."
       }
     },
     emergencySymptoms: {

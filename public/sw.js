@@ -3,7 +3,8 @@ const CACHE_NAME = 'nrbcor-cache-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.webmanifest'
+  '/manifest.webmanifest',
+  '/fonts/material-symbols-outlined.woff2'
 ];
 
 self.addEventListener('install', (event) => {

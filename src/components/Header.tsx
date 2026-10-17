@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface HeaderProps {
   currentTitle?: string;
@@ -27,6 +27,21 @@ export const Header: React.FC<HeaderProps> = ({
   theme = 'light',
   onToggleTheme,
 }) => {
+  const [isOnline, setIsOnline] = useState<boolean>(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   return (
     <header className="fixed top-0 w-full z-40 bg-[#f8f9ff]/95 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e4efff]">
       <div className="h-20 px-3 sm:px-4 flex items-center justify-between gap-2 max-w-4xl mx-auto">
@@ -61,19 +76,30 @@ export const Header: React.FC<HeaderProps> = ({
             />
 
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="font-['Space_Grotesk'] text-[14px] text-[#001126] tracking-wide uppercase font-bold truncate">
                   NRBCOR
                 </span>
-                <span className="font-['Space_Grotesk'] text-[10px] px-1.5 py-0.5 rounded bg-[#98f6c5] text-[#005236] uppercase font-bold">
-                  ACTIF
+                <span
+                  title={isOnline ? 'Réseau Internet détecté et opérationnel' : 'Aucun réseau détecté - Fonctionnement sur base locale'}
+                  className={`font-['Space_Grotesk'] text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-1 ${
+                    isOnline
+                      ? 'bg-[#98f6c5] text-[#005236]'
+                      : 'bg-[#ffdad6] text-[#93000a]'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-[#005236]' : 'bg-[#93000a]'}`}></span>
+                  {isOnline ? 'En Ligne' : 'Hors Ligne'}
+                </span>
+                <span className="font-['Space_Grotesk'] text-[9px] px-1 py-0.5 rounded bg-[#eef4ff] text-[#0036ce] uppercase font-bold hidden sm:inline-block border border-[#d6e4f8]">
+                  Base Locale Prête
                 </span>
               </div>
               
-              <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#3f9d73] truncate">
-                <span>● 100% Hors-Ligne</span>
+              <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#44474d] truncate">
+                <span className="text-[#001126] font-semibold truncate">{currentTitle}</span>
                 <span className="text-[#c4c6ce]">•</span>
-                <span className="text-[#001126] font-medium truncate">{currentTitle}</span>
+                <span className="text-[#3f9d73] font-medium truncate">Stockage Autonome v1.2</span>
               </div>
             </div>
           </div>

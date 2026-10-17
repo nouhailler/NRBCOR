@@ -23,7 +23,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
 
   useEffect(() => {
     storageService.getInventoryItems().then((loaded) => {
-      setItems(loaded.length > 0 ? loaded : INITIAL_INVENTORY);
+      setItems(loaded);
       setLoading(false);
     });
   }, []);
@@ -353,6 +353,30 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
             </article>
           );
         })}
+
+        {sorted.length === 0 && (
+          <div className="bg-white p-6 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col items-center justify-center text-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-[#f0f4f9] flex items-center justify-center text-[#44474d]">
+              <span className="material-symbols-outlined text-[28px]">inventory_2</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-['Space_Grotesk'] text-[15px] font-bold text-[#001126]">
+                Inventaire vide (Feuille blanche)
+              </h3>
+              <p className="text-[12px] text-[#44474d] max-w-sm">
+                Aucun article n'est actuellement répertorié. Ajoutez vos packs d'eau, conserves ou piles pour suivre leurs péremptions.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              type="button"
+              className="min-h-[44px] px-4 rounded-xl bg-[#001126] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-1.5 shadow-xs"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span>Ajouter mon premier article</span>
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Modal Ajout Article */}

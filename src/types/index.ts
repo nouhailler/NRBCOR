@@ -12,7 +12,8 @@ export type SubScreen =
   | { type: 'siren-guide' }
   | { type: 'inventory' }
   | { type: 'settings' }
-  | { type: 'system-settings' };
+  | { type: 'system-settings' }
+  | { type: 'suis-je-pret' };
 
 export interface EmergencyCall {
   number: string;
@@ -36,6 +37,49 @@ export interface KitItem {
 export interface HouseholdConfig {
   peopleCount: number;
   durationDays: number;
+}
+
+export interface SpecificNeedsConfig {
+  adultsCount: number;
+  childrenCount: number;
+  infantsCount: number;
+  elderlyCount: number;
+  hasPmr: boolean;
+  hasChronicCondition: boolean;
+  petsCount: number;
+  isNearSevesoOrNpp: boolean;
+  targetDurationDays: number; // 2 (48h), 3 (72h), 7 (7j)
+}
+
+export interface ScoreDetailItem {
+  label: string;
+  earned: number;
+  max: number;
+  comment: string;
+}
+
+export interface ScorePillar {
+  id: string;
+  title: string;
+  score: number;
+  maxScore: number;
+  icon: string;
+  status: 'optimal' | 'warning' | 'critical';
+  formulaExplanation: string;
+  details: ScoreDetailItem[];
+}
+
+export interface ReadinessScoreResult {
+  totalScore: number;
+  level: {
+    number: number;
+    title: string;
+    badge: string;
+    color: string;
+    description: string;
+  };
+  pillars: ScorePillar[];
+  disclaimer: string;
 }
 
 export interface FamilyMember {

@@ -1,6 +1,7 @@
 {
   "name": "NRBCOR - Protection Civile & Risques NRBC",
   "short_name": "NRBCOR",
+  "version": "1.2.0",
   "description": "Application PWA citoyenne 100% hors-ligne de préparation aux risques nucléaires, radiologiques, biologiques et chimiques.",
   "start_url": "/",
   "display": "standalone",

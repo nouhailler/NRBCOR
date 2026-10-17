@@ -11,6 +11,7 @@ interface HamburgerMenuProps {
   theme?: 'light' | 'dark' | 'system';
   onChangeTheme?: (theme: 'light' | 'dark' | 'system') => void;
   onTriggerOnboarding?: () => void;
+  onOpenWipeModal?: () => void;
 }
 
 export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
@@ -23,6 +24,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   theme = 'light',
   onChangeTheme,
   onTriggerOnboarding,
+  onOpenWipeModal,
 }) => {
   if (!isOpen) return null;
 
@@ -225,6 +227,13 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </span>
             <div className="flex flex-col gap-1 bg-white rounded-xl p-1.5 border border-[#c4c6ce] shadow-xs">
               <button
+                onClick={() => handleSelectSub({ type: 'suis-je-pret' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#eef4ff] hover:bg-[#dee1ff] text-[#001258] font-bold transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#0036ce]">speed</span>
+                <span>Tableau de bord « Suis-je prêt ? »</span>
+              </button>
+              <button
                 onClick={() => handleSelectTab('preparation')}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#f0f4f9] text-[#001126] font-semibold transition-colors"
               >
@@ -306,10 +315,25 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                     onTriggerOnboarding();
                     onClose();
                   }}
-                  className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#f0f4f9] text-[#ba1a1a] transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#f0f4f9] text-[#44474d] transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[18px] text-[#ba1a1a]">gavel</span>
+                  <span className="material-symbols-outlined text-[18px] text-[#44474d]">gavel</span>
                   <span>Mentions Légales & Onboarding</span>
+                </button>
+              )}
+              {onOpenWipeModal && (
+                <button
+                  onClick={() => {
+                    onOpenWipeModal();
+                    onClose();
+                  }}
+                  className="flex items-center gap-2.5 p-2.5 rounded-lg text-left bg-[#ffdad6]/40 hover:bg-[#ffdad6] text-[#ba1a1a] transition-colors border border-[#ffb4ab] mt-1"
+                >
+                  <span className="material-symbols-outlined text-[20px] text-[#ba1a1a]">restart_alt</span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-['Space_Grotesk'] text-[12px] font-bold">Réinitialiser le prototype</span>
+                    <span className="text-[10px] text-[#93000a] leading-tight">Partir d'une feuille blanche ou recharger démo</span>
+                  </div>
                 </button>
               )}
             </div>

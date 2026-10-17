@@ -21,7 +21,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
   } | null>({
     code: 'C',
     name: 'Chimique',
-    desc: 'Fuite toxique industrielle, agents neurotoxiques ou suffocants. Fuite perpendiculaire au vent et confinement hermétique étanche.',
+    desc: 'Fuite toxique industrielle Seveso / TMD. Attention : aucune direction de fuite ni pièce n\'est universellement sûre. Mise à l\'abri immédiate et écoute stricte des ordres préfectoraux.',
     protocolKey: 'chimique',
   });
 
@@ -37,7 +37,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         setSelectedRisk({
           code: 'N',
           name: 'Nucléaire',
-          desc: "Accident de réacteur civil ou incident militaire majeur. Murs en béton épais, pas d'iode sans ordre gouvernemental formel.",
+          desc: "Accident de réacteur civil ou retombées radioactives. Murs en béton épais (sous-sol protecteur contre les rayons gamma). Calfeutrage et coupure VMC. ZÉRO automédication : iode UNIQUEMENT sur ordre formel du Préfet !",
           protocolKey: 'nucleaire',
         });
         break;
@@ -45,7 +45,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         setSelectedRisk({
           code: 'R',
           name: 'Radiologique',
-          desc: 'Dispersion de matières radioactives (source orpheline, attentat radiologique). Éloignement immédiat et écran physique.',
+          desc: "Dispersion de radioéléments ou source orpheline perdue. Règle d'or : Temps d'exposition minimal, Distance maximale, Écran dense. Déshabillage sans secouer et lavage doux sans frotter.",
           protocolKey: 'nucleaire',
         });
         break;
@@ -53,7 +53,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         setSelectedRisk({
           code: 'B',
           name: 'Biologique',
-          desc: 'Agents pathogènes vivants, toxines aéroportées ou dissémination biologique. Masque FFP3, isolement hermétique et stricte asepsie.',
+          desc: "Agents pathogènes viraux/bactériens ou toxines. Masque FFP3 hermétique ajusté, isolement physique, arrêt des VMC collectives et décontamination au savon/chlore actif.",
           protocolKey: 'bio',
         });
         break;
@@ -61,7 +61,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         setSelectedRisk({
           code: 'C',
           name: 'Chimique',
-          desc: 'Fuite toxique industrielle, agents neurotoxiques ou suffocants. Fuite perpendiculaire au vent et confinement hermétique étanche.',
+          desc: "Fuite toxique industrielle Seveso / TMD. Attention : aucune direction de fuite ni emplacement n'est universellement sûr. Les actions dépendent du produit (gaz lourd vs léger), de la météo et impérativement des consignes officielles. Aucun comprimé d'iode !",
           protocolKey: 'chimique',
         });
         break;
@@ -312,14 +312,14 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           </div>
 
           <p className="text-[14px] text-[#0f1c2b] font-medium leading-relaxed">
-            Consigne immédiate de mise à l’abri : éloignez-vous de la zone sans courir contre le vent, rejoignez un bâtiment en dur et calfeutrez tous les accès.
+            Consigne immédiate de mise à l’abri : rejoignez au plus vite un bâtiment en dur clos et calfeutrez tous les accès. Ne cherchez pas à fuir au hasard en voiture : appliquez strictement les ordres diffusés par les autorités.
           </p>
 
           <div className="grid grid-cols-3 gap-1.5 pt-0.5">
             <div className="bg-[#eef4ff] p-2 rounded-lg flex flex-col items-center text-center border border-[#d6e4f8]">
-              <span className="material-symbols-outlined text-[#001126] text-[20px] mb-0.5">air</span>
+              <span className="material-symbols-outlined text-[#001126] text-[20px] mb-0.5">campaign</span>
               <span className="font-['Space_Grotesk'] text-[11px] text-[#0f1c2b] font-semibold">
-                Vent transversal
+                Ordres d'État
               </span>
             </div>
             <div className="bg-[#eef4ff] p-2 rounded-lg flex flex-col items-center text-center border border-[#d6e4f8]">
@@ -711,12 +711,16 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           <span>Consulter le catalogue complet des guides</span>
         </button>
 
-        <div className="flex items-center justify-center gap-2 py-1 text-center">
-          <span className="material-symbols-outlined text-[#3f9d73] text-[16px]">verified_user</span>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
-            Référentiel Interministériel NRBC • Révision Civile 2024
+        <button
+          onClick={() => onOpenSubScreen({ type: 'tracabilite' })}
+          type="button"
+          className="w-full py-2.5 px-3 bg-[#eef4ff] hover:bg-[#e4efff] border border-[#d6e4f8] rounded-xl flex items-center justify-center gap-2 text-center transition-colors cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[#3f9d73] text-[18px]">verified_user</span>
+          <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold">
+            Consulter le Registre de Traçabilité & Sources Officielles (v2.4.1)
           </span>
-        </div>
+        </button>
       </section>
     </div>
   );

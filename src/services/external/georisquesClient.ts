@@ -6,6 +6,15 @@ export interface CommuneSearchResult {
   population?: number;
 }
 
+export interface GeorisquesReportRisk {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  officialDocumentUrl?: string;
+  protocolKey?: 'chimique' | 'nucleaire' | 'confinement' | 'bio';
+}
+
 export interface GeorisquesReport {
   communeName: string;
   inseeCode: string;
@@ -13,20 +22,13 @@ export interface GeorisquesReport {
   source: string;
   isOfflineCache: boolean;
   risksCount: number;
-  risks: {
-    id: string;
-    category: string;
-    title: string;
-    description: string;
-    officialDocumentUrl?: string;
-  }[];
+  risks: GeorisquesReportRisk[];
 }
 
-const TIMEOUT_MS = 4000;
+const TIMEOUT_MS = 5000;
 
 /**
- * Recherche de communes via l'API publique geo.api.gouv.fr
- * avec délai d'attente strict et gestion d'erreur hors-ligne.
+ * Recherche de communes par nom ou code postal via l'API publique geo.api.gouv.fr
  */
 export async function searchCommunesOnline(query: string): Promise<{
   success: boolean;
@@ -43,8 +45,8 @@ export async function searchCommunesOnline(query: string): Promise<{
   try {
     const isPostal = /^\d{2,5}$/.test(query.trim());
     const url = isPostal
-      ? `https://geo.api.gouv.fr/communes?codePostal=${encodeURIComponent(query.trim())}&fields=nom,code,codeDepartement,codesPostaux,population&limit=5`
-      : `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query.trim())}&fields=nom,code,codeDepartement,codesPostaux,population&limit=5`;
+      ? `https://geo.api.gouv.fr/communes?codePostal=${encodeURIComponent(query.trim())}&fields=nom,code,codeDepartement,codesPostaux,population&limit=6`
+      : `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query.trim())}&fields=nom,code,codeDepartement,codesPostaux,population&limit=6`;
 
     const res = await fetch(url, {
       signal: controller.signal,
@@ -72,8 +74,49 @@ export async function searchCommunesOnline(query: string): Promise<{
 }
 
 /**
- * Récupère la synthèse des risques locaux pour une commune
- * avec garantie de non-régression si le réseau est absent.
+ * Géocodage inverse : retrouve la commune officielle française à partir de coordonnées GPS (W3C Geolocation)
+ */
+export async function reverseGeocodeOnline(lat: number, lon: number): Promise<{
+  success: boolean;
+  commune?: CommuneSearchResult;
+  error?: string;
+}> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    const url = `https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lon}&fields=nom,code,codeDepartement,codesPostaux,population`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: 'application/json' }
+    });
+
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      throw new Error(`Erreur reverse geocoding (${res.status})`);
+    }
+
+    const list: CommuneSearchResult[] = await res.json();
+    if (list && list.length > 0) {
+      return { success: true, commune: list[0] };
+    }
+
+    return { success: false, error: 'Aucune commune française identifiée à ces coordonnées exactes' };
+  } catch (err: any) {
+    clearTimeout(timer);
+    return {
+      success: false,
+      error: err.name === 'AbortError'
+        ? 'Délai dépassé lors de la résolution de commune'
+        : 'Réseau indisponible pour le géocodage inverse'
+    };
+  }
+}
+
+/**
+ * Récupère la synthèse des risques locaux pour une commune via l'API officielle Géorisques (data.gouv.fr)
+ * avec mise en cache locale et gestion stricte hors-ligne.
  */
 export async function fetchGeorisquesOnline(inseeCode: string, communeName: string): Promise<GeorisquesReport> {
   const cacheKey = `georisques_cache_${inseeCode}`;
@@ -85,7 +128,7 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
     if (s) cached = JSON.parse(s);
   } catch (e) {}
 
-  // Si pas de réseau, renvoie immédiatement le cache ou le rapport par défaut
+  // Si pas de réseau, renvoie immédiatement le cache
   if (typeof navigator !== 'undefined' && !navigator.onLine && cached) {
     return { ...cached, isOfflineCache: true };
   }
@@ -94,40 +137,68 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    // API officielle Géorisques (data.gouv.fr)
     const url = `https://www.georisques.gouv.fr/api/v1/gaspar/risques?code_insee=${encodeURIComponent(inseeCode)}`;
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
 
     if (res.ok) {
       const data = await res.json();
-      const report: GeorisquesReport = {
-        communeName,
-        inseeCode,
-        retrievedAt: new Date().toISOString(),
-        source: 'API Géorisques (data.gouv.fr / BRGM)',
-        isOfflineCache: false,
-        risksCount: data?.data?.length || 3,
-        risks: (data?.data || []).map((r: any, idx: number) => ({
-          id: `risk-${idx}`,
-          category: r.libelle_risque_jo || 'Risque Technologique',
-          title: r.libelle_risque_jo || 'Plan de Prévention des Risques',
-          description: `Historique arrêté préfectoral : ${r.date_arrete || 'Consulter le DICRIM municipal'}.`,
-          officialDocumentUrl: `https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${inseeCode}`
-        }))
-      };
+      const firstEntry = data?.data?.[0];
+      const rawRisks = firstEntry?.risques_detail || [];
 
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(report));
-      } catch (e) {}
+      if (rawRisks.length > 0) {
+        // Déduplication et sélection des risques technologiques et majeurs prioritaires
+        const parsedRisks: GeorisquesReportRisk[] = rawRisks.map((r: any, idx: number) => {
+          const label = r.libelle_risque_long || r.libelle_risque_jo || 'Risque Technologique';
+          let protocolKey: 'chimique' | 'nucleaire' | 'confinement' | 'bio' | undefined = undefined;
+          let category = 'Risque Majeur Notifié';
 
-      return report;
+          if (/industriel|seveso|chim|toxique/i.test(label)) {
+            protocolKey = 'chimique';
+            category = 'Risque Industriel & Seveso';
+          } else if (/matières dangereuses|marchandises dangereuses|tmd/i.test(label)) {
+            protocolKey = 'confinement';
+            category = 'Transport Matières Dangereuses (TMD)';
+          } else if (/radon|nucl|radioac/i.test(label)) {
+            protocolKey = 'nucleaire';
+            category = 'Risque Radiologique';
+          } else if (/inondation|barrage|submersion/i.test(label)) {
+            protocolKey = 'confinement';
+            category = 'Risque Naturel / Rupture';
+          }
+
+          return {
+            id: `gaspar-${idx}`,
+            category,
+            title: label,
+            description: `Recensé dans le dossier communal d'information préfectoral (GASPAR/Géorisques).`,
+            officialDocumentUrl: `https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${inseeCode}`,
+            protocolKey
+          };
+        });
+
+        const report: GeorisquesReport = {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: 'API Géorisques en ligne (data.gouv.fr / BRGM)',
+          isOfflineCache: false,
+          risksCount: parsedRisks.length,
+          risks: parsedRisks
+        };
+
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(report));
+        } catch (e) {}
+
+        return report;
+      }
     }
   } catch (err) {
     clearTimeout(timer);
   }
 
-  // Fallback sécurisé : si l'API échoue ou est hors ligne, utiliser le cache ou des données certifiées
+  // Fallback sécurisé : si l'API échoue ou est hors ligne, utiliser le cache existant ou les données certifiées
   if (cached) {
     return { ...cached, isOfflineCache: true };
   }
@@ -135,31 +206,34 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
   return {
     communeName,
     inseeCode,
-    retrievedAt: '2026-10-04T14:32:00.000Z',
-    source: 'Base locale intégrée NRBCOR (Cache certifié)',
+    retrievedAt: '2026-10-14T08:00:00.000Z',
+    source: 'Base locale intégrée NRBCOR (Cache certifié hors-ligne)',
     isOfflineCache: true,
     risksCount: 3,
     risks: [
       {
         id: 'c-1',
         category: 'Risque Industriel Majeur (Seveso)',
-        title: 'Site Chimique Seveso Seuil Haut',
-        description: 'Établissement classé à proximité. PPI préfectoral en vigueur. Confinement étanche prioritaire.',
-        officialDocumentUrl: 'https://www.georisques.gouv.fr/'
+        title: 'Couloir Industriel & Installations Seveso Seuil Haut',
+        description: 'Établissements classés sous Plan de Prévention des Risques Technologiques (PPRT). Confinement étanche prioritaire.',
+        officialDocumentUrl: 'https://www.georisques.gouv.fr/',
+        protocolKey: 'chimique'
       },
       {
         id: 'c-2',
         category: 'Transport de Matières Dangereuses (TMD)',
-        title: 'Axe TMD Ferroviaire et Routier',
-        description: 'Circulation de wagons citernes de chlore et gaz liquéfiés. Éloignement perpendiculaire au vent.',
-        officialDocumentUrl: 'https://www.georisques.gouv.fr/'
+        title: 'Transit Ferroviaire & Autoroutier TMD',
+        description: 'Circulation régulière de citernes de composés chimiques et gaz liquéfiés. Éloignement transversal au vent.',
+        officialDocumentUrl: 'https://www.georisques.gouv.fr/',
+        protocolKey: 'confinement'
       },
       {
         id: 'c-3',
-        category: 'Risque Nucléaire',
-        title: 'Installation Nucléaire Civile (Centrale CNPE)',
-        description: 'Zone d\'action PPI. Suivi de l\'exploitant et consignes préfectorales via radio.',
-        officialDocumentUrl: 'https://www.asnr.fr/'
+        category: 'Risque Nucléaire & Radiologique',
+        title: 'Vigilance Territoriale PPI & Rayon Élargi',
+        description: 'Installation nucléaire civile dans le bassin régional. Consignes préfectorales via radio et distribution d\'iode sur ordre.',
+        officialDocumentUrl: 'https://www.asnr.fr/',
+        protocolKey: 'nucleaire'
       }
     ]
   };

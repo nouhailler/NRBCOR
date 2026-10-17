@@ -21,6 +21,7 @@ import { SirenGuideView } from './views/SirenGuideView';
 import { InventoryView } from './views/InventoryView';
 import { SettingsView } from './views/SettingsView';
 import { SystemSettingsView } from './views/SystemSettingsView';
+import { SuisJePretView } from './views/SuisJePretView';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { storageService } from './services/storage/IndexedDbStorage';
@@ -35,42 +36,19 @@ export default function App() {
   const [isWipeModalOpen, setIsWipeModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
-  // Thème Clair / Sombre / Système
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    try {
-      const saved = localStorage.getItem('nrbcor_theme_mode');
-      if (saved === 'light' || saved === 'dark' || saved === 'system') {
-        return saved;
-      }
-    } catch (e) {}
-    return 'light'; // Thème clair par défaut
-  });
+  // Thème Clair / Sombre / Système (accès centralisé via storageService)
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => storageService.getInitialTheme());
 
-  // Local storage persisted kit items
-  const [kitItems, setKitItems] = useState<KitItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('nrbcor_kit_items');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn('Could not read from localStorage', e);
-    }
-    return INITIAL_KIT_ITEMS;
-  });
+  // Kit d'urgence 72h unifié (IndexedDB prioritaire avec miroir synchrone géré par storageService)
+  const [kitItems, setKitItems] = useState<KitItem[]>(() => storageService.getInitialKitItems());
 
+  // Sauvegarde unifiée dans IndexedDB & miroir local à chaque modification
   useEffect(() => {
-    try {
-      localStorage.setItem('nrbcor_kit_items', JSON.stringify(kitItems));
-    } catch (e) {
-      console.warn('Could not save to localStorage', e);
-    }
+    storageService.saveKitItems(kitItems);
   }, [kitItems]);
 
-  // Synchronisation du thème avec le DOM et localStorage
+  // Synchronisation du thème avec le DOM et IndexedDB
   useEffect(() => {
-    try {
-      localStorage.setItem('nrbcor_theme_mode', theme);
-    } catch (e) {}
-
     const root = document.documentElement;
     const isDark =
       theme === 'dark' ||
@@ -88,6 +66,16 @@ export default function App() {
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', isDark ? '#001126' : '#f8f9ff');
     }
+
+    // Persister dans les paramètres unifiés
+    storageService.getSettings().then((curr) => {
+      if (curr.preferredTheme !== theme) {
+        storageService.saveSettings({
+          ...curr,
+          preferredTheme: theme
+        });
+      }
+    });
   }, [theme]);
 
   const handleToggleTheme = () => {
@@ -129,15 +117,18 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' as any });
   };
 
-  const handleConfirmWipe = () => {
+  const [dataReloadKey, setDataReloadKey] = useState(0);
+
+  const handleResetClean = async () => {
     setIsWipeModalOpen(false);
-    try {
-      localStorage.removeItem('nrbcor_kit_items');
-      localStorage.removeItem('nrbcor_family_plan');
-    } catch (e) {
-      console.warn(e);
-    }
-    setKitItems(INITIAL_KIT_ITEMS.map((it) => ({ ...it, completed: false })));
+    await storageService.resetToCleanState();
+    await handleDataReloaded();
+  };
+
+  const handleResetDemo = async () => {
+    setIsWipeModalOpen(false);
+    await storageService.resetToDemoState();
+    await handleDataReloaded();
   };
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -146,12 +137,34 @@ export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstall, setCanInstall] = useState(false);
 
-  // Vérification de l'onboarding et initialisation du Service Worker & auto-updater
+  // Vérification, migration transparente et synchronisation au démarrage (IndexedDB + Service Worker)
   useEffect(() => {
+    // 1. Migration automatique et test d'intégrité du stockage
+    storageService.migrateLegacyData().then((mig) => {
+      if (mig.migratedCount > 0) {
+        console.info(`[NRBCOR Storage] Migration réussie : ${mig.migratedCount} ensembles de données synchronisés vers IndexedDB.`);
+      }
+    });
+
+    storageService.testStorageHealth().then((health) => {
+      if (!health.indexedDbOk) {
+        console.warn('[NRBCOR Storage] IndexedDB indisponible (mode privé/restreint). Bascule automatique en mode localStorage tolérant.');
+      }
+    });
+
     storageService.getSettings().then((s) => {
       setTextScale(s.textScale || 'normal');
+      if (s.preferredTheme) {
+        setTheme(s.preferredTheme);
+      }
       if (!s.onboardingCompleted) {
         setShowOnboarding(true);
+      }
+    });
+
+    storageService.getKitItems().then((items) => {
+      if (items && items.length > 0) {
+        setKitItems(items);
       }
     });
 
@@ -169,6 +182,19 @@ export default function App() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
   }, []);
+
+  const handleDataReloaded = async () => {
+    const items = await storageService.getKitItems();
+    setKitItems(items);
+    const s = await storageService.getSettings();
+    if (s.preferredTheme) {
+      setTheme(s.preferredTheme);
+    }
+    if (s.textScale) {
+      setTextScale(s.textScale);
+    }
+    setDataReloadKey((k) => k + 1);
+  };
 
   const handleInstallApp = async () => {
     if (deferredPrompt) {
@@ -336,6 +362,7 @@ export default function App() {
               onChangeTextScale={setTextScale}
               theme={theme}
               onChangeTheme={setTheme}
+              onDataReloaded={handleDataReloaded}
             />
           ) : subScreen.type === 'system-settings' ? (
             <SystemSettingsView
@@ -345,16 +372,27 @@ export default function App() {
               theme={theme}
               onChangeTheme={setTheme}
             />
+          ) : subScreen.type === 'suis-je-pret' ? (
+            <SuisJePretView
+              onBack={handleBack}
+              onNavigateTab={handleSelectTab}
+              onOpenSubScreen={handleOpenSubScreen}
+              items={kitItems}
+              onToggleItem={handleToggleKitItem}
+              onOpenInventory={() => handleOpenSubScreen({ type: 'inventory' })}
+            />
           ) : null
         ) : (
           <>
             {activeTab === 'accueil' && (
               <HomeView
+                key={`home-${dataReloadKey}`}
                 onNavigateTab={handleSelectTab}
                 onOpenSubScreen={handleOpenSubScreen}
                 kitCompletionPercent={kitCompletionPercent}
                 canInstall={canInstall}
                 onInstallClick={handleInstallApp}
+                onOpenWipeModal={() => setIsWipeModalOpen(true)}
               />
             )}
 
@@ -375,16 +413,20 @@ export default function App() {
 
             {activeTab === 'preparation' && (
               <PreparationView
+                key={`prep-${dataReloadKey}`}
                 items={kitItems}
                 onToggleItem={handleToggleKitItem}
                 onResetItems={handleResetKitItems}
                 onAddItem={handleAddKitItem}
                 onOpenInventory={() => handleOpenSubScreen({ type: 'inventory' })}
+                onNavigateTab={handleSelectTab}
+                onOpenSubScreen={handleOpenSubScreen}
               />
             )}
 
             {activeTab === 'mon-plan' && (
               <MonPlanView
+                key={`plan-${dataReloadKey}`}
                 onOpenCallModal={setActiveCallModal}
                 onOpenWipeModal={() => setIsWipeModalOpen(true)}
               />
@@ -407,6 +449,7 @@ export default function App() {
         theme={theme}
         onChangeTheme={setTheme}
         onTriggerOnboarding={() => setShowOnboarding(true)}
+        onOpenWipeModal={() => setIsWipeModalOpen(true)}
       />
 
       {/* Modals */}
@@ -424,7 +467,8 @@ export default function App() {
       <WipeModal
         isOpen={isWipeModalOpen}
         onClose={() => setIsWipeModalOpen(false)}
-        onConfirm={handleConfirmWipe}
+        onConfirmClean={handleResetClean}
+        onConfirmDemo={handleResetDemo}
       />
 
       <InstallGuideModal
