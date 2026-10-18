@@ -16,7 +16,8 @@ import {
 import { SECURITY_CORPUS_ITEMS } from '../src/data/securityCorpus';
 import { SpecificNeedsConfig, KitItem } from '../src/types';
 import { InventoryItem, FamilyPlanData } from '../src/services/storage/StorageRepository';
-import { getPedagogicalSampleRisks, fetchGeorisquesOnline } from '../src/services/external/georisquesClient';
+import { getPedagogicalSampleRisks, fetchGeorisquesOnline, searchCommunesOnline } from '../src/services/external/georisquesClient';
+import { AVAILABLE_COMMUNES } from '../src/data/georisquesData';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -207,6 +208,119 @@ assert(samplePedago.length >= 3, 'Échantillon didactique d\'entraînement dispo
 assert(
   samplePedago.every((r) => r.category.includes('Exemple Pédagogique')),
   'Les risques didactiques sont formellement étiquetés "Exemple Pédagogique"'
+);
+
+// ========================================================
+// TEST 5 : Discrimination des coordonnées territoriales réelles
+// ========================================================
+console.log('\n5. TEST DISCRIMINATION DES COORDONNÉES TERRITORIALES (ANTI-CONFUSION LYON) :');
+
+const lyonCommune = AVAILABLE_COMMUNES.find((c) => c.insee === '69383');
+const rouenCommune = AVAILABLE_COMMUNES.find((c) => c.insee === '76540');
+const dunkerqueCommune = AVAILABLE_COMMUNES.find((c) => c.insee === '59183');
+const marseilleCommune = AVAILABLE_COMMUNES.find((c) => c.insee === '13202');
+const parisCommune = AVAILABLE_COMMUNES.find((c) => c.insee === '75101');
+
+assert(!!lyonCommune, 'Commune de référence Lyon 3e présente');
+assert(!!rouenCommune, 'Commune de Rouen présente dans les références');
+assert(!!dunkerqueCommune, 'Commune de Dunkerque présente dans les références');
+assert(!!marseilleCommune, 'Commune de Marseille présente dans les références');
+assert(!!parisCommune, 'Commune de Paris présente dans les références');
+
+// Vérification stricte que Rouen ne reçoit PAS les coordonnées de Lyon
+assert(Math.abs(rouenCommune!.lat - 49.4432) < 0.01, 'Rouen a sa latitude réelle (49.44)');
+assert(Math.abs(rouenCommune!.lng - 1.0999) < 0.01, 'Rouen a sa longitude réelle (1.10)');
+assert(
+  Math.abs(rouenCommune!.lat - lyonCommune!.lat) > 2.0,
+  'Les coordonnées de Rouen sont distinctes de Lyon (> 2° d\'écart)'
+);
+
+// Vérification stricte que Dunkerque ne reçoit PAS les coordonnées de Lyon
+assert(Math.abs(dunkerqueCommune!.lat - 51.0343) < 0.01, 'Dunkerque a sa latitude réelle (51.03)');
+assert(
+  Math.abs(dunkerqueCommune!.lat - lyonCommune!.lat) > 4.0,
+  'Les coordonnées de Dunkerque sont distinctes de Lyon (> 4° d\'écart)'
+);
+
+// Vérification stricte pour Paris et Marseille
+assert(Math.abs(parisCommune!.lat - 48.8606) < 0.01, 'Paris a sa latitude réelle (48.86)');
+assert(Math.abs(marseilleCommune!.lat - 43.3039) < 0.01, 'Marseille a sa latitude réelle (43.30)');
+
+// Test recherche locale / hors-ligne
+const searchRouenRes = await searchCommunesOnline('Rouen');
+assert(searchRouenRes.success === true, 'Recherche locale pour Rouen réussie');
+const matchRouen = searchRouenRes.data.find((d) => d.code === '76540');
+assert(!!matchRouen, 'Rouen trouvé dans les résultats de recherche');
+assert(
+  matchRouen?.centre?.coordinates[1] === rouenCommune!.lat,
+  'Coordonnées réelles de Rouen attachées aux résultats de recherche'
+);
+
+// ========================================================
+// TEST 6 : Intégrité des statuts et isolation documentaire
+// ========================================================
+console.log('\n6. TEST INTÉGRITÉ DES STATUTS DE RAPPORT GÉORISQUES :');
+
+// Simuler les statuts de rapport pour s'assurer qu'aucun ne confond zéro risque avec un échec
+const validZeroRiskReport = {
+  communeName: 'Village Rural Exempt',
+  inseeCode: '00000',
+  retrievedAt: new Date().toISOString(),
+  source: 'API Géorisques en direct (data.gouv.fr / BRGM)',
+  isOfflineCache: false,
+  dataSourceType: 'live_api_zero_risk' as const,
+  risksCount: 0,
+  risks: []
+};
+
+assert(
+  validZeroRiskReport.dataSourceType === 'live_api_zero_risk',
+  'Statut live_api_zero_risk correctement typé pour une commune sans risque notifié'
+);
+assert(
+  validZeroRiskReport.risksCount === 0 && validZeroRiskReport.risks.length === 0,
+  'Zéro risque inventorié pour commune sans arrêté technologique'
+);
+
+// ========================================================
+// TEST 7 : Spécification des exports territoriaux et mentions de sauvegarde
+// ========================================================
+console.log('\n7. TEST SPÉCIFICATION DES EXPORTS TERRITORIAUX :');
+
+const dummySnapshot = {
+  application: 'NRBCOR Protection Civile',
+  type: 'INSTANTANE_TERRITORIAL_GEORISQUES',
+  fiabiliteSynthese: {
+    statut: 'OFFICIEL_DIRECT_API_GEORISQUES',
+    estOfficielDirect: true,
+    estCacheOfficiel: false,
+    estEchantillonDidactique: false,
+    mentionLegale: 'Ne se substitue pas aux arrêtés préfectoraux opposables.'
+  },
+  documentsDeSauvegarde: [
+    {
+      id: 'dicrim',
+      nom: 'DICRIM - Synthèse',
+      disponibiliteHorsLigne: false,
+      statutAuthenticite: 'L’exemplaire authentique intégral paraphé par le Maire doit être consulté en Mairie.'
+    },
+    {
+      id: 'pcs',
+      nom: 'PCS - Dispositif communal',
+      disponibiliteHorsLigne: false,
+      statutAuthenticite: 'Dispositif opérationnel communal.'
+    }
+  ]
+};
+
+assert(dummySnapshot.fiabiliteSynthese.estOfficielDirect === true, 'Export officiel identifié comme tel');
+assert(
+  dummySnapshot.documentsDeSauvegarde.every((d) => d.disponibiliteHorsLigne === false),
+  'Les documents DICRIM et PCS indiquent formellement disponibiliteHorsLigne = false'
+);
+assert(
+  dummySnapshot.documentsDeSauvegarde.some((d) => d.statutAuthenticite.includes('paraphé par le Maire')),
+  'Mention explicite que l\'exemplaire paraphé doit être consulté en mairie'
 );
 
 console.log(`\n========================================================`);

@@ -103,12 +103,12 @@
 * **🟢 Fonctions Réellement Opérationnelles** :
   * **Géolocalisation GPS W3C Réelle** : Récupération des coordonnées physiques matérielles du terminal (latitude, longitude, précision). Géocodage inverse officiel automatique via l'API `geo.api.gouv.fr` ou projection géodésique hors-ligne (Haversine) sur les bassins de référence sans aucun transit serveur.
   * **Recherche de Communes en Direct** : Recherche instantanée parmi les 35 000 communes françaises via l'API publique nationale.
-  * **Export d'un Instantané Territorial Réel** : Génération et téléchargement effectif d'un fichier normé `instantane-georisques-[commune]-[date].json` sur votre terminal, doublé d'une sauvegarde locale.
-  * **Documents Communaux 100% Embarqués** : Consultation hors-ligne des arrêtés préfectoraux, fiches réflexes, DICRIM et Plan Communal de Sauvegarde (PCS).
+  * **Export d'un Instantané Territorial Réel** : Génération et téléchargement effectif d'un fichier normé `instantane-georisques-[commune]-[date].json` sur votre terminal avec traçabilité explicite du niveau de fiabilité (`OFFICIEL_DIRECT_API`, `OFFICIEL_CACHE_LOCAL`, `OFFICIEL_DIRECT_API_AUCUN_RISQUE_RECENSE` ou `ECHANTILLON_PEDAGOGIQUE`).
+  * **Synthèses Communales & Cadre Réflexe** : Consultation hors-ligne des synthèses d'information préventive (DICRIM, PCS), fiches réflexes et contact officiel de la Mairie via l'Annuaire du Service Public (DILA). Les textes intégraux paraphés par les Maires restent opposables auprès des mairies respectives.
 * **🟡 Démonstration & Schéma Pédagogique** :
-  * **Carte Vectorielle Schématique** : Modélisation didactique légère des périmètres PPI, couloirs TMD et CNPE en SVG natif, conçue pour un fonctionnement ultra-rapide et autonome sans SIG lourd.
+  * **Carte Vectorielle Schématique** : Modélisation didactique légère des périmètres PPI, couloirs TMD et CNPE en SVG natif (maquette d'entraînement sans prétention de Système d'Information Géographique officiel).
 * **🔵 Fonctionnalités Indisponibles Hors-Connexion** :
-  * **Actualisation en direct de l'API Géorisques** (`georisques.gouv.fr / GASPAR`) et **liens sortants** vers les rapports ministériels complets : nécessitent une connexion Internet active et basculent automatiquement sur le cache scellé en cas d'absence de réseau.
+  * **Actualisation en direct de l'API Géorisques** (`georisques.gouv.fr / GASPAR`) et **liens sortants** vers les portails officiels de l'État : nécessitent une connexion Internet active et basculent automatiquement sur le cache local vérifié en cas d'absence de réseau.
 
 ---
 
@@ -165,11 +165,11 @@
 
 * 🧴 **Déshabillage & Décontamination Pas-à-Pas (8 étapes)** : Délimitation de sas souillé, découpe des vêtements sans secouer, double ensachage hermétique étanche, rinçage cutané doux à l'eau claire.
 * 💊 **Calculateur d'Iodure de Potassium (KI 65mg)** : Posologie certifiée selon l'âge (nouveau-né, nourrisson, enfant, adulte, femme enceinte).
-* 🚪 **Guide Confinement Étanche & Simulateur d'Air** : Calcul du volume m³ de la pièce et de la fenêtre temporelle sécuritaire de respiration sans VMC.
+* 🚪 **Guide Confinement Étanche & Simulateur Didactique d'Air** : Modèle volumétrique indicatif de renouvellement d'air en pièce calfeutrée avec avertissement formel interdisant d'interpréter ce calcul comme une garantie de survie.
 * 📢 **Simulateur Sonore du Signal National d'Alerte (RNA)** : Synthétiseur Web Audio API reproduisant le cycle réglementaire (1 min 41 s x 3) et le signal de fin d'alerte (30 s continu).
 * 📋 **Checklist Paramétrique du Kit 72h** : Rations, lampes dynamo, radio FM, pharmacie d'urgence et inventaire avec alerte de péremption.
 * 🧭 **Mon Plan Familial de Mise en Sûreté** : Points de ralliement, mode discret pour masquer les données à l'écran, et bouton de purge complète sécurisée.
-* 🗺️ **Radar Géorisques Local** : Détection des sites Seveso, axes TMD et plans communaux (DICRIM/PCS) avec mise en cache sans dépendance réseau.
+* 🗺️ **Module Géorisques & Analyse Territoriale** : Consultation des arrêtés préfectoraux GASPAR en direct ou mis en cache local, échantillon didactique d'entraînement distinct, coordonnées officielles de la Mairie et schéma vectoriel d'incidence.
 
 ---
 
@@ -186,10 +186,16 @@ npm install
 # 3. Lancer l'environnement de développement local (Port 3000)
 npm run dev
 
-# 4. Vérifier les types TypeScript et le linter
+# 4. Vérifier les types TypeScript
 npm run lint
 
-# 5. Compiler l'application pour la production
+# 5. Exécuter la suite complète de 133 tests fonctionnels & réglementaires
+npm test
+
+# 6. Contrôler la conformité éditoriale et la traçabilité doctrinale
+npm run check:content
+
+# 7. Compiler l'application pour la production
 npm run build
 ```
 

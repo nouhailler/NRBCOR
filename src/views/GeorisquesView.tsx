@@ -50,7 +50,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
   // Modal and Interactive map state
   const [activeModalDoc, setActiveModalDoc] = useState<string | null>(null);
-  const [selectedMapNode, setSelectedMapNode] = useState<'ref' | 'ppi' | 'tmd' | 'bugey' | null>(null);
+  const [selectedMapNode, setSelectedMapNode] = useState<'ref' | 'ppi' | 'tmd' | 'nucleaire' | null>(null);
   const [showAuditPanel, setShowAuditPanel] = useState<boolean>(true);
 
   // Monitor Network Status
@@ -280,17 +280,32 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           type: 'info',
           text: `Données issues du cache certifié local (${report.risksCount} risques recensés pour ${activeCommune.name}).`
         });
+      } else if (report.dataSourceType === 'live_api_zero_risk') {
+        setRefreshMessage({
+          type: 'info',
+          text: `Actualisation en direct réussie auprès de Géorisques (data.gouv.fr) : aucun risque technologique ou majeur répertorié dans la base GASPAR pour ${activeCommune.name}.`
+        });
+      } else if (report.dataSourceType === 'network_error') {
+        setRefreshMessage({
+          type: 'warning',
+          text: `Échec de connexion : ${report.source}. Impossible d'actualiser les arrêtés pour ${activeCommune.name}.`
+        });
+      } else if (report.dataSourceType === 'api_error') {
+        setRefreshMessage({
+          type: 'warning',
+          text: `Erreur API Géorisques : ${report.source}.`
+        });
       } else {
         setRefreshMessage({
           type: 'success',
-          text: `Actualisation en direct réussie auprès de l’API Géorisques (data.gouv.fr / BRGM). ${report.risksCount} risques identifiés.`
+          text: `Actualisation en direct réussie auprès de l’API Géorisques (data.gouv.fr / BRGM). ${report.risksCount} risque(s) majeur(s) identifié(s).`
         });
       }
     } catch (err: any) {
       setRefreshing(false);
       setRefreshMessage({
         type: 'warning',
-        text: 'Erreur lors de la communication avec l’API Géorisques. Conservation des données locales.'
+        text: 'Erreur inattendue lors de la communication avec l’API Géorisques. Conservation des données locales.'
       });
     }
   };
@@ -298,6 +313,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   // 3. EXPORT RÉEL D'UN INSTANTANÉ (OPÉRATIONNEL TÉLÉCHARGEABLE)
   const handleRealExportSnapshot = () => {
     const isAuthenticLive = liveReport?.dataSourceType === 'live_api';
+    const isAuthenticLiveZero = liveReport?.dataSourceType === 'live_api_zero_risk';
     const isAuthenticCache = liveReport?.dataSourceType === 'cached_official';
     const isPedagogical = liveReport?.dataSourceType === 'pedagogical_sample';
     const isLyonPreset = activeCommune.insee === '69383';
@@ -306,18 +322,26 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
     let exportStatus = 'NON_SYNCHRONISE';
     let exportSource = 'Aucune donnée officielle authentifiée en cache';
 
-    if (liveReport && (isAuthenticLive || isAuthenticCache)) {
+    if (liveReport && isAuthenticLive) {
       exportRisks = liveReport.risks;
-      exportStatus = isAuthenticLive ? 'OFFICIEL_DIRECT_API_GEORISQUES' : 'OFFICIEL_CACHE_LOCAL_GEORISQUES';
+      exportStatus = 'OFFICIEL_DIRECT_API_GEORISQUES';
+      exportSource = liveReport.source;
+    } else if (liveReport && isAuthenticLiveZero) {
+      exportRisks = [];
+      exportStatus = 'OFFICIEL_DIRECT_API_AUCUN_RISQUE_RECENSE';
+      exportSource = liveReport.source;
+    } else if (liveReport && isAuthenticCache) {
+      exportRisks = liveReport.risks;
+      exportStatus = 'OFFICIEL_CACHE_LOCAL_GEORISQUES';
       exportSource = liveReport.source;
     } else if (isPedagogical) {
       exportRisks = liveReport?.risks || [];
       exportStatus = 'ECHANTILLON_PEDAGOGIQUE_DIDACTIQUE';
       exportSource = 'Échantillon didactique d’entraînement (non représentatif des arrêtés de la commune)';
-    } else if (isLyonPreset) {
+    } else if (isLyonPreset && !liveReport) {
       exportRisks = GEORISQUES_ITEMS;
-      exportStatus = 'ECHANTILLON_REFERENCE_LYON';
-      exportSource = 'Base de référence pré-embarquée pour Lyon 3e / Rhône';
+      exportStatus = 'ECHANTILLON_INITIAL_NON_SYNCHRONISE';
+      exportSource = 'Jeu didactique pré-embarqué pour Lyon 3e (non synchronisé en direct avec l’API)';
     } else {
       exportRisks = [];
       exportStatus = 'NON_SYNCHRONISE';
@@ -334,9 +358,18 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       connectiviteLorsDeExport: navigator.onLine ? 'EN_LIGNE' : 'HORS_LIGNE',
       sourceDonnees: exportSource,
       statutAuthenticite: exportStatus,
-      estDonneesAuthentifiees: isAuthenticLive || isAuthenticCache,
+      estDonneesAuthentifiees: isAuthenticLive || isAuthenticLiveZero || isAuthenticCache,
+      fiabiliteSynthese: {
+        statut: exportStatus,
+        estOfficielDirect: isAuthenticLive || isAuthenticLiveZero,
+        estCacheOfficiel: isAuthenticCache,
+        estEchantillonDidactique: isPedagogical || (!isAuthenticLive && !isAuthenticLiveZero && !isAuthenticCache && isLyonPreset),
+        mentionLegale: 'Ce fichier regroupe les repères de préparation et le statut de synchronisation pour la commune. Il ne se substitue pas aux arrêtés préfectoraux opposables ni aux ordres de sécurité civile diffusés par le Préfet en direct via FR-Alert.'
+      },
       avertissementAuthenticite:
-        exportRisks.length === 0
+        isAuthenticLiveZero
+          ? `NOTE OFFICIELLE : La commune de ${activeCommune.name} ne fait l'objet d'aucun risque technologique majeur recensé dans la base nationale d'État GASPAR.`
+          : exportRisks.length === 0
           ? `ATTENTION : Ce dossier territorial n'a pas encore été synchronisé en ligne avec l'API Géorisques pour ${activeCommune.name}. Aucun risque préfectoral fictif n'a été inséré pour prévenir toute fausse information.`
           : isPedagogical
           ? `AVERTISSEMENT PÉDAGOGIQUE : Les risques inclus dans cet export constituent un échantillon didactique d'entraînement et ne correspondent pas aux arrêtés préfectoraux réels de la commune de ${activeCommune.name}.`
@@ -348,7 +381,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           nom: `DICRIM - Document d'Information Communal sur les Risques Majeurs (${activeCommune.name})`,
           nature: 'Synthèse réglementaire des risques recensés (Code de l’Environnement Art. R125-9 à R125-14)',
           portailOfficielGouv: `https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`,
-          statutAuthenticite: 'Consulter l’exemplaire complet paraphé par le Maire sur le site de la commune ou en Mairie.'
+          disponibiliteHorsLigne: false,
+          statutAuthenticite: 'Fiche repère méthodologique : l’exemplaire authentique intégral paraphé par le Maire doit être consulté en Mairie ou sur le site officiel municipal.'
         },
         {
           id: 'pcs',
@@ -356,7 +390,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           nature: 'Cadre municipal d’organisation des secours sous l’autorité du Maire (Code de la Sécurité Intérieure Art. L731-3)',
           autoriteMunicipale: mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`,
           siteInternetMairie: mairieContact?.siteInternet || null,
-          statutAuthenticite: 'Consulter la cellule de crise municipale pour les plans de réquisition d’urgence.'
+          disponibiliteHorsLigne: false,
+          statutAuthenticite: 'Dispositif opérationnel communal : les ordres de réquisition et d’évacuation relèvent de la cellule de crise municipale et préfectorale.'
         }
       ],
       lignesUrgenceSecuriteCivile: {
@@ -657,11 +692,15 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     key={com.insee}
                     type="button"
                     onClick={() => {
+                      setLiveReport(null);
+                      setLastUpdated('');
+                      setRefreshMessage(null);
+                      setSelectedMapNode(null);
                       setActiveCommune(com);
                       setIsEditingCommune(false);
                       setGpsStatusMessage({
                         type: 'success',
-                        text: `Commune chargée : ${com.name}`
+                        text: `Commune chargée : ${com.name} (${com.postalCode} • Dép. ${com.departement}) - Coordonnées réelles : ${com.lat.toFixed(4)}, ${com.lng.toFixed(4)}`
                       });
                     }}
                     className={`p-2 rounded text-left text-[13px] flex items-center justify-between transition-colors ${
@@ -896,16 +935,16 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 y1="110"
                 x2="295"
                 y2="55"
-                stroke={selectedMapNode === 'bugey' ? "#0036ce" : "#74777e"}
-                strokeWidth={selectedMapNode === 'bugey' ? "2.5" : "1.5"}
+                stroke={selectedMapNode === 'nucleaire' ? "#0036ce" : "#74777e"}
+                strokeWidth={selectedMapNode === 'nucleaire' ? "2.5" : "1.5"}
                 strokeDasharray="2 2"
               />
               <circle
                 cx="295"
                 cy="55"
                 r="7"
-                fill={selectedMapNode === 'bugey' ? "#0036ce" : "#12263f"}
-                onClick={() => setSelectedMapNode('bugey')}
+                fill={selectedMapNode === 'nucleaire' ? "#0036ce" : "#12263f"}
+                onClick={() => setSelectedMapNode('nucleaire')}
                 className="cursor-pointer"
               />
               <text
@@ -916,9 +955,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 fontSize="9"
                 fontWeight="700"
                 fontFamily="Public Sans"
-                onClick={() => setSelectedMapNode('bugey')}
+                onClick={() => setSelectedMapNode('nucleaire')}
               >
-                CNPE (35km)
+                PPI Nucléaire
               </text>
 
               {/* Center Reference */}
@@ -960,18 +999,26 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             </svg>
           </div>
 
+          {/* Avertissement de non-confusion cartographique formel */}
+          <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] text-[11px] text-[#001126] flex items-start gap-2">
+            <span className="material-symbols-outlined text-[16px] text-[#0036ce] shrink-0 mt-0.5">info</span>
+            <div className="leading-snug">
+              <strong className="text-[#0036ce]">Illustration vectorielle didactique :</strong> Ce schéma local simplifié permet d'appréhender les distances réflexes d'entraînement. Il <strong>ne constitue pas une cartographie officielle de zonage</strong> ni un Système d'Information Géographique (SIG) certifié des périmètres réels de danger. Seuls les documents graphiques opposables annexés aux arrêtés préfectoraux (consultables sur georisques.gouv.fr) font foi.
+            </div>
+          </div>
+
           {/* Interactive node indicator alert */}
           {selectedMapNode && (
             <div className="p-2.5 rounded-lg bg-[#dce9fd] text-[12px] flex items-center justify-between border border-[#c4c6ce]">
               <span className="font-semibold text-[#001126]">
-                {selectedMapNode === 'ppi' && "Repère SEVESO : Zone industrielle classée (Périmètre PPI actif)"}
-                {selectedMapNode === 'tmd' && "Repère TMD : Axe Faisceau Ferroviaire / Autoroutier (Transport dangereux)"}
-                {selectedMapNode === 'bugey' && "Repère Nucléaire : Centrale CNPE (Vigilance élargie)"}
-                {selectedMapNode === 'ref' && `Point central : ${activeCommune.name}`}
+                {selectedMapNode === 'ppi' && "Repère didactique SEVESO : Zone industrielle classée (Périmètre PPI)"}
+                {selectedMapNode === 'tmd' && "Repère didactique TMD : Axe Faisceau Ferroviaire / Routier"}
+                {selectedMapNode === 'nucleaire' && "Repère didactique Nucléaire : Rayon de vigilance CNPE / PPI"}
+                {selectedMapNode === 'ref' && `Point central de référence : ${activeCommune.name}`}
               </span>
               <button
                 onClick={() => setSelectedMapNode(null)}
-                className="text-[#001126] font-bold text-[11px] underline ml-2"
+                className="text-[#001126] font-bold text-[11px] underline ml-2 cursor-pointer"
               >
                 Effacer
               </button>
@@ -982,28 +1029,28 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <div className="grid grid-cols-2 gap-2 text-[12px]">
             <button
               onClick={() => setSelectedMapNode('ref')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff]"
+              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
             >
               <span className="w-3 h-3 rounded-full bg-[#0036ce] shrink-0"></span>
               <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Point de référence</span>
             </button>
             <button
               onClick={() => setSelectedMapNode('tmd')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff]"
+              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
             >
               <span className="w-3 h-1.5 bg-[#ba1a1a] shrink-0"></span>
               <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Transit TMD (&lt; 800 m)</span>
             </button>
             <button
               onClick={() => setSelectedMapNode('ppi')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff]"
+              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
             >
               <span className="w-3 h-3 rounded bg-[#12263f] shrink-0"></span>
               <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Périmètre PPI (4.2 km)</span>
             </button>
             <button
-              onClick={() => setSelectedMapNode('bugey')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff]"
+              onClick={() => setSelectedMapNode('nucleaire')}
+              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
             >
               <span className="w-3 h-0.5 bg-[#74777e] shrink-0"></span>
               <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Vigilance nucléaire</span>
@@ -1014,15 +1061,23 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         {/* Categorized Inventory of Territorial Risks */}
         {(() => {
           const isLyonPreset = activeCommune.insee === '69383';
-          const hasOfficialRisks = !!(liveReport && liveReport.risks && liveReport.risks.length > 0 && liveReport.dataSourceType !== 'pedagogical_sample');
+          const hasOfficialRisks = !!(
+            liveReport &&
+            liveReport.risks &&
+            liveReport.risks.length > 0 &&
+            (liveReport.dataSourceType === 'live_api' || liveReport.dataSourceType === 'cached_official')
+          );
+          const isLiveZeroRisk = liveReport?.dataSourceType === 'live_api_zero_risk';
           const isPedagogical = liveReport?.dataSourceType === 'pedagogical_sample';
-          const isUnverifiedEmpty = !hasOfficialRisks && !isPedagogical && !isLyonPreset;
+          const isNetworkError = liveReport?.dataSourceType === 'network_error' || liveReport?.dataSourceType === 'api_error';
+          const isLyonInitial = isLyonPreset && !liveReport;
+          const isUnverifiedEmpty = !hasOfficialRisks && !isLiveZeroRisk && !isPedagogical && !isLyonInitial && !isNetworkError;
 
           const displayedRisks = hasOfficialRisks
             ? liveReport!.risks
             : isPedagogical
             ? liveReport!.risks
-            : isLyonPreset
+            : isLyonInitial
             ? GEORISQUES_ITEMS
             : [];
 
@@ -1048,12 +1103,90 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </div>
               )}
 
+              {/* Réponse officielle valide : 0 risque recensé dans la base d'État */}
+              {isLiveZeroRisk && (
+                <div className="bg-[#f0fdf4] p-4 rounded-xl border border-[#bbf7d0] flex flex-col gap-2">
+                  <div className="flex items-center gap-2 text-[#166534]">
+                    <span className="material-symbols-outlined text-[20px] text-[#16a34a]">verified</span>
+                    <strong className="font-['Space_Grotesk'] text-[13px] font-bold">
+                      Réponse officielle Géorisques : Aucun risque technologique notifié
+                    </strong>
+                  </div>
+                  <p className="text-[12px] text-[#15803d] leading-relaxed">
+                    La base nationale GASPAR (data.gouv.fr / BRGM) ne recense actuellement aucun PPRT, établissement Seveso ni périmètre PPI pour la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}).
+                  </p>
+                  <p className="text-[11px] text-[#166534]/80 italic">
+                    Les consignes de sécurité civile générale (alerte FR-Alert, radio de service public) et les fiches réflexes de secours restent consultables à des fins de préparation.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const pedago = getPedagogicalSampleRisks();
+                        setLiveReport({
+                          communeName: activeCommune.name,
+                          inseeCode: activeCommune.insee,
+                          retrievedAt: new Date().toISOString(),
+                          source: 'Échantillon didactique d’entraînement (non lié aux arrêtés réels)',
+                          isOfflineCache: true,
+                          dataSourceType: 'pedagogical_sample',
+                          risksCount: pedago.length,
+                          risks: pedago
+                        });
+                      }}
+                      className="h-9 px-3 rounded-lg bg-white hover:bg-[#dcfce7] text-[#15803d] font-['Space_Grotesk'] text-[11px] font-bold flex items-center gap-1 border border-[#bbf7d0] cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">school</span>
+                      <span>Charger l'échantillon didactique d'entraînement</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Échec de connexion réseau ou erreur API sans cache */}
+              {isNetworkError && (
+                <div className="p-3.5 rounded-lg bg-[#fffbeb] border border-[#fef3c7] text-[#92400e] text-[12px] flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-[20px] text-[#d97706] shrink-0 mt-0.5">cloud_off</span>
+                  <div className="flex flex-col gap-1 leading-snug">
+                    <strong className="font-bold">
+                      {liveReport?.dataSourceType === 'network_error' ? 'Connexion réseau impossible avec l’API Géorisques' : 'Erreur de transmission API Géorisques'}
+                    </strong>
+                    <span>{liveReport?.source}</span>
+                    <span className="text-[11px] text-[#b45309]">
+                      Aucun risque fictif n'a été inséré. Vous pouvez vous entraîner avec l'échantillon pédagogique ci-dessous ou réessayer dès le rétablissement de la connexion.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Échantillon pédagogique actif */}
               {isPedagogical && (
                 <div className="p-3 rounded-lg bg-[#fff0ed] border border-[#ffdad6] text-[#93000a] text-[12px] flex items-start gap-2">
                   <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">school</span>
                   <div>
                     <strong className="font-bold">Échantillon Pédagogique Actif :</strong> Ces risques sont affichés à des fins didactiques d'entraînement civil. Ils ne représentent pas l'inventaire officiel de la commune de <strong>{activeCommune.name}</strong>.
                   </div>
+                </div>
+              )}
+
+              {/* Jeu didactique pré-embarqué (Lyon 3e) */}
+              {isLyonInitial && (
+                <div className="p-3 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] text-[#1e40af] text-[12px] flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-[18px] text-[#2563eb] shrink-0 mt-0.5">info</span>
+                    <div>
+                      <strong className="font-bold">Base didactique pré-embarquée (Lyon 3e) :</strong> Ce jeu de données illustratif permet de découvrir l'application hors connexion. Pour actualiser les arrêtés préfectoraux officiels en direct, cliquez sur « Actualiser ».
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRealRefreshData}
+                    disabled={refreshing}
+                    className="shrink-0 h-8 px-2.5 rounded bg-[#2563eb] text-white font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1 hover:bg-[#1d4ed8] cursor-pointer"
+                  >
+                    <span className={`material-symbols-outlined text-[14px] ${refreshing ? 'animate-spin' : ''}`}>sync</span>
+                    Actualiser
+                  </button>
                 </div>
               )}
 
@@ -1075,7 +1208,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                       type="button"
                       onClick={handleRealRefreshData}
                       disabled={refreshing}
-                      className="h-10 px-4 rounded-lg bg-[#0036ce] text-white font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 hover:bg-[#002ba8] transition-colors disabled:opacity-60"
+                      className="h-10 px-4 rounded-lg bg-[#0036ce] text-white font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 hover:bg-[#002ba8] transition-colors disabled:opacity-60 cursor-pointer"
                     >
                       <span className={`material-symbols-outlined text-[16px] ${refreshing ? 'animate-spin' : ''}`}>sync</span>
                       <span>Interroger l'API Géorisques</span>
@@ -1095,7 +1228,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           risks: pedago
                         });
                       }}
-                      className="h-10 px-3.5 rounded-lg bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors border border-[#c4c6ce]"
+                      className="h-10 px-3.5 rounded-lg bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors border border-[#c4c6ce] cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">school</span>
                       <span>Charger l'échantillon pédagogique</span>
