@@ -372,7 +372,7 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
     },
     emergencySymptoms: {
       title: "Signes de Rupture d'Herméticité ou Intoxication",
-      intro: "Alerte sensorielle immédiate : odeurs suspectes persistantes (piquante, amande amère, œuf pourri, chlore), picotements oculaires ou toux sèche : mettre immédiatement un masque FFP3 ou une étoffe humide sur les voies respiratoires, se déplacer dans la pièce la plus éloignée du vent et composer les numéros ci-dessous.",
+      intro: "Alerte sensorielle immédiate : odeurs suspectes persistantes (piquante, amande amère, œuf pourri, chlore), picotements oculaires ou toux sèche. ATTENTION : un masque FFP2/FFP3 ou un linge humide NE PROTÈGE PAS contre les gaz et vapeurs toxiques. Rejoindre immédiatement la zone la plus calfeutrée du logement, vérifier les étanchéités et composer immédiatement le 18 ou le 112 pour signaler une suspicion d'infiltration toxique.",
       symptoms: [
         'Odeurs chimiques suspectes persistantes',
         'Picotements oculaires ou irritation pharyngée',
@@ -447,14 +447,14 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       ],
       pendant: [
         {
-          title: '1. Choix de la pièce selon le produit et les ordres reçus',
+          title: '1. Choix de la pièce : priorité aux ordres préfectoraux',
           icon: 'door_front',
-          desc: "Rejoignez une pièce centrale, sans ouverture vers l'extérieur. Attention : l'emplacement optimal dépend de la densité du gaz (les gaz denses type chlore s'infiltrent dans les caves et dépressions, tandis que les gaz volatils type ammoniac montent). Appliquez impérativement les consignes préfectorales diffusées pour votre secteur."
+          desc: "Rejoignez une pièce centrale sans fenêtre donnant sur l'extérieur. Ne vous fiez à aucune règle universelle d'étage : la dispersion d'un gaz dépend de sa température de rejet, du vent et de la ventilation du bâtiment. Appliquez impérativement et en priorité les consignes préfectorales diffusées pour votre secteur."
         },
         {
-          title: '2. Tissu humide : pis-aller d\'ultime recours',
+          title: '2. Masques et linges : aucune protection contre les gaz',
           icon: 'masks',
-          desc: "En cas d'odeur piquante ou suspecte à l'intérieur, appliquez un linge humide sur le nez et la bouche. Attention : ceci n'est qu'un filtre de fortune n'absorbant qu'une fraction des gaz solubles pendant 2-3 minutes. Cela ne protège pas contre le monoxyde de carbone ou les cyanures."
+          desc: "Ne comptez JAMAIS sur un masque FFP2/FFP3, chirurgical ou un linge humide pour vous protéger des gaz toxiques : ces dispositifs ne filtrent aucun composé gazeux toxique. La seule mesure efficace est de demeurer dans la pièce calfeutrée ou d'évacuer selon les ordres préfectoraux formels."
         },
         {
           title: '3. Flammes et étincelles strictement proscrites',
@@ -508,22 +508,22 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       }
     ],
     pedagogy: {
-      title: 'Typologie des Gaz Industriels & Consignes Géométriques',
+      title: 'Typologie Indicative des Gaz Industriels (Principes Physiques Non Universels)',
       cards: [
         {
-          title: 'Gaz Plus Lourds que l\'Air (Densité > 1)',
-          tag: 'STAGNATION AU SOL',
+          title: 'Gaz à Tendance Lourde (Densité théorique > 1 à 20°C)',
+          tag: 'TENDANCE BASSE (AIR CALME)',
           tagClass: 'bg-primary text-white',
           examples: 'Chlore (Cl2), Dioxyde de soufre (SO2), Phosgène, GPL / Propane / Butane.',
-          specificity: "Ces gaz rampent au ras du sol et s'accumulent dans les dépressions, caves, sous-sols et rez-de-chaussée bas. CONFINEMENT IMPÉRATIF AUX ÉTAGES INTERMÉDIAIRES.",
+          specificity: "Ces gaz tendent à stagner dans les dépressions et sous-sols par temps calme. Attention : la température de rejet, le vent et les turbulences créent des mélanges complexes. Éviter caves et sous-sols non étanches, mais appliquer en priorité stricte les ordres d'évacuation ou de confinement diffusés par la Préfecture pour votre zone.",
           icon: 'south'
         },
         {
-          title: 'Gaz Plus Légers que l\'Air (Densité < 1)',
-          tag: 'ASCENSION EN TOITURE',
+          title: 'Gaz à Tendance Légère (Densité théorique < 1 à 20°C)',
+          tag: 'TENDANCE ASCENDANTE',
           tagClass: 'bg-secondary-fixed text-on-secondary-fixed',
           examples: 'Ammoniac (NH3), Méthane (CH4), Hydrogène (H2), Monoxyde de carbone (CO).',
-          specificity: "Ces gaz s'élèvent rapidement dans l'atmosphère et sous les toitures. Éviter les pièces sous combles ou greniers. Choisir une pièce centrale à mi-hauteur.",
+          specificity: "Ces composés s'élèvent plus rapidement en milieu ouvert mais s'accumulent sous les toitures et combles mal isolés. Choisir une pièce centrale bien calfeutrée sans en faire une règle absolue : la dispersion réelle dépend des courants d'air et du bâti.",
           icon: 'north'
         }
       ]
@@ -670,9 +670,9 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
         }
       ],
       table: {
-        title: 'Posologie Officielle Iode Stable',
-        authority: 'Santé Publique France',
-        desc: "Comprimés de Iodure de Potassium (65 mg). À dissoudre dans de l'eau, du lait ou du jus de fruits.",
+        title: "Posologie Officielle d'Iode Stable (STRICTEMENT SOUMISE À ORDRE DU PRÉFET)",
+        authority: 'Santé Publique France & Autorité de Sûreté Nucléaire (ASNR)',
+        desc: "Comprimés de Iodure de Potassium (KI 65 mg sécables). ATTENTION FORMELLE : Cette posologie ne doit JAMAIS être prise spontanément ou préventivement. La saturation thyroïdienne doit coïncider exactement avec le passage du panache radioactif sous ordre explicite du Préfet (FR-Alert / radio France Bleu).",
         rows: [
           { label: 'Adulte & enfant > 12 ans', value: '2 comprimés (130 mg KI / 100 mg d’iode)' },
           { label: 'Enfant de 3 à 12 ans', value: '1 comprimé (65 mg KI / 50 mg d’iode)' },
@@ -681,7 +681,7 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
           { label: 'Femmes enceintes / allaitantes', value: '2 comprimés (priorité vitale fœtale)', isHighlighted: true },
           { label: 'Adultes de plus de 40 ans', value: 'Prise NON recommandée*', isWarning: true }
         ],
-        footnote: "*Recommandation ASN/IRSN/OMS : le risque d'effets secondaires cardiaques et thyroïdiens est supérieur au bénéfice (vulnérabilité quasi nulle au cancer thyroïdien radio-induit après 40 ans)."
+        footnote: "*Recommandation ASN/IRSN/OMS : la prise est obligatoirement subordonnée à l'ordre préfectoral. Au-delà de 40 ans, le risque d'effets indésirables thyroïdiens et cardiovasculaires est supérieur au bénéfice (vulnérabilité au cancer thyroïdien radio-induit quasi nulle, sauf consigne exceptionnelle de la préfecture)."
       }
     },
     emergencySymptoms: {

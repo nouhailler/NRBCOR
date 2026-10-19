@@ -95,9 +95,9 @@ const CONFINEMENT_STEPS: ConfinementStep[] = [
     order: 4,
     title: 'Rejoindre la pièce adéquate selon le scénario',
     icon: 'meeting_room',
-    desc: 'Adaptez le choix de la pièce à la nature exacte du danger : étage médian pour le chimique (éviter les sous-sols), sous-sol ou pièce centrale bétonnée pour le nucléaire (protection gamma).',
-    tip: 'Consultez le sélecteur de scénario en haut de page pour adapter immédiatement votre positionnement.',
-    scenarioNote: 'Différence doctrinale majeure entre risque chimique et radiologique !',
+    desc: 'Adaptez le choix de la pièce selon les ordres de la Préfecture : privilégiez une pièce centrale avec le minimum d’ouvertures. Attention : il n’existe pas de règle universelle d’étage pour les gaz chimiques (la dispersion dépend de la météo et du produit). Pour le nucléaire, recherchez une pièce centrale bétonnée (effet écran).',
+    tip: 'Consultez les messages officiels FR-Alert et la radio pour connaître les consignes sectorielles précises.',
+    scenarioNote: 'Les ordres diffusés en temps réel par les autorités prévalent toujours sur toute disposition générale.',
     essential: true
   },
   {
@@ -105,9 +105,9 @@ const CONFINEMENT_STEPS: ConfinementStep[] = [
     order: 5,
     title: 'Calfeutrer les interstices et bas de porte',
     icon: 'tape',
-    desc: 'Appliquez du ruban adhésif large et épais (toilé blindé) sur le pourtour des dormants. Placez des serviettes ou linges épais tassés et humidifiés sous les portes.',
-    tip: 'L’eau emprisonnée dans le tissu humide retient une partie des gaz hydrosolubles (chlore, ammoniac) et particules fines.',
-    scenarioNote: 'Mesure de fortune efficace pour limiter les infiltrations rapides.',
+    desc: 'Appliquez du ruban adhésif large et épais (toilé blindé) sur le pourtour des dormants. Placez des serviettes ou linges épais tassés sous les portes.',
+    tip: 'Le linge au bas de porte agit comme un obturateur mécanique contre les courants d’air mais ne filtre pas les gaz toxiques.',
+    scenarioNote: 'Mesure de fortune pour limiter les infiltrations rapides.',
     essential: true
   },
   {

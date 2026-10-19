@@ -260,10 +260,106 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
         };
       }
 
-      // Structure GASPAR officielle : { data: [ { code_insee: "...", risques_detail: [...] } ] }
-      const dataArray = Array.isArray(data?.data) ? data.data : [];
+      // Validation de conformité du code INSEE demandé
+      const inseeRegex = /^[0-9]{2}[0-9A-B]{1}[0-9]{2}$/i;
+      if (!inseeRegex.test(inseeCode.trim())) {
+        if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
+        return {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: `Code INSEE invalide ou non conforme (${inseeCode}) : validation territoriale impossible`,
+          isOfflineCache: false,
+          dataSourceType: 'api_error',
+          risksCount: 0,
+          risks: []
+        };
+      }
+
+      // Validation stricte de la structure GASPAR officielle
+      // Format attendu : { data: [ { code_insee: "...", risques_detail: [...] } ] } ou { data: [] }
+      if (!data || typeof data !== 'object' || !Array.isArray(data.data)) {
+        if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
+        return {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: 'Structure de réponse inattendue de l’API Géorisques (attribut data manquant ou non tabulaire)',
+          isOfflineCache: false,
+          dataSourceType: 'api_error',
+          risksCount: 0,
+          risks: []
+        };
+      }
+
+      const dataArray = data.data;
+
+      // Si le tableau data est explicitement vide : l'API a bien reçu la requête pour ce code INSEE et confirme zéro dossier
+      if (dataArray.length === 0) {
+        const zeroRiskReport: GeorisquesReport = {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: 'Réponse valide de l’API Géorisques (data.gouv.fr / BRGM) : aucun risque technologique ou PPRT répertorié dans la base GASPAR pour ce code INSEE',
+          isOfflineCache: false,
+          dataSourceType: 'live_api_zero_risk',
+          risksCount: 0,
+          risks: []
+        };
+
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(zeroRiskReport));
+        } catch (e) {}
+
+        return zeroRiskReport;
+      }
+
       const firstEntry = dataArray[0];
-      const rawRisks: any[] = Array.isArray(firstEntry?.risques_detail) ? firstEntry.risques_detail : [];
+      if (!firstEntry || typeof firstEntry !== 'object') {
+        if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
+        return {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: 'Structure de réponse inattendue de l’API Géorisques (premier enregistrement invalide)',
+          isOfflineCache: false,
+          dataSourceType: 'api_error',
+          risksCount: 0,
+          risks: []
+        };
+      }
+
+      // Vérification obligatoire de la présence et cohérence du code INSEE retourné
+      if (!firstEntry.code_insee || String(firstEntry.code_insee).trim() !== String(inseeCode).trim()) {
+        if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
+        return {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: `Divergence territoriale API : code INSEE reçu (${firstEntry.code_insee || 'absent'}) ne correspond pas au code sélectionné (${inseeCode})`,
+          isOfflineCache: false,
+          dataSourceType: 'api_error',
+          risksCount: 0,
+          risks: []
+        };
+      }
+
+      // Vérification que le champ risques_detail est bien un tableau
+      if (!Array.isArray(firstEntry.risques_detail)) {
+        if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
+        return {
+          communeName,
+          inseeCode,
+          retrievedAt: new Date().toISOString(),
+          source: 'Structure de réponse inattendue de l’API Géorisques (champ risques_detail manquant ou non tabulaire)',
+          isOfflineCache: false,
+          dataSourceType: 'api_error',
+          risksCount: 0,
+          risks: []
+        };
+      }
+
+      const rawRisks: any[] = firstEntry.risques_detail;
 
       // CAS 1 : Réponse officielle valide avec des risques recensés
       if (rawRisks.length > 0) {

@@ -10,6 +10,7 @@ import {
   CommuneSearchResult
 } from '../services/external/georisquesClient';
 import { fetchMairieContact, MairieContact } from '../services/external/mairieDirectoryService';
+import { APP_VERSION } from '../constants/appInfo';
 
 interface GeorisquesViewProps {
   onBack: () => void;
@@ -258,7 +259,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
     if (!navigator.onLine) {
       setRefreshMessage({
         type: 'warning',
-        text: 'Fonctionnalité indisponible hors connexion : connexion Internet requise pour interroger l’API Géorisques en direct. Les données restent scellées dans le cache local certifié.'
+        text: 'Fonctionnalité indisponible hors connexion : connexion Internet requise pour interroger l’API Géorisques en direct. Consultation de la dernière réponse enregistrée de l’API officielle.'
       });
       return;
     }
@@ -278,7 +279,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       if (report.isOfflineCache) {
         setRefreshMessage({
           type: 'info',
-          text: `Données issues du cache certifié local (${report.risksCount} risques recensés pour ${activeCommune.name}).`
+          text: `Dernière réponse enregistrée de l’API officielle (${report.risksCount} risque(s) recensé(s) pour ${activeCommune.name}, enregistrée le ${new Date(report.retrievedAt).toLocaleDateString('fr-FR')}).`
         });
       } else if (report.dataSourceType === 'live_api_zero_risk') {
         setRefreshMessage({
@@ -350,7 +351,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
     const snapshotPayload = {
       application: 'NRBCOR Protection Civile',
-      version: '1.2.0 PWA',
+      version: APP_VERSION,
       type: 'INSTANTANE_TERRITORIAL_GEORISQUES',
       dateExport: new Date().toISOString(),
       dateExportFormatee: new Date().toLocaleString('fr-FR'),
@@ -540,7 +541,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             Risques Locaux & Géorisques
           </h1>
           <p className="text-[13px] text-[#44474d] leading-relaxed">
-            Inventaire certifié des installations industrielles Seveso, plans de prévention technologique (PPRT), axes TMD et documents communaux de sauvegarde.
+            Inventaire officiel des installations industrielles Seveso, plans de prévention technologique (PPRT), axes TMD et documents communaux de sauvegarde.
           </p>
         </header>
 
@@ -576,7 +577,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                   <li><strong>Géolocalisation GPS réelle (W3C)</strong> : capture des coordonnées physiques de l'appareil (latitude, longitude, précision).</li>
                   <li><strong>Résolution de commune</strong> : géocodage inverse en direct via <code>geo.api.gouv.fr</code> ou projection géodésique hors-ligne (Haversine).</li>
                   <li><strong>Export d'instantané réel</strong> : génération et téléchargement immédiat d'un fichier JSON normé sur votre terminal.</li>
-                  <li><strong>Consultation hors-ligne intégrale</strong> : documents DICRIM, PCS et fiches réflexes 100% embarqués.</li>
+                  <li><strong>Consultation hors-ligne</strong> : fiches réflexes opérationnelles embarquées et fiches de repérage réglementaire communales (DICRIM / PCS récapitulatifs). La consultation des arrêtés et documents paraphés complets nécessite une démarche externe en mairie ou en ligne.</li>
                 </ul>
               </div>
 
@@ -613,7 +614,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               Commune d'Analyse Locale
             </label>
             <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold uppercase">
-              RÉEL & CERTIFIÉ
+              DONNÉES OFFICIELLES API
             </span>
           </div>
 
@@ -1097,9 +1098,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 <div className="p-2.5 rounded-lg bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] text-[12px] flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
                     <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
-                    <span>{liveReport?.dataSourceType === 'live_api' ? 'Données officielles en direct (API Géorisques / BRGM)' : 'Données officielles issues du cache local certifié'}</span>
+                    <span>{liveReport?.dataSourceType === 'live_api' ? 'Données officielles en direct (API Géorisques / BRGM)' : `Dernière réponse enregistrée de l’API officielle (${liveReport?.retrievedAt ? new Date(liveReport.retrievedAt).toLocaleDateString('fr-FR') : 'archive locale'})`}</span>
                   </span>
-                  <span className="text-[10px] text-[#15803d] font-['Space_Grotesk'] uppercase font-bold">Arrêtés vérifiés</span>
+                  <span className="text-[10px] text-[#15803d] font-['Space_Grotesk'] uppercase font-bold">{liveReport?.dataSourceType === 'live_api' ? 'Arrêtés en direct' : 'Archive locale'}</span>
                 </div>
               )}
 
@@ -1328,10 +1329,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </span>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[14px] font-bold text-[#001126] truncate">
-                    Synthèse DICRIM ({activeCommune.name})
+                    Fiche de repérage DICRIM ({activeCommune.name})
                   </span>
                   <span className="text-[12px] text-[#44474d] truncate">
-                    Document d'Information Communal sur les Risques Majeurs (Code Env. R125-9)
+                    Synthèse des risques • Document complet et paraphé consultable en mairie
                   </span>
                 </div>
               </div>
@@ -1353,10 +1354,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </span>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[14px] font-bold text-[#001126] truncate">
-                    Dispositif PCS ({activeCommune.name})
+                    Fiche de repérage PCS ({activeCommune.name})
                   </span>
                   <span className="text-[12px] text-[#44474d] truncate">
-                    Plan Communal de Sauvegarde & organisation de crise municipale
+                    Organisation des secours • Dossier communal officiel consultable en mairie
                   </span>
                 </div>
               </div>

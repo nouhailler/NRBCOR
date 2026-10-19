@@ -81,20 +81,20 @@
 
 ### 🛡️ 7. Priorité 1 — Fiabilisation des Consignes de Sécurité & Non-Substitution Opérationnelle
 * **Confinement contextualisé par scénario précis** :
-  * *Accident Chimique* : Confinement impératif à l'étage intermédiaire (1er/2e) ; interdiction absolue des caves et sous-sols où s'accumulent les gaz denses (chlore, GPL, dioxyde de soufre) et des combles (gaz légers comme l'ammoniac). Si pris dehors : fuite impérative à 90° de la direction du vent (jamais en voiture).
+  * *Accident Chimique* : Mise à l'abri immédiate dans un bâtiment clos. Priorité absolue aux consignes sectorielles diffusées par la Préfecture et FR-Alert (pas de règle universelle d'étage car la dispersion dépend des conditions météorologiques, du produit et de la configuration du bâti).
   * *Accident Nucléaire / Radiologique* : Le sous-sol ou la pièce centrale en dur offre l'écran radiologique le plus dense contre les rayonnements gamma (atténuation 10 à 20x supérieure à un étage sous toiture).
-  * *Accident Biologique* : Pièce isolée avec point d'eau, masque FFP3 ajusté, arrêt immédiat des VMC non filtrées.
+  * *Accident Biologique* : Pièce isolée avec point d'eau, masque FFP3 ajusté pour agents particulaires, arrêt immédiat des VMC non filtrées.
 * **Simulateur d'air disponible fiabilisé** :
   * Calcul basé sur la cinétique d'accumulation du CO2 (< 1% seuil de vigilance) et la consommation respiratoire au repos.
-  * Encadré d'avertissement formel : **modèle mathématique indicatif non opérationnel**. Rappel que le confinement civil d'urgence dure généralement **2 à 4 heures** (temps de dispersion du panache) et qu'une simulation ne doit JAMAIS inciter à différer l'ordre d'aération ou d'évacuation préfectorale.
+  * Encadré d'avertissement formel : **modèle mathématique indicatif non opérationnel**. Rappel qu'une simulation ne doit JAMAIS être interprétée comme une durée de confinement garantie ni inciter à différer l'ordre d'aération ou d'évacuation préfectorale.
 * **Fiche Iode Stable (KI 65mg) rigoureusement conforme ASN / IRSN** :
   * **Ordre préfectoral formel obligatoire** : Aucune ingestion préventive sauvage.
   * **Fenêtre temporelle d'efficacité** : Optimale 1 à 2h avant le panache (~100%), résiduelle jusqu'à 6h, inutile et déconseillée après 24h.
   * **Contre-indications médicales officielles** : Allergie avérée, maladies thyroïdiennes actives graves, maladies cutanées auto-immunes (dermatite herpétiforme).
   * **Avertissement contre les faux remèdes mortels** : Interdiction formelle de boire de la Bétadine (corrosif digestif létal) ou de surconsommer du sel de cuisine (hypernatrémie mortelle).
 * **Risques Chimiques fiabilisés** :
-  * Rappel capital : **les masques FFP2 / FFP3 ne protègent PAS contre les gaz et vapeurs chimiques** (chlore, ammoniac, CO).
-  * Le linge humide n'est qu'un **moyen de fortune d'ultime recours** (filtration partielle pendant 2-3 min des seuls gaz hydrosolubles).
+  * Rappel capital : **les masques FFP2 / FFP3 ainsi que les linges humides ne protègent PAS contre les gaz et vapeurs chimiques toxiques**.
+  * Aucune direction de fuite ni aucun étage ne constituent une garantie universelle de protection.
   * Interdiction absolue de prendre de l'iode pour un risque chimique.
 
 ---

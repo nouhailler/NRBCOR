@@ -212,7 +212,7 @@ export function calculateFoodAutonomy(
   }
 
   const foodKitItem = kitItems.find((it) => it.id === 'k3');
-  const hypothesis = `Hypothèse nutritionnelle : 2 rations complètes sans cuisson (conserves prêtes, barres denses ~2 000 kcal/j) par adulte/enfant + 3 portions adaptées/jour par nourrisson.`;
+  const hypothesis = `Estimation approximative par comptage d'articles : calcul fondé sur 2 unités sans cuisson/jour/personne (+3 si nourrisson). Ce résultat est une simple approximation quantitative et ne constitue pas une mesure nutritionnelle réelle en calories (une boîte, une barre énergétique et un repas complet ne sont pas équivalents).`;
 
   // 1. Stock mesuré présent dans l'inventaire
   if (rationsInStock > 0) {
@@ -226,21 +226,21 @@ export function calculateFoodAutonomy(
     }
 
     return {
-      title: 'Alimentation de Survie',
+      title: 'Alimentation de Survie (Estimation Indicative)',
       currentValue: rationsInStock,
-      currentUnit: 'rations mesurées',
+      currentUnit: 'articles comptabilisés (indicatif)',
       targetValue: targetRations,
-      targetUnit: 'rations requises',
+      targetUnit: 'articles indicatifs requis',
       autonomyHours: hours,
       autonomyDays: days,
       status,
       isEstimatedFromCheckboxOnly: false,
       hasInsufficientData: false,
-      details: `${rationsInStock} portions prêtes sans cuisson (${dailyRationsNeeded}/jour nécessaires pour le foyer).`,
+      details: `${rationsInStock} article(s) recensé(s) (~${days} j d'autonomie théorique approximative pour ${adultsAndKids + config.infantsCount} personne(s)). Ne constitue pas une autonomie nutritionnelle mesurée.`,
       hypothesis,
       recommendation:
         rationsInStock < targetRations
-          ? `Compléter avec ${targetRations - rationsInStock} rations ou conserves prêtes sans réchauffage.`
+          ? `Compléter avec ${targetRations - rationsInStock} rations ou conserves prêtes sans cuisson en vérifiant la valeur calorique réelle de chaque produit.`
           : undefined
     };
   }
