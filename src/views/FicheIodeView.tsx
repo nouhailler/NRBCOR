@@ -263,12 +263,25 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
                 <span>Calculateur Posologique Officiel</span>
               </h2>
               <span className="font-['Space_Grotesk'] text-[11px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
-                Comprimés KI 65 mg
+                Comprimés KI 65 mg sécables
               </span>
             </div>
 
+            {/* Avertissement formel de subordination de la décision */}
+            <div className="p-3 bg-[#fff0ed] rounded-lg border-2 border-[#ba1a1a] text-[#93000a] text-[11px] flex items-start gap-2">
+              <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">notification_important</span>
+              <div className="flex flex-col gap-0.5 leading-snug">
+                <strong className="uppercase font-bold tracking-wide">
+                  Subordination Stricte à l'Ordre Préfectoral
+                </strong>
+                <p>
+                  Ce tableau récapitule les doses fixées par l'ANSM (Notice RCP de l'Iodure de Potassium 65 mg PCA, AMM 34009 360 847 8 7) à titre purement informatif. <strong>La prise dépend exclusivement des instructions diffusées en temps réel par les autorités</strong> (Préfet de département via FR-Alert et Radio France) et <strong>ne doit en aucun cas être décidée à partir de ce seul tableau</strong>.
+                </p>
+              </div>
+            </div>
+
             <p className="text-[13px] text-[#44474d]">
-              Sélectionnez la tranche d'âge ou le profil pour afficher les doses préfectorales homologuées :
+              Sélectionnez la tranche d'âge ou le profil pour consulter la posologie théorique de l'AMM :
             </p>
 
             <div className="grid grid-cols-2 gap-1.5">
@@ -315,7 +328,7 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[12px] font-semibold text-[#44474d]">Dose prescrite :</span>
+                  <span className="text-[12px] font-semibold text-[#44474d]">Dose théorique AMM :</span>
                   <span className="font-['Space_Grotesk'] text-[20px] font-bold text-[#001126] leading-none">
                     {selectedDose.tablets}
                   </span>
@@ -330,7 +343,11 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
               </div>
 
               <div className="text-[11px] p-2 bg-white/80 rounded border border-current font-medium">
-                💡 <strong>Doctrinaire ASN :</strong> {selectedDose.recommendation}
+                💡 <strong>Référence officielle ANSM / ASNR :</strong> {selectedDose.recommendation}
+              </div>
+
+              <div className="text-[10px] text-[#555962] italic pt-1 border-t border-current/20">
+                Source : Notice légale ANSM - Pharmacie Centrale des Armées (AMM 34009 360 847 8 7). L'ingestion réelle reste obligatoirement conditionnée à l'ordre formel du Préfet.
               </div>
             </div>
           </section>

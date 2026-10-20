@@ -219,17 +219,28 @@ export function getPedagogicalSampleRisks(): GeorisquesReportRisk[] {
  * - Un échec réseau / hors-ligne ('network_error')
  * - Une erreur de structure / HTTP de l'API ('api_error')
  */
+/**
+ * Validation de conformité des codes INSEE français :
+ * - France métropolitaine : 5 chiffres (ex: 75056, 69383)
+ * - Corse : 2A + 3 chiffres (ex: 2A004 Ajaccio) ou 2B + 3 chiffres (ex: 2B033 Bastia)
+ * - Départements et régions d'outre-mer (DROM) : 5 chiffres commençant par 97 ou 98 (ex: 97415 Saint-Denis)
+ */
+export function isValidInseeCode(inseeCode: string): boolean {
+  if (!inseeCode || typeof inseeCode !== 'string') return false;
+  return /^(?:[0-9]{5}|2[AB][0-9]{3})$/i.test(inseeCode.trim());
+}
+
 export async function fetchGeorisquesOnline(inseeCode: string, communeName: string): Promise<GeorisquesReport> {
   const cacheKey = `georisques_cache_${inseeCode}`;
 
-  // Tente de vérifier si un cache local authentifié existe déjà
+  // Tente de vérifier si un cache local existe déjà
   let cached: GeorisquesReport | null = null;
   try {
     const s = localStorage.getItem(cacheKey);
     if (s) cached = JSON.parse(s);
   } catch (e) {}
 
-  // Si pas de réseau et un cache authentifié existe, renvoie immédiatement le cache
+  // Si pas de réseau et un cache existe, renvoie immédiatement la dernière réponse enregistrée
   if (typeof navigator !== 'undefined' && !navigator.onLine && cached) {
     return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
   }
@@ -261,8 +272,7 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
       }
 
       // Validation de conformité du code INSEE demandé
-      const inseeRegex = /^[0-9]{2}[0-9A-B]{1}[0-9]{2}$/i;
-      if (!inseeRegex.test(inseeCode.trim())) {
+      if (!isValidInseeCode(inseeCode)) {
         if (cached) return { ...cached, isOfflineCache: true, dataSourceType: 'cached_official' };
         return {
           communeName,
@@ -294,13 +304,13 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
 
       const dataArray = data.data;
 
-      // Si le tableau data est explicitement vide : l'API a bien reçu la requête pour ce code INSEE et confirme zéro dossier
+      // Si le tableau data est explicitement vide : l'API a bien reçu la requête pour ce code INSEE et confirme zéro dossier renvoyé
       if (dataArray.length === 0) {
         const zeroRiskReport: GeorisquesReport = {
           communeName,
           inseeCode,
           retrievedAt: new Date().toISOString(),
-          source: 'Réponse valide de l’API Géorisques (data.gouv.fr / BRGM) : aucun risque technologique ou PPRT répertorié dans la base GASPAR pour ce code INSEE',
+          source: 'Réponse de l’API Géorisques (data.gouv.fr / BRGM) : aucun dossier renvoyé par cette requête dans la base consultée (GASPAR) à la date de vérification. Cela ne prouve pas l’absence de tout risque sur la commune et ne se substitue pas aux informations officielles de prévention (DICRIM, arrêtés préfectoraux, bulletins de vigilance).',
           isOfflineCache: false,
           dataSourceType: 'live_api_zero_risk',
           risksCount: 0,
@@ -415,7 +425,7 @@ export async function fetchGeorisquesOnline(inseeCode: string, communeName: stri
         communeName,
         inseeCode,
         retrievedAt: new Date().toISOString(),
-        source: 'API Géorisques officielle en direct (data.gouv.fr / BRGM) - Réponse vérifiée : aucun risque technologique ou majeur notifié',
+        source: 'Réponse de l’API Géorisques (data.gouv.fr / BRGM) : aucun dossier renvoyé par cette requête dans la base consultée (GASPAR) à la date de vérification. Cela ne prouve pas l’absence de tout risque sur la commune et ne remplace pas l’ensemble des informations officielles de prévention (DICRIM, arrêtés préfectoraux, bulletins de vigilance).',
         isOfflineCache: false,
         dataSourceType: 'live_api_zero_risk',
         risksCount: 0,

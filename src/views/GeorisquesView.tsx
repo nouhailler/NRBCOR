@@ -284,7 +284,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       } else if (report.dataSourceType === 'live_api_zero_risk') {
         setRefreshMessage({
           type: 'info',
-          text: `Actualisation en direct réussie auprès de Géorisques (data.gouv.fr) : aucun risque technologique ou majeur répertorié dans la base GASPAR pour ${activeCommune.name}.`
+          text: `Actualisation en direct (API Géorisques) : aucun dossier renvoyé par cette requête dans la base consultée (GASPAR) pour ${activeCommune.name} (${activeCommune.insee}). Cela n'exclut pas d'autres risques locaux et ne remplace pas le DICRIM.`
         });
       } else if (report.dataSourceType === 'network_error') {
         setRefreshMessage({
@@ -329,7 +329,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       exportSource = liveReport.source;
     } else if (liveReport && isAuthenticLiveZero) {
       exportRisks = [];
-      exportStatus = 'OFFICIEL_DIRECT_API_AUCUN_RISQUE_RECENSE';
+      exportStatus = 'OFFICIEL_DIRECT_API_AUCUN_DOSSIER_RENVOYE';
       exportSource = liveReport.source;
     } else if (liveReport && isAuthenticCache) {
       exportRisks = liveReport.risks;
@@ -369,7 +369,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       },
       avertissementAuthenticite:
         isAuthenticLiveZero
-          ? `NOTE OFFICIELLE : La commune de ${activeCommune.name} ne fait l'objet d'aucun risque technologique majeur recensé dans la base nationale d'État GASPAR.`
+          ? `NOTE D’INFORMATION : L'API Géorisques (base GASPAR) ne renvoie aucun dossier technologique majeur pour la commune de ${activeCommune.name} (${activeCommune.insee}) lors de la requête du ${new Date().toLocaleDateString('fr-FR')}. Cette absence de résultat dans la base interrogée ne prouve pas l'absence de tout risque (risques naturels, inondations, transports non classés) et ne se substitue pas aux documents officiels de prévention (DICRIM, arrêtés préfectoraux opposables).`
           : exportRisks.length === 0
           ? `ATTENTION : Ce dossier territorial n'a pas encore été synchronisé en ligne avec l'API Géorisques pour ${activeCommune.name}. Aucun risque préfectoral fictif n'a été inséré pour prévenir toute fausse information.`
           : isPedagogical
@@ -1106,18 +1106,18 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
               {/* Réponse officielle valide : 0 risque recensé dans la base d'État */}
               {isLiveZeroRisk && (
-                <div className="bg-[#f0fdf4] p-4 rounded-xl border border-[#bbf7d0] flex flex-col gap-2">
+                <div className="bg-[#f0fdf4] p-4 rounded-xl border border-[#bbf7d0] flex flex-col gap-2.5">
                   <div className="flex items-center gap-2 text-[#166534]">
-                    <span className="material-symbols-outlined text-[20px] text-[#16a34a]">verified</span>
+                    <span className="material-symbols-outlined text-[20px] text-[#16a34a]">info</span>
                     <strong className="font-['Space_Grotesk'] text-[13px] font-bold">
-                      Réponse officielle Géorisques : Aucun risque technologique notifié
+                      Réponse API Géorisques : Aucun dossier renvoyé par cette requête
                     </strong>
                   </div>
                   <p className="text-[12px] text-[#15803d] leading-relaxed">
-                    La base nationale GASPAR (data.gouv.fr / BRGM) ne recense actuellement aucun PPRT, établissement Seveso ni périmètre PPI pour la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}).
+                    La base nationale consultée (GASPAR via data.gouv.fr / BRGM) ne renvoie actuellement aucun dossier de risque technologique ou PPRT pour la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}) lors de cette requête.
                   </p>
-                  <p className="text-[11px] text-[#166534]/80 italic">
-                    Les consignes de sécurité civile générale (alerte FR-Alert, radio de service public) et les fiches réflexes de secours restent consultables à des fins de préparation.
+                  <p className="text-[11px] text-[#166534] bg-white/80 p-2.5 rounded border border-[#bbf7d0] leading-relaxed">
+                    ⚠️ <strong>Portée de cette information :</strong> Cette réponse signifie qu'aucun dossier n'est répertorié dans la base GASPAR pour ce code INSEE. Cela <strong>ne prouve pas l'absence de tout risque sur la commune</strong> (aléas météorologiques, inondations, transports non classés) et <strong>ne remplace pas l'ensemble des informations de prévention des risques</strong> (DICRIM consultable en mairie, arrêtés préfectoraux opposables, bulletins de vigilance de la Sécurité Civile).
                   </p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <button

@@ -257,35 +257,167 @@ assert(
 );
 
 // ========================================================
-// TEST 6 : Intégrité des statuts et isolation documentaire
+// TEST 6 : Validation des codes INSEE français (Corse 2A/2B, Métropole, DROM, rejets)
 // ========================================================
-console.log('\n6. TEST INTÉGRITÉ DES STATUTS DE RAPPORT GÉORISQUES :');
+console.log('\n6. TEST VALIDATION DES CODES INSEE (CORSE 2A/2B, MÉTROPOLE, OUTRE-MER, REJETS) :');
 
-// Simuler les statuts de rapport pour s'assurer qu'aucun ne confond zéro risque avec un échec
-const validZeroRiskReport = {
-  communeName: 'Village Rural Exempt',
-  inseeCode: '00000',
-  retrievedAt: new Date().toISOString(),
-  source: 'API Géorisques en direct (data.gouv.fr / BRGM)',
+import { isValidInseeCode } from '../src/services/external/georisquesClient';
+
+assert(isValidInseeCode('2A004') === true, 'Code INSEE Corse-du-Sud 2A004 (Ajaccio) reconnu valide');
+assert(isValidInseeCode('2B033') === true, 'Code INSEE Haute-Corse 2B033 (Bastia) reconnu valide');
+assert(isValidInseeCode('2a004') === true, 'Code INSEE Corse en minuscules 2a004 reconnu valide');
+assert(isValidInseeCode('75056') === true, 'Code INSEE Métropole 75056 (Paris) reconnu valide');
+assert(isValidInseeCode('69383') === true, 'Code INSEE Métropole 69383 (Lyon 3e) reconnu valide');
+assert(isValidInseeCode('97415') === true, 'Code INSEE DROM 97415 (Saint-Denis La Réunion) reconnu valide');
+assert(isValidInseeCode('97105') === true, 'Code INSEE DROM 97105 (Basse-Terre Guadeloupe) reconnu valide');
+
+// Rejets stricts des codes non conformes
+assert(isValidInseeCode('123') === false, 'Code trop court (123) rejeté');
+assert(isValidInseeCode('2C001') === false, 'Lettre non corse 2C001 rejetée');
+assert(isValidInseeCode('ABCD') === false, 'Chaîne alphabétique ABCD rejetée');
+assert(isValidInseeCode('750561') === false, 'Code trop long (6 chiffres) rejeté');
+assert(isValidInseeCode('') === false, 'Code vide rejeté');
+
+// ========================================================
+// TEST 7 : Réponses simulées pour fetchGeorisquesOnline (Mock API Géorisques GASPAR)
+// ========================================================
+console.log('\n7. TEST RÉPONSES SIMULÉES API GÉORISQUES (CAS D\'ERREURS ET NUANCES) :');
+
+// Mise en place d'un mock localStorage en mémoire pour le runtime de test
+const testStorage: Record<string, string> = {};
+globalThis.localStorage = {
+  getItem: (key: string) => testStorage[key] || null,
+  setItem: (key: string, val: string) => { testStorage[key] = val; },
+  removeItem: (key: string) => { delete testStorage[key]; },
+  clear: () => { Object.keys(testStorage).forEach((k) => delete testStorage[k]); }
+} as any;
+
+const originalFetch = globalThis.fetch;
+
+// 7.A : JSON corrompu (SyntaxError)
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => { throw new SyntaxError('Unexpected token < in JSON at position 0'); }
+} as any);
+
+const resJsonInvalide = await fetchGeorisquesOnline('75056', 'Paris');
+assert(resJsonInvalide.dataSourceType === 'api_error', '7.A - JSON corrompu : statut api_error retourné');
+assert(resJsonInvalide.source.includes('JSON corrompu'), '7.A - Source mentionne le JSON corrompu');
+
+// 7.B : Attribut data absent de la réponse
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => ({ status: 'success', message: 'No data key provided' })
+} as any);
+
+const resNoData = await fetchGeorisquesOnline('75056', 'Paris');
+assert(resNoData.dataSourceType === 'api_error', '7.B - data absent : statut api_error retourné');
+assert(resNoData.source.includes('attribut data manquant'), '7.B - Source explicite sur l\'absence de data');
+
+// 7.C : Code INSEE divergent dans le premier enregistrement
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => ({
+    data: [{ code_insee: '13055', risques_detail: [] }]
+  })
+} as any);
+
+const resInseeDivergent = await fetchGeorisquesOnline('75056', 'Paris');
+assert(resInseeDivergent.dataSourceType === 'api_error', '7.C - INSEE divergent : statut api_error retourné');
+assert(resInseeDivergent.source.includes('Divergence territoriale'), '7.C - Source signale la divergence territoriale');
+
+// 7.D : risques_detail absent ou non tabulaire
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => ({
+    data: [{ code_insee: '75056', risques_detail: null }]
+  })
+} as any);
+
+const resNoRisquesDetail = await fetchGeorisquesOnline('75056', 'Paris');
+assert(resNoRisquesDetail.dataSourceType === 'api_error', '7.D - risques_detail non tabulaire : statut api_error retourné');
+assert(resNoRisquesDetail.source.includes('risques_detail'), '7.D - Source signale l\'attribut risques_detail manquant');
+
+// 7.E : Réponse vide (data: []) pour commune corse (2A004) -> nuance zéro risque
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => ({ data: [] })
+} as any);
+
+const resCorse2A = await fetchGeorisquesOnline('2A004', 'Ajaccio');
+assert(resCorse2A.dataSourceType === 'live_api_zero_risk', '7.E - Corse 2A004 réponse vide : statut live_api_zero_risk');
+assert(resCorse2A.risksCount === 0, '7.E - Corse 2A004 : 0 risque comptabilisé');
+assert(resCorse2A.source.includes('aucun dossier renvoyé'), '7.E - Source nuance bien « aucun dossier renvoyé »');
+assert(resCorse2A.source.includes('ne prouve pas l’absence de tout risque'), '7.E - Avertissement qu’aucun dossier ne prouve pas le risque zéro');
+
+// 7.F : Réponse vide (data: []) pour commune corse (2B033 Bastia)
+const resCorse2B = await fetchGeorisquesOnline('2B033', 'Bastia');
+assert(resCorse2B.dataSourceType === 'live_api_zero_risk', '7.F - Corse 2B033 réponse vide : statut live_api_zero_risk');
+
+// 7.G : Réponse vide (data: []) avec code INSEE invalide (ex: 2C001)
+const resInvalidInsee = await fetchGeorisquesOnline('2C001', 'Commune Invalide');
+assert(resInvalidInsee.dataSourceType === 'api_error', '7.G - Code INSEE invalide (2C001) : rejet immédiat en api_error');
+
+// 7.H : Coupure réseau / échec fetch avec cache existant
+testStorage['georisques_cache_69383'] = JSON.stringify({
+  communeName: 'Lyon 3e',
+  inseeCode: '69383',
+  retrievedAt: '2026-10-15T10:00:00.000Z',
+  source: 'Dernière réponse enregistrée de l’API officielle',
   isOfflineCache: false,
-  dataSourceType: 'live_api_zero_risk' as const,
-  risksCount: 0,
-  risks: []
+  dataSourceType: 'live_api',
+  risksCount: 2,
+  risks: [
+    { id: 'gaspar-0', category: 'Risque Industriel', title: 'Site Seveso', officialDocumentUrl: 'https://georisques.gouv.fr' },
+    { id: 'gaspar-1', category: 'TMD', title: 'Axe TMD', officialDocumentUrl: 'https://georisques.gouv.fr' }
+  ]
+});
+
+globalThis.fetch = async () => {
+  throw new Error('Failed to fetch: Network unreachable');
 };
 
-assert(
-  validZeroRiskReport.dataSourceType === 'live_api_zero_risk',
-  'Statut live_api_zero_risk correctement typé pour une commune sans risque notifié'
-);
-assert(
-  validZeroRiskReport.risksCount === 0 && validZeroRiskReport.risks.length === 0,
-  'Zéro risque inventorié pour commune sans arrêté technologique'
-);
+const resOfflineWithCache = await fetchGeorisquesOnline('69383', 'Lyon 3e');
+assert(resOfflineWithCache.dataSourceType === 'cached_official', '7.H - Échec réseau avec cache : statut cached_official');
+assert(resOfflineWithCache.isOfflineCache === true, '7.H - Flag isOfflineCache activé');
+assert(resOfflineWithCache.risksCount === 2, '7.H - 2 risques restitués depuis le cache');
+
+// 7.I : Coupure réseau sans aucun cache disponible
+delete testStorage['georisques_cache_01001'];
+const resOfflineNoCache = await fetchGeorisquesOnline('01001', 'L’Abergement-Clémenciat');
+assert(resOfflineNoCache.dataSourceType === 'network_error', '7.I - Échec réseau sans cache : statut network_error');
+assert(resOfflineNoCache.risksCount === 0, '7.I - 0 risque restitué');
+
+// 7.J : Réponse officielle valide avec risques technologiques identifiés
+globalThis.fetch = async () => ({
+  ok: true,
+  json: async () => ({
+    data: [
+      {
+        code_insee: '76540',
+        risques_detail: [
+          {
+            libelle_risque_long: 'Risque industriel Seveso Seuil Haut',
+            libelle_risque_jo: 'Risque Technologique Majeur'
+          }
+        ]
+      }
+    ]
+  })
+} as any);
+
+const resValideRisques = await fetchGeorisquesOnline('76540', 'Rouen');
+assert(resValideRisques.dataSourceType === 'live_api', '7.J - Réponse valide avec risques : statut live_api');
+assert(resValideRisques.risksCount === 1, '7.J - 1 risque recensé');
+assert(resValideRisques.risks[0].protocolKey === 'chimique', '7.J - Protocole chimique correctement assigné');
+
+// Rétablissement du fetch original
+globalThis.fetch = originalFetch;
 
 // ========================================================
-// TEST 7 : Spécification des exports territoriaux et mentions de sauvegarde
+// TEST 8 : Spécification des exports territoriaux et mentions de sauvegarde
 // ========================================================
-console.log('\n7. TEST SPÉCIFICATION DES EXPORTS TERRITORIAUX :');
+console.log('\n8. TEST SPÉCIFICATION DES EXPORTS TERRITORIAUX :');
 
 const dummySnapshot = {
   application: 'NRBCOR Protection Civile',

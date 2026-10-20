@@ -20,21 +20,21 @@ interface ScenarioInstruction {
 
 const SCENARIO_DETAILS: Record<ConfinementScenario, ScenarioInstruction> = {
   chimique: {
-    badge: 'RISQUE CHIMIQUE • GAZ & VAPEURS TOXIQUES',
+    badge: 'RISQUE CHIMIQUE • INCIDENT INDUSTRIEL OU TRANSPORT',
     badgeBg: 'bg-[#0036ce] text-white',
-    idealLocation: 'Pièce centrale fermée sans prise d’air directe (sous réserve stricte des consignes préfectorales diffusées)',
-    forbiddenLocation: 'Locaux avec aérations non obturables ; éviter sous-sols si gaz dense ou combles si gaz léger',
-    keyRule: 'Fermer tout ouvrant, couper VMC, écouter impérativement les ordres diffusés en direct par les autorités.',
-    rationale: 'Attention : aucun emplacement n’est universellement sûr. Les gaz lourds (chlore, propane, phosgène) s’accumulent au sol, tandis que les gaz légers (ammoniac, cyanure) s’élèvent vers les hauteurs. En l’absence de précision immédiate sur le produit, rejoignez une pièce fermée au cœur du bâti et appliquez sans délai les instructions transmises par la Préfecture et FR-Alert.',
-    airRenewalWarning: 'Dès la fin de l’alerte diffusée par la Préfecture (passage du nuage chimique), ouvrez en grand pour évacuer les gaz résiduels infiltrés.'
+    idealLocation: 'Pièce fermée au cœur du bâti, sans ouvrant direct vers l’extérieur (selon consignes préfectorales diffusées)',
+    forbiddenLocation: 'Locaux présentant des prises d’air extérieures non obturables ou sous toiture perméable',
+    keyRule: 'Mise à l’abri immédiate, fermeture des ouvrants, écoute stricte des ordres diffusés en direct par les autorités.',
+    rationale: 'Le comportement d’un panache toxique dépend de la température de rejet, du vent, de la topographie et de la cinétique du sinistre. Il n’existe aucune règle universelle sur l’étage ou le sous-sol (les notions théoriques de gaz dense ou léger ne préjugent pas de la trajectoire réelle d’un nuage mélangé à l’air). Les ordres sectoriels diffusés par la Préfecture et FR-Alert priment toujours sur toute disposition générale.',
+    airRenewalWarning: 'Attendez impérativement le message officiel de fin d’alerte émis par la Préfecture avant toute aération ou sortie.'
   },
   nucleaire: {
     badge: 'RISQUE NUCLÉAIRE & RADIOLOGIQUE • RETOMBÉES & RAYONNEMENTS',
     badgeBg: 'bg-[#ba1a1a] text-white',
-    idealLocation: 'Sous-sol bétonné ou pièce centrale du rez-de-chaussée entourée de murs épais',
-    forbiddenLocation: 'Pièces sous combles, vérandas, balcons ou pièces à simples parois vitrées',
-    keyRule: 'Interposition maximale de matière dense (béton, terre, brique) pour bloquer les rayons gamma.',
-    rationale: 'Contrairement au risque chimique où le sous-sol est un piège à gaz, pour les retombées radioactives le sous-sol offre un facteur de protection radiologique (écran gamma) 10 à 20 fois supérieur à un étage supérieur, pourvu que les aérations soient obturées.',
+    idealLocation: 'Sous-sol bétonné ou pièce centrale du rez-de-chaussée entourée de maçonnerie dense',
+    forbiddenLocation: 'Pièces sous combles légers, vérandas, balcons ou pièces à simples parois vitrées',
+    keyRule: 'Interposition maximale de matière dense (béton, brique pleine) pour atténuer le rayonnement ionisant.',
+    rationale: 'Face aux rayonnements ionisants directs (gamma) et aux poussières radioactives, la densité des parois agit comme un écran protecteur. La mise à l’abri doit être maintenue jusqu’aux instructions préfectorales de déconfinement ou d’évacuation graduée.',
     airRenewalWarning: 'Le confinement protège du panache et des retombées directes. Attendez formellement l’ordre préfectoral avant d’aérer ou de sortir.'
   },
   biologique: {
@@ -73,11 +73,11 @@ const CONFINEMENT_STEPS: ConfinementStep[] = [
   {
     id: 'c2',
     order: 2,
-    title: 'Couper VMC, hottes et climatisation',
+    title: 'Gérer la ventilation selon les consignes d’urgence',
     icon: 'mode_fan_off',
-    desc: 'Coupez immédiatement la ventilation mécanique contrôlée (VMC) au tableau électrique (disjoncteur VMC), ainsi que toute climatisation ou hotte aspirante.',
-    tip: 'Une VMC standard aspire l’air extérieur et diffuserait les toxiques dans l’ensemble du logement en moins de 10 minutes.',
-    scenarioNote: 'Règle absolue : aucune aspiration mécanique d’air extérieur.',
+    desc: 'Coupez les systèmes aspirant l’air extérieur (VMC, climatisation, hottes) et obturez les aérations directes selon les instructions des secours. Veillez à ne pas créer de risque secondaire si des appareils à tirage fonctionnent.',
+    tip: 'L’arrêt de la ventilation réduit l’aspiration des rejets extérieurs, mais ne remplace pas une étanchéité soignée et le respect des consignes préfectorales.',
+    scenarioNote: 'Suivre les consignes diffusées en temps réel pour le secteur concerné.',
     essential: true
   },
   {

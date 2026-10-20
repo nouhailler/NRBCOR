@@ -671,8 +671,8 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       ],
       table: {
         title: "Posologie Officielle d'Iode Stable (STRICTEMENT SOUMISE À ORDRE DU PRÉFET)",
-        authority: 'Santé Publique France & Autorité de Sûreté Nucléaire (ASNR)',
-        desc: "Comprimés de Iodure de Potassium (KI 65 mg sécables). ATTENTION FORMELLE : Cette posologie ne doit JAMAIS être prise spontanément ou préventivement. La saturation thyroïdienne doit coïncider exactement avec le passage du panache radioactif sous ordre explicite du Préfet (FR-Alert / radio France Bleu).",
+        authority: 'Santé Publique France & Autorité de Sûreté Nucléaire (ASNR) / ANSM',
+        desc: "Comprimés de Iodure de Potassium (KI 65 mg sécables - AMM PCA n° 34009 360 847 8 7). ATTENTION FORMELLE : Ce tableau est informatif. La prise d'iode dépend exclusivement et strictement des ordres diffusés en direct par les autorités (Préfet via FR-Alert / France Bleu) et ne doit jamais être décidée à partir du seul tableau de l'application ni par automédication préventive.",
         rows: [
           { label: 'Adulte & enfant > 12 ans', value: '2 comprimés (130 mg KI / 100 mg d’iode)' },
           { label: 'Enfant de 3 à 12 ans', value: '1 comprimé (65 mg KI / 50 mg d’iode)' },
@@ -681,7 +681,7 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
           { label: 'Femmes enceintes / allaitantes', value: '2 comprimés (priorité vitale fœtale)', isHighlighted: true },
           { label: 'Adultes de plus de 40 ans', value: 'Prise NON recommandée*', isWarning: true }
         ],
-        footnote: "*Recommandation ASN/IRSN/OMS : la prise est obligatoirement subordonnée à l'ordre préfectoral. Au-delà de 40 ans, le risque d'effets indésirables thyroïdiens et cardiovasculaires est supérieur au bénéfice (vulnérabilité au cancer thyroïdien radio-induit quasi nulle, sauf consigne exceptionnelle de la préfecture)."
+        footnote: "*Recommandation ASN/IRSN/ANSM : la prise est obligatoirement subordonnée à l'ordre préfectoral. Au-delà de 40 ans, le risque d'effets indésirables thyroïdiens et cardiovasculaires est supérieur au bénéfice (vulnérabilité au cancer thyroïdien radio-induit quasi nulle, sauf consigne exceptionnelle de la préfecture)."
       }
     },
     emergencySymptoms: {
