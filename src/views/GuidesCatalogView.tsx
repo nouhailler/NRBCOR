@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { PROTOCOLS_DATA, ProtocolData } from '../data/protocols';
 import { SubScreen } from '../types';
+import { ExportPdfModal } from '../components/ExportPdfModal';
+import { PrintableGuideKey } from '../services/pdfExportService';
 
 interface GuidesCatalogViewProps {
-  onSelectProtocol: (id: 'bio' | 'chimique' | 'nucleaire' | 'confinement') => void;
+  onSelectProtocol: (id: 'bio' | 'chimique' | 'nucleaire' | 'confinement' | 'radiologique') => void;
   onOpenSubScreen: (screen: SubScreen) => void;
 }
 
@@ -13,6 +15,8 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'n' | 'r' | 'b' | 'c'>('all');
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportKey, setExportKey] = useState<PrintableGuideKey>('pack-complet');
 
   const protocolsList = Object.values(PROTOCOLS_DATA);
 
@@ -28,7 +32,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
     if (selectedFilter === 'b') return p.id === 'bio';
     if (selectedFilter === 'c') return p.id === 'chimique';
     if (selectedFilter === 'n') return p.id === 'nucleaire';
-    if (selectedFilter === 'r') return p.id === 'nucleaire' || p.id === 'confinement';
+    if (selectedFilter === 'r') return p.id === 'radiologique';
     return true;
   });
 
@@ -39,7 +43,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
         <div className="flex items-center gap-1.5 min-w-0">
           <span className="material-symbols-outlined text-[18px]">local_library</span>
           <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold tracking-wider truncate">
-            Catalogue Officiel • 4 Protocoles Majeurs
+            Catalogue Officiel • 5 Protocoles Majeurs
           </span>
         </div>
         <span className="font-['Space_Grotesk'] text-[10px] bg-[#001126] text-white px-2 py-0.5 rounded font-bold">
@@ -61,6 +65,55 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
           Consultez l'ensemble des protocoles opérationnels complets, validés par le SGDSN, la Sécurité Civile et Santé Publique France.
         </p>
       </header>
+
+      {/* Printable Crisis Binder Card */}
+      <div className="bg-gradient-to-r from-[#001126] to-[#12263f] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-lg bg-[#0036ce] text-white flex items-center justify-center shrink-0 shadow-sm">
+              <span className="material-symbols-outlined text-[24px]">menu_book</span>
+            </div>
+            <div>
+              <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#98f6c5] tracking-wider block">
+                Sécurité Hors-Ligne & Classeur Papier
+              </span>
+              <h2 className="text-[15px] font-bold text-white leading-tight">
+                Pack Guides Clés & Fiches Mémo
+              </h2>
+            </div>
+          </div>
+          <span className="font-['Space_Grotesk'] text-[10px] bg-white/10 text-white px-2 py-0.5 rounded font-bold uppercase shrink-0">
+            PDF A4
+          </span>
+        </div>
+        <p className="text-[12px] text-[#dce9fd] leading-relaxed">
+          En cas de black-out ou d'urgence cinétique, vos téléphones peuvent être déchargés ou inaccessibles. Imprimez vos fiches réflexes (Déshabillage 8 étapes, Fiche Iode, Confinement 4 piliers, Plan familial) pour votre classeur d'urgence.
+        </p>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              setExportKey('pack-complet');
+              setShowExportModal(true);
+            }}
+            className="flex-1 min-h-[44px] bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[12px] uppercase font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            <span>Pack Complet 4-en-1</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setExportKey('deshabillage');
+              setShowExportModal(true);
+            }}
+            className="min-h-[44px] bg-white/10 hover:bg-white/20 text-white font-['Space_Grotesk'] text-[11px] uppercase font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors border border-white/20"
+          >
+            <span>Choisir un guide</span>
+            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
 
       {/* Search Input */}
       <div className="relative">
@@ -88,7 +141,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
       {/* Classification Quick Filter Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
         {[
-          { id: 'all', label: 'Tous (4)' },
+          { id: 'all', label: 'Tous (5)' },
           { id: 'b', label: 'B • Biologique' },
           { id: 'c', label: 'C • Chimique' },
           { id: 'n', label: 'N • Nucléaire' },
@@ -298,6 +351,13 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
           </div>
         </button>
       </section>
+
+      {/* Modal Export PDF */}
+      <ExportPdfModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        initialGuideKey={exportKey}
+      />
     </div>
   );
 };

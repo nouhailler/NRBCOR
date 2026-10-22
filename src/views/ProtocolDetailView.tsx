@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ProtocolData } from '../data/protocols';
 import { EmergencyCall } from '../types';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
+import { triggerHaptic } from '../utils/haptics';
 
 interface ProtocolDetailViewProps {
   protocol: ProtocolData;
@@ -18,6 +19,7 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
   const [sirenActive, setSirenActive] = useState(false);
 
   const toggleSirenAudio = () => {
+    triggerHaptic(sirenActive ? 'light' : 'heavy');
     if (sirenActive) {
       stopSiren();
       setSirenActive(false);

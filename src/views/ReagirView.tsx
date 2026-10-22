@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SubScreen, EmergencyCall } from '../types';
 import { Tooltip } from '../components/Tooltip';
+import { triggerHaptic } from '../utils/haptics';
 
 interface ReagirViewProps {
   onOpenSubScreen: (screen: SubScreen) => void;
@@ -17,7 +18,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
     code: 'N' | 'R' | 'B' | 'C';
     name: string;
     desc: string;
-    protocolKey: 'nucleaire' | 'bio' | 'chimique';
+    protocolKey: 'nucleaire' | 'radiologique' | 'bio' | 'chimique';
   } | null>({
     code: 'C',
     name: 'Chimique',
@@ -26,18 +27,67 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
   });
 
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [isStressMode, setIsStressMode] = useState<boolean>(false);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const toggleExpand = (id: string) => {
+    triggerHaptic('light');
     setExpandedSection(expandedSection === id ? null : id);
   };
 
+  const toggleStressMode = () => {
+    triggerHaptic('warning');
+    setIsStressMode((prev) => !prev);
+  };
+
+  const toggleSpeechSynthesis = (textToRead: string) => {
+    triggerHaptic('medium');
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      return;
+    }
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = 'fr-FR';
+    utterance.rate = 0.95;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSelectRiskCode = (code: 'N' | 'R' | 'B' | 'C') => {
+    triggerHaptic('light');
     switch (code) {
       case 'N':
         setSelectedRisk({
           code: 'N',
           name: 'Nucléaire',
-          desc: "Accident de réacteur civil ou retombées radioactives. Murs en béton épais (sous-sol protecteur contre les rayons gamma). Calfeutrage et coupure VMC. ZÉRO automédication : iode UNIQUEMENT sur ordre formel du Préfet !",
+          desc: "Accident de réacteur civil ou panache de retombées radioactives. Murs en béton épais (sous-sol protecteur contre les rayons gamma). Calfeutrage et coupure VMC. ZÉRO automédication : iode UNIQUEMENT sur ordre formel du Préfet !",
           protocolKey: 'nucleaire',
         });
         break;
@@ -45,8 +95,8 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         setSelectedRisk({
           code: 'R',
           name: 'Radiologique',
-          desc: "Dispersion de radioéléments ou source orpheline perdue. Règle d'or : Temps d'exposition minimal, Distance maximale, Écran dense. Déshabillage sans secouer et lavage doux sans frotter.",
-          protocolKey: 'nucleaire',
+          desc: "Sources orphelines, dispersion radiologique (bombe sale), irradiation externe vs contamination. Règle ALARA : Temps minimum, Distance maximale (dose divisée par 4 si distance doublée), Écran dense. Déshabillage sans secouer et douche tiède sans frotter la peau. ATTENTION : comprimés d'iode STRICTEMENT INUTILES dans ce cas !",
+          protocolKey: 'radiologique',
         });
         break;
       case 'B':
@@ -68,24 +118,75 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
     }
   };
 
+  const getEmergencySpeechText = (): string => {
+    if (!selectedRisk) {
+      return "Consignes d'urgence vitale : Rejoignez immédiatement un bâtiment en dur clos. Fermez toutes les portes et fenêtres. Coupez la ventilation. Écoutez la radio locale France Bleu ou les notifications FR-Alert. Ne téléphonez qu'en cas d'urgence absolue pour laisser le réseau aux secours.";
+    }
+    return `Alerte risque ${selectedRisk.name}. ${selectedRisk.desc} Règle vitale : Rejoignez un local clos en dur, calfeutrez les accès, coupez la VMC. Écoutez France Bleu et suivez scrupuleusement les consignes de la préfecture.`;
+  };
+
   return (
-    <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
-      {/* Sentinel Statut Déconnecté */}
-      <aside className="w-full bg-[#002c1b] text-white rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-sm border border-[#005236]">
-        <div className="flex items-center gap-2 min-w-0">
-          <span
-            className="material-symbols-outlined text-[#3f9d73] text-[20px] flex-shrink-0"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            cloud_off
+    <div className={`flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto transition-colors duration-200 ${
+      isStressMode ? 'bg-black text-white min-h-screen' : ''
+    }`}>
+      {/* Barre de contrôle Stress & Accessibilité 1-Tap */}
+      <div className="flex items-center justify-between gap-2">
+        <button
+          onClick={toggleStressMode}
+          type="button"
+          className={`min-h-[48px] px-3.5 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-2 border transition-all ${
+            isStressMode
+              ? 'bg-[#f59e0b] text-black border-[#f59e0b] shadow-lg ring-2 ring-white'
+              : 'bg-white hover:bg-[#eef4ff] text-[#001126] border-[#c4c6ce]'
+          }`}
+          title="Bascule vers le mode lisibilité maximale pour doigts tremblants ou situation de stress"
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {isStressMode ? 'contrast' : 'tonality'}
           </span>
-          <span className="font-['Space_Grotesk'] text-[11px] tracking-wider uppercase truncate text-[#3f9d73] font-bold">
-            Mode Hors-Ligne Garanti • Protocoles embarqués
+          <span>{isStressMode ? 'Mode Normal' : 'Mode Lisibilité Extrême'}</span>
+        </button>
+
+        <button
+          onClick={() => toggleSpeechSynthesis(getEmergencySpeechText())}
+          type="button"
+          className={`min-h-[48px] px-3.5 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-2 border transition-all ${
+            isSpeaking
+              ? 'bg-[#dc2626] text-white border-[#dc2626] animate-pulse shadow-lg'
+              : isStressMode
+              ? 'bg-[#1e293b] text-white border-white'
+              : 'bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001126] border-[#d6e4f8]'
+          }`}
+          title="Écouter la synthèse vocale des consignes vitales"
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {isSpeaking ? 'stop_circle' : 'volume_up'}
+          </span>
+          <span>{isSpeaking ? 'Arrêter Voix' : 'Écouter Consignes'}</span>
+        </button>
+      </div>
+
+      {/* Bannière de fraîcheur doctrinale et connectivité proéminente */}
+      <aside className={`w-full rounded-xl p-3 flex flex-col gap-2 shadow-sm border ${
+        isStressMode ? 'bg-[#18181b] border-white text-white' : 'bg-[#eef4ff] border-[#d6e4f8] text-[#001126]'
+      }`}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOnline ? 'bg-[#16a34a] animate-pulse' : 'bg-[#dc2626]'}`}></span>
+            <span className="font-['Space_Grotesk'] text-[11px] tracking-wider uppercase font-bold truncate">
+              {isOnline ? 'Réseau Détecté • Données Officielles Directes' : 'Mode Hors-Ligne • Corpus Embarqué 100%'}
+            </span>
+          </div>
+          <span className={`font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded font-bold uppercase shrink-0 ${
+            isStressMode ? 'bg-white text-black' : 'bg-[#001126] text-white'
+          }`}>
+            V2.4.1 SEC
           </span>
         </div>
-        <span className="font-['Space_Grotesk'] text-[11px] text-white bg-[#001126] px-2 py-0.5 rounded font-bold flex-shrink-0">
-          SEC-V4
-        </span>
+        <div className="flex items-center justify-between text-[11px] pt-1 border-t border-current/15">
+          <span className="opacity-80">Corpus de sécurité civile révisé :</span>
+          <span className="font-bold">18 Octobre 2026</span>
+        </div>
       </aside>
 
       {/* 1. Avertissement permanent supérieur encadré haute lisibilité */}

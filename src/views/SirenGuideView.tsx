@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
+import { triggerHaptic } from '../utils/haptics';
 
 interface SirenGuideViewProps {
   onBack: () => void;
@@ -13,6 +14,7 @@ export const SirenGuideView: React.FC<SirenGuideViewProps> = ({
   const [playingSiren, setPlayingSiren] = useState<'alerte' | 'fin' | null>(null);
 
   const toggleSound = (type: 'alerte' | 'fin') => {
+    triggerHaptic(playingSiren === type ? 'light' : 'heavy');
     if (playingSiren === type) {
       stopSiren();
       setPlayingSiren(null);

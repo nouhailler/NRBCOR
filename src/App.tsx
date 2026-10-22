@@ -28,9 +28,19 @@ import { storageService } from './services/storage/IndexedDbStorage';
 import { updateService } from './services/updateService';
 import { PROTOCOLS_DATA } from './data/protocols';
 import { INITIAL_KIT_ITEMS } from './data/kitData';
+import { triggerHaptic } from './utils/haptics';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabType>('accueil');
+  const [activeTab, setActiveTab] = useState<TabType>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'reagir' || tabParam === 'mon-plan' || tabParam === 'guides' || tabParam === 'preparation') {
+        return tabParam as TabType;
+      }
+    }
+    return 'accueil';
+  });
   const [subScreen, setSubScreen] = useState<SubScreen>(null);
   const [activeCallModal, setActiveCallModal] = useState<EmergencyCall | null>(null);
   const [isWipeModalOpen, setIsWipeModalOpen] = useState(false);
@@ -83,26 +93,31 @@ export default function App() {
   };
 
   const handleToggleKitItem = (id: string) => {
+    triggerHaptic('success');
     setKitItems((prev) =>
       prev.map((it) => (it.id === id ? { ...it, completed: !it.completed } : it))
     );
   };
 
   const handleResetKitItems = () => {
+    triggerHaptic('warning');
     setKitItems((prev) => prev.map((it) => ({ ...it, completed: false })));
   };
 
   const handleAddKitItem = (item: KitItem) => {
+    triggerHaptic('medium');
     setKitItems((prev) => [item, ...prev]);
   };
 
   const handleSelectTab = (tab: TabType) => {
+    triggerHaptic('light');
     setActiveTab(tab);
     setSubScreen(null);
     window.scrollTo({ top: 0, behavior: 'instant' as any });
   };
 
-  const handleOpenProtocol = (id: 'bio' | 'chimique' | 'nucleaire' | 'confinement') => {
+  const handleOpenProtocol = (id: 'bio' | 'chimique' | 'nucleaire' | 'confinement' | 'radiologique') => {
+    triggerHaptic('light');
     setSubScreen({ type: 'protocol', id });
     window.scrollTo({ top: 0, behavior: 'instant' as any });
   };

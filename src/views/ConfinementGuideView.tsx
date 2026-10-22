@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tooltip } from '../components/Tooltip';
+import { triggerHaptic } from '../utils/haptics';
 
 interface ConfinementGuideViewProps {
   onBack: () => void;
@@ -140,6 +141,7 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
   const [checkedSteps, setCheckedSteps] = useState<{ [id: string]: boolean }>({});
 
   const toggleCheck = (id: string) => {
+    triggerHaptic('success');
     setCheckedSteps((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 

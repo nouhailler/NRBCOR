@@ -18,6 +18,8 @@ import { SpecificNeedsConfig, KitItem } from '../src/types';
 import { InventoryItem, FamilyPlanData } from '../src/services/storage/StorageRepository';
 import { getPedagogicalSampleRisks, fetchGeorisquesOnline, searchCommunesOnline } from '../src/services/external/georisquesClient';
 import { AVAILABLE_COMMUNES } from '../src/data/georisquesData';
+import { PROTOCOLS_DATA } from '../src/data/protocols';
+import { triggerHaptic } from '../src/utils/haptics';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -454,6 +456,43 @@ assert(
   dummySnapshot.documentsDeSauvegarde.some((d) => d.statutAuthenticite.includes('paraphé par le Maire')),
   'Mention explicite que l\'exemplaire paraphé doit être consulté en mairie'
 );
+
+// ========================================================
+// TEST 9 : Distinction Doctrinale Nucléaire vs Radiologique
+// ========================================================
+console.log('\n9. TEST SÉPARATION NUCLÉAIRE vs RADIOLOGIQUE :');
+
+const protoNucleaire = PROTOCOLS_DATA['nucleaire'];
+const protoRadiologique = PROTOCOLS_DATA['radiologique'];
+
+assert(!!protoNucleaire, '9.A - Protocole Nucléaire autonome présent');
+assert(!!protoRadiologique, '9.B - Protocole Radiologique autonome présent et distinct');
+assert(protoNucleaire.id !== protoRadiologique.id, '9.C - Identifiants de protocoles distincts');
+assert(protoRadiologique.title.includes('Radiologique'), '9.D - Titre radiologique explicite');
+assert(protoRadiologique.reflexes.some((r) => r.title.includes('ALARA')), '9.E - Principe ALARA (Temps/Distance/Écran) documenté');
+assert(
+  protoRadiologique.reflexes.some((r) => r.description.toLowerCase().includes('inutile') || r.description.toLowerCase().includes('inopérant') || r.title.toLowerCase().includes('inutile')),
+  '9.F - Inefficacité de l\'iode stable hors réacteur nucléaire formalisée'
+);
+assert(
+  Boolean(protoRadiologique.pedagogy?.cards.some((c) => c.title.includes('IRRADIATION') || c.title.includes('CONTAMINATION'))),
+  '9.G - Distinction claire entre irradiation externe et contamination surfacique'
+);
+
+// ========================================================
+// TEST 10 : Module de Retour Haptique
+// ========================================================
+console.log('\n10. TEST UTILITAIRE HAPTIQUE (DÉGRADATION SILENCIEUSE) :');
+
+let hapticError = false;
+try {
+  triggerHaptic('light');
+  triggerHaptic('success');
+  triggerHaptic('warning');
+} catch (e) {
+  hapticError = true;
+}
+assert(!hapticError, '10.A - triggerHaptic s\'exécute sans lever d\'exception même sans vibreur physique');
 
 console.log(`\n========================================================`);
 console.log(`🎉 SUITE DE TESTS COMPLÈTE : ${passedTests} / ${totalTests} VÉRIFICATIONS RÉUSSIES (100% SUCCÈS)`);

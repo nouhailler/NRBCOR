@@ -53,6 +53,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   const [activeModalDoc, setActiveModalDoc] = useState<string | null>(null);
   const [selectedMapNode, setSelectedMapNode] = useState<'ref' | 'ppi' | 'tmd' | 'nucleaire' | null>(null);
   const [showAuditPanel, setShowAuditPanel] = useState<boolean>(true);
+  const [mapZoom, setMapZoom] = useState<number>(1);
+  const [mapMode, setMapMode] = useState<'officiel' | 'pedagogique'>('officiel');
 
   // Monitor Network Status
   useEffect(() => {
@@ -859,145 +861,326 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           </div>
         </div>
 
-        {/* Schematized Vector Map with Clickable Nodes (DÉMONSTRATION PÉDAGOGIQUE) */}
+        {/* Schematized Vector Map with Clickable Nodes & Zoom */}
         <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex flex-col">
               <span className="font-['Space_Grotesk'] text-[12px] uppercase tracking-wider text-[#001126] font-bold">
                 Périmètres & Rayons d'Incidence
               </span>
               <span className="text-[12px] text-[#44474d]">
-                Représentation vectorielle schématique (Touchez un repère)
+                Représentation vectorielle interactive (Zoomable, repères cliquables)
               </span>
             </div>
-            <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#fefce8] text-[#854d0e] font-bold border border-[#fef08a]">
-              🟡 SCHÉMA LOCAL
-            </span>
+
+            {/* Mode Switcher: Officiel vs Pédagogique */}
+            <div className="inline-flex rounded-lg p-0.5 bg-[#f0f4f9] border border-[#c4c6ce] shrink-0 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setMapMode('officiel')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                  mapMode === 'officiel'
+                    ? 'bg-[#001126] text-white shadow-xs'
+                    : 'text-[#44474d] hover:text-[#001126]'
+                }`}
+              >
+                Données Officielles
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapMode('pedagogique')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                  mapMode === 'pedagogique'
+                    ? 'bg-[#854d0e] text-white shadow-xs'
+                    : 'text-[#44474d] hover:text-[#001126]'
+                }`}
+              >
+                Mode Pédagogique
+              </button>
+            </div>
           </div>
 
-          {/* Clean Vector SVG Canvas */}
-          <div className="w-full bg-[#eef4ff] rounded-lg p-2 flex items-center justify-center relative overflow-hidden border border-[#d6e4f8]">
-            <svg
-              className="w-full max-w-sm h-auto select-none cursor-pointer"
-              viewBox="0 0 340 220"
-              xmlns="http://www.w3.org/2000/svg"
+          {/* Mode Banner */}
+          {mapMode === 'officiel' ? (
+            <div className="px-3 py-2 rounded-lg bg-[#eef4ff] border border-[#0036ce]/30 flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-[#0036ce]">
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                <span className="font-bold">Territoire Réel : {activeCommune.name} ({activeCommune.insee})</span>
+              </div>
+              <span className="text-[#44474d] text-[10px]">Base API Géorisques</span>
+            </div>
+          ) : (
+            <div className="px-3 py-2 rounded-lg bg-[#fefce8] border border-[#fef08a] flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-[#854d0e]">
+                <span className="material-symbols-outlined text-[16px]">school</span>
+                <span className="font-bold">Simulation d'Exercice Non-Contractuelle</span>
+              </div>
+              <span className="text-[#854d0e] text-[10px]">Didactique uniquement</span>
+            </div>
+          )}
+
+          {/* Zoom Toolbar & Map Canvas */}
+          <div className="relative">
+            {/* Zoom Controls */}
+            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 bg-white/90 backdrop-blur-xs p-1 rounded-lg border border-[#c4c6ce] shadow-xs">
+              <button
+                type="button"
+                onClick={() => setMapZoom((z) => Math.min(2.4, +(z + 0.35).toFixed(2)))}
+                disabled={mapZoom >= 2.4}
+                title="Zoom avant (+)"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126] disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <span className="material-symbols-outlined text-[18px]">zoom_in</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapZoom((z) => Math.max(1, +(z - 0.35).toFixed(2)))}
+                disabled={mapZoom <= 1}
+                title="Zoom arrière (-)"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126] disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <span className="material-symbols-outlined text-[18px]">zoom_out</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMapZoom(1); setSelectedMapNode(null); }}
+                title="Réinitialiser zoom (100%)"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126]"
+              >
+                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+              </button>
+            </div>
+
+            {/* Clean Vector SVG Canvas */}
+            <div className="w-full bg-[#eef4ff] rounded-lg p-2 flex items-center justify-center relative overflow-hidden border border-[#d6e4f8]">
+              {(() => {
+                const baseW = 340;
+                const baseH = 220;
+                const vbW = baseW / mapZoom;
+                const vbH = baseH / mapZoom;
+                let targetX = 170;
+                let targetY = 110;
+                if (selectedMapNode === 'tmd') { targetX = 140; targetY = 130; }
+                if (selectedMapNode === 'ppi') { targetX = 115; targetY = 155; }
+                if (selectedMapNode === 'nucleaire') { targetX = 260; targetY = 70; }
+                const vbX = Math.max(0, Math.min(baseW - vbW, targetX - vbW / 2));
+                const vbY = Math.max(0, Math.min(baseH - vbH, targetY - vbH / 2));
+                const currentVb = `${vbX} ${vbY} ${vbW} ${vbH}`;
+
+                return (
+                  <svg
+                    className="w-full max-w-sm h-auto select-none cursor-pointer transition-all duration-300"
+                    viewBox={currentVb}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {/* Radial grid circles */}
+                    <circle cx="170" cy="110" r="95" fill="none" stroke="#74777e" strokeWidth="1" strokeDasharray="3 3" opacity="0.35" />
+                    <circle
+                      cx="170"
+                      cy="110"
+                      r="65"
+                      fill="#dce9fd"
+                      fillOpacity={selectedMapNode === 'ppi' ? "0.6" : "0.3"}
+                      stroke="#0036ce"
+                      strokeWidth={selectedMapNode === 'ppi' ? "2.5" : "1.2"}
+                      strokeDasharray="4 2"
+                    />
+                    <circle cx="170" cy="110" r="38" fill="#eef4ff" fillOpacity="0.6" stroke="#12263f" strokeWidth="1.5" />
+
+                    {/* TMD Corridor Line */}
+                    <path
+                      d="M 60 180 Q 140 130 200 40"
+                      fill="none"
+                      stroke="#ba1a1a"
+                      strokeWidth={selectedMapNode === 'tmd' ? "4.5" : "2.5"}
+                      strokeDasharray="6 3"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'tmd' ? null : 'tmd')}
+                    />
+                    <circle
+                      cx="180"
+                      cy="85"
+                      r={selectedMapNode === 'tmd' ? "7" : "5"}
+                      fill="#ba1a1a"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'tmd' ? null : 'tmd')}
+                    />
+
+                    {/* SEVESO Zone Pin */}
+                    <g
+                      transform="translate(115, 155)"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'ppi' ? null : 'ppi')}
+                      className="cursor-pointer"
+                    >
+                      <rect
+                        x="-16"
+                        y="-12"
+                        width="32"
+                        height="24"
+                        rx="4"
+                        fill={selectedMapNode === 'ppi' ? "#0036ce" : "#12263f"}
+                        stroke={selectedMapNode === 'ppi' ? "#98f6c5" : "none"}
+                        strokeWidth="2"
+                      />
+                      <text x="0" y="4" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="700" fontFamily="Space Grotesk">PPI</text>
+                    </g>
+
+                    {/* Nuclear Direction indicator */}
+                    <line
+                      x1="170"
+                      y1="110"
+                      x2="295"
+                      y2="55"
+                      stroke={selectedMapNode === 'nucleaire' ? "#0036ce" : "#74777e"}
+                      strokeWidth={selectedMapNode === 'nucleaire' ? "3" : "1.5"}
+                      strokeDasharray="2 2"
+                    />
+                    <circle
+                      cx="295"
+                      cy="55"
+                      r={selectedMapNode === 'nucleaire' ? "9" : "7"}
+                      fill={selectedMapNode === 'nucleaire' ? "#0036ce" : "#12263f"}
+                      stroke={selectedMapNode === 'nucleaire' ? "#98f6c5" : "none"}
+                      strokeWidth="2"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'nucleaire' ? null : 'nucleaire')}
+                      className="cursor-pointer"
+                    />
+                    <text
+                      x="295"
+                      y="42"
+                      textAnchor="middle"
+                      fill="#0f1c2b"
+                      fontSize="9"
+                      fontWeight="700"
+                      fontFamily="Public Sans"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'nucleaire' ? null : 'nucleaire')}
+                    >
+                      PPI Nucléaire
+                    </text>
+
+                    {/* Center Reference */}
+                    <circle
+                      cx="170"
+                      cy="110"
+                      r={selectedMapNode === 'ref' ? "10" : "8"}
+                      fill="#0036ce"
+                      stroke={selectedMapNode === 'ref' ? "#98f6c5" : "none"}
+                      strokeWidth="2"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'ref' ? null : 'ref')}
+                      className="cursor-pointer"
+                    />
+                    <circle cx="170" cy="110" r="3" fill="#ffffff" />
+                    <text
+                      x="170"
+                      y="134"
+                      textAnchor="middle"
+                      fill="#0f1c2b"
+                      fontSize="10"
+                      fontWeight="700"
+                      fontFamily="Public Sans"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'ref' ? null : 'ref')}
+                    >
+                      {activeCommune.name.slice(0, 16)} (Réf.)
+                    </text>
+
+                    {/* Distance tags */}
+                    <text x="170" y="70" textAnchor="middle" fill="#44474d" fontSize="8" fontFamily="Space Grotesk">Rayon 4.2 km</text>
+                    <text
+                      x="75"
+                      y="170"
+                      fill="#ba1a1a"
+                      fontSize="8"
+                      fontWeight="700"
+                      fontFamily="Space Grotesk"
+                      onClick={() => setSelectedMapNode(selectedMapNode === 'tmd' ? null : 'tmd')}
+                    >
+                      Axe TMD Rail (&lt;800m)
+                    </text>
+                  </svg>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Interactive node indicator alert with operational advice */}
+          {selectedMapNode && (
+            <div className="p-3 rounded-lg bg-[#dce9fd] text-[12px] border border-[#0036ce]/30 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#001126] flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px] text-[#0036ce]">near_me</span>
+                  {selectedMapNode === 'ppi' && "Zone SEVESO Seuil Haut (Périmètre PPI)"}
+                  {selectedMapNode === 'tmd' && "Corridor TMD (Transport Matières Dangereuses Rail/Route)"}
+                  {selectedMapNode === 'nucleaire' && "Rayon de Prévention CNPE / Nucléaire (PPI 10-20 km)"}
+                  {selectedMapNode === 'ref' && `Point central de référence : ${activeCommune.name}`}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedMapNode(null)}
+                  className="text-[#001126] font-bold text-[11px] underline cursor-pointer"
+                >
+                  Effacer
+                </button>
+              </div>
+              <p className="text-[11px] text-[#0f1c2b] leading-relaxed">
+                {selectedMapNode === 'ppi' && "En cas d'accident industriel majeur : sirène POI/PPI spécifique (ou RNA), confinement immédiat dans le local étanche préparé, écoute de la radio locale conventionnée (France Bleu)."}
+                {selectedMapNode === 'tmd' && "Accident de convoi chimique : s'éloigner perpendiculairement au sens du vent à plus de 800 mètres. Ne jamais s'approcher ni utiliser de flamme nue."}
+                {selectedMapNode === 'nucleaire' && "Alerte radiologique : prise d'iode stable (KI) EXCLUSIVEMENT sur ordre formel du Préfet (FR-Alert / radio). Rester calfeutré en attendant les consignes d'évacuation éventuelle."}
+                {selectedMapNode === 'ref' && `Coordonnées géographiques de la commune : ${activeCommune.postalCode} • Code INSEE ${activeCommune.insee}. Repère kilométrique zéro pour vos plans d'évacuation.`}
+              </p>
+            </div>
+          )}
+
+          {/* Interactive Clickable Map Legend */}
+          <div className="grid grid-cols-2 gap-2 text-[12px]">
+            <button
+              type="button"
+              onClick={() => setSelectedMapNode(selectedMapNode === 'ref' ? null : 'ref')}
+              className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
+                selectedMapNode === 'ref'
+                  ? 'bg-[#001126] text-white border-[#001126] shadow-xs'
+                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+              }`}
             >
-              {/* Radial grid circles */}
-              <circle cx="170" cy="110" r="95" fill="none" stroke="#74777e" strokeWidth="1" strokeDasharray="3 3" opacity="0.35" />
-              <circle
-                cx="170"
-                cy="110"
-                r="65"
-                fill="#dce9fd"
-                fillOpacity={selectedMapNode === 'ppi' ? "0.6" : "0.3"}
-                stroke="#0036ce"
-                strokeWidth={selectedMapNode === 'ppi' ? "2" : "1.2"}
-                strokeDasharray="4 2"
-              />
-              <circle cx="170" cy="110" r="38" fill="#eef4ff" fillOpacity="0.6" stroke="#12263f" strokeWidth="1.5" />
+              <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${selectedMapNode === 'ref' ? 'bg-[#98f6c5]' : 'bg-[#0036ce]'}`}></span>
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Point de référence</span>
+            </button>
 
-              {/* TMD Corridor Line */}
-              <path
-                d="M 60 180 Q 140 130 200 40"
-                fill="none"
-                stroke="#ba1a1a"
-                strokeWidth={selectedMapNode === 'tmd' ? "4" : "2.5"}
-                strokeDasharray="6 3"
-                onClick={() => setSelectedMapNode('tmd')}
-              />
-              <circle
-                cx="180"
-                cy="85"
-                r="5"
-                fill="#ba1a1a"
-                onClick={() => setSelectedMapNode('tmd')}
-              />
+            <button
+              type="button"
+              onClick={() => setSelectedMapNode(selectedMapNode === 'tmd' ? null : 'tmd')}
+              className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
+                selectedMapNode === 'tmd'
+                  ? 'bg-[#ba1a1a] text-white border-[#ba1a1a] shadow-xs'
+                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+              }`}
+            >
+              <span className={`w-3.5 h-1.5 shrink-0 ${selectedMapNode === 'tmd' ? 'bg-white' : 'bg-[#ba1a1a]'}`}></span>
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Transit TMD (&lt; 800 m)</span>
+            </button>
 
-              {/* SEVESO Zone Pin */}
-              <g
-                transform="translate(115, 155)"
-                onClick={() => setSelectedMapNode('ppi')}
-                className="cursor-pointer"
-              >
-                <rect
-                  x="-16"
-                  y="-12"
-                  width="32"
-                  height="24"
-                  rx="4"
-                  fill={selectedMapNode === 'ppi' ? "#0036ce" : "#12263f"}
-                />
-                <text x="0" y="4" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="700" fontFamily="Space Grotesk">PPI</text>
-              </g>
+            <button
+              type="button"
+              onClick={() => setSelectedMapNode(selectedMapNode === 'ppi' ? null : 'ppi')}
+              className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
+                selectedMapNode === 'ppi'
+                  ? 'bg-[#0036ce] text-white border-[#0036ce] shadow-xs'
+                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+              }`}
+            >
+              <span className={`w-3.5 h-3.5 rounded shrink-0 ${selectedMapNode === 'ppi' ? 'bg-[#98f6c5]' : 'bg-[#12263f]'}`}></span>
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Périmètre PPI (4.2 km)</span>
+            </button>
 
-              {/* Nuclear Direction indicator */}
-              <line
-                x1="170"
-                y1="110"
-                x2="295"
-                y2="55"
-                stroke={selectedMapNode === 'nucleaire' ? "#0036ce" : "#74777e"}
-                strokeWidth={selectedMapNode === 'nucleaire' ? "2.5" : "1.5"}
-                strokeDasharray="2 2"
-              />
-              <circle
-                cx="295"
-                cy="55"
-                r="7"
-                fill={selectedMapNode === 'nucleaire' ? "#0036ce" : "#12263f"}
-                onClick={() => setSelectedMapNode('nucleaire')}
-                className="cursor-pointer"
-              />
-              <text
-                x="295"
-                y="42"
-                textAnchor="middle"
-                fill="#0f1c2b"
-                fontSize="9"
-                fontWeight="700"
-                fontFamily="Public Sans"
-                onClick={() => setSelectedMapNode('nucleaire')}
-              >
-                PPI Nucléaire
-              </text>
-
-              {/* Center Reference */}
-              <circle
-                cx="170"
-                cy="110"
-                r="8"
-                fill="#0036ce"
-                onClick={() => setSelectedMapNode('ref')}
-                className="cursor-pointer"
-              />
-              <circle cx="170" cy="110" r="3" fill="#ffffff" />
-              <text
-                x="170"
-                y="134"
-                textAnchor="middle"
-                fill="#0f1c2b"
-                fontSize="10"
-                fontWeight="700"
-                fontFamily="Public Sans"
-                onClick={() => setSelectedMapNode('ref')}
-              >
-                {activeCommune.name.slice(0, 16)} (Réf.)
-              </text>
-
-              {/* Distance tags */}
-              <text x="170" y="70" textAnchor="middle" fill="#44474d" fontSize="8" fontFamily="Space Grotesk">Rayon 4.2 km</text>
-              <text
-                x="75"
-                y="170"
-                fill="#ba1a1a"
-                fontSize="8"
-                fontWeight="700"
-                fontFamily="Space Grotesk"
-                onClick={() => setSelectedMapNode('tmd')}
-              >
-                Axe TMD Rail (&lt;800m)
-              </text>
-            </svg>
+            <button
+              type="button"
+              onClick={() => setSelectedMapNode(selectedMapNode === 'nucleaire' ? null : 'nucleaire')}
+              className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
+                selectedMapNode === 'nucleaire'
+                  ? 'bg-[#12263f] text-[#98f6c5] border-[#12263f] shadow-xs'
+                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+              }`}
+            >
+              <span className={`w-3.5 h-0.5 shrink-0 ${selectedMapNode === 'nucleaire' ? 'bg-[#98f6c5]' : 'bg-[#74777e]'}`}></span>
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Vigilance nucléaire</span>
+            </button>
           </div>
 
           {/* Avertissement de non-confusion cartographique formel */}
@@ -1006,56 +1189,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             <div className="leading-snug">
               <strong className="text-[#0036ce]">Illustration vectorielle didactique :</strong> Ce schéma local simplifié permet d'appréhender les distances réflexes d'entraînement. Il <strong>ne constitue pas une cartographie officielle de zonage</strong> ni un Système d'Information Géographique (SIG) certifié des périmètres réels de danger. Seuls les documents graphiques opposables annexés aux arrêtés préfectoraux (consultables sur georisques.gouv.fr) font foi.
             </div>
-          </div>
-
-          {/* Interactive node indicator alert */}
-          {selectedMapNode && (
-            <div className="p-2.5 rounded-lg bg-[#dce9fd] text-[12px] flex items-center justify-between border border-[#c4c6ce]">
-              <span className="font-semibold text-[#001126]">
-                {selectedMapNode === 'ppi' && "Repère didactique SEVESO : Zone industrielle classée (Périmètre PPI)"}
-                {selectedMapNode === 'tmd' && "Repère didactique TMD : Axe Faisceau Ferroviaire / Routier"}
-                {selectedMapNode === 'nucleaire' && "Repère didactique Nucléaire : Rayon de vigilance CNPE / PPI"}
-                {selectedMapNode === 'ref' && `Point central de référence : ${activeCommune.name}`}
-              </span>
-              <button
-                onClick={() => setSelectedMapNode(null)}
-                className="text-[#001126] font-bold text-[11px] underline ml-2 cursor-pointer"
-              >
-                Effacer
-              </button>
-            </div>
-          )}
-
-          {/* Map Legend */}
-          <div className="grid grid-cols-2 gap-2 text-[12px]">
-            <button
-              onClick={() => setSelectedMapNode('ref')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
-            >
-              <span className="w-3 h-3 rounded-full bg-[#0036ce] shrink-0"></span>
-              <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Point de référence</span>
-            </button>
-            <button
-              onClick={() => setSelectedMapNode('tmd')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
-            >
-              <span className="w-3 h-1.5 bg-[#ba1a1a] shrink-0"></span>
-              <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Transit TMD (&lt; 800 m)</span>
-            </button>
-            <button
-              onClick={() => setSelectedMapNode('ppi')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
-            >
-              <span className="w-3 h-3 rounded bg-[#12263f] shrink-0"></span>
-              <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Périmètre PPI (4.2 km)</span>
-            </button>
-            <button
-              onClick={() => setSelectedMapNode('nucleaire')}
-              className="flex items-center gap-2 text-left p-1 rounded hover:bg-[#eef4ff] cursor-pointer"
-            >
-              <span className="w-3 h-0.5 bg-[#74777e] shrink-0"></span>
-              <span className="text-[#44474d] font-['Space_Grotesk'] text-[11px]">Vigilance nucléaire</span>
-            </button>
           </div>
         </section>
 

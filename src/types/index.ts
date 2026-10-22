@@ -2,7 +2,7 @@ export type TabType = 'accueil' | 'reagir' | 'guides' | 'preparation' | 'mon-pla
 
 export type SubScreen = 
   | null
-  | { type: 'protocol'; id: 'bio' | 'chimique' | 'nucleaire' | 'confinement' }
+  | { type: 'protocol'; id: 'bio' | 'chimique' | 'nucleaire' | 'confinement' | 'radiologique' }
   | { type: 'georisques' }
   | { type: 'formation' }
   | { type: 'tracabilite' }

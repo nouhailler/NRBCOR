@@ -11,6 +11,8 @@ import { EmergencyCall, FamilyMember, ContactPerson, AssemblyPoint } from '../ty
 import { Tooltip } from '../components/Tooltip';
 
 import { storageService } from '../services/storage/IndexedDbStorage';
+import { FamilyPlanQrModal } from '../components/FamilyPlanQrModal';
+import { ExportPdfModal } from '../components/ExportPdfModal';
 
 interface MonPlanViewProps {
   onOpenCallModal: (call: EmergencyCall) => void;
@@ -22,6 +24,8 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
   onOpenWipeModal,
 }) => {
   const [isDiscreet, setIsDiscreet] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [showExportPdfModal, setShowExportPdfModal] = useState(false);
   const [tasks, setTasks] = useState<PlanTask[]>(() => {
     try {
       const s = localStorage.getItem('nrbcor_family_plan');
@@ -172,10 +176,17 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
   };
 
   const handleExportPDF = () => {
-    showToast('Fiche mémo prête pour impression hors-ligne');
-    setTimeout(() => {
-      window.print();
-    }, 400);
+    setShowExportPdfModal(true);
+  };
+
+  const handleImportPlan = async (imported: any) => {
+    if (imported.tasks) setTasks(imported.tasks);
+    if (imported.members) setMembers(imported.members);
+    if (imported.outZoneContact !== undefined) setOutZoneContact(imported.outZoneContact);
+    if (imported.localContacts) setLocalContacts(imported.localContacts);
+    if (imported.assemblyPoints) setAssemblyPoints(imported.assemblyPoints);
+    await storageService.saveFamilyPlan(imported);
+    showToast('Plan familial synchronisé avec succès via QR Code');
   };
 
   const maskText = (text: string) => {
@@ -850,18 +861,27 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           </p>
         </div>
 
-        {/* Export Button */}
-        <div className="space-y-2">
+        {/* Actions de partage et export */}
+        <div className="space-y-2.5">
+          <button
+            onClick={() => setShowQrModal(true)}
+            type="button"
+            className="w-full min-h-[48px] bg-[#0036ce] hover:bg-[#0028a3] text-white font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+            <span>Partager / Transférer via QR Code (sans cloud)</span>
+          </button>
+
           <button
             onClick={handleExportPDF}
             type="button"
             className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
-            <span>Exporter une fiche mémo papier (PDF hors-ligne)</span>
+            <span>Exporter / Imprimer le Plan en PDF (Classeur de Crise)</span>
           </button>
           <p className="text-[11px] text-[#44474d] leading-relaxed px-1">
-            <span className="font-bold text-[#001126]">Avertissement de sécurité :</span> Le document exporté ou imprimé n'est plus protégé par le stockage local chiffré de l'appareil. Conservez-le dans un endroit discret du foyer.
+            <span className="font-bold text-[#001126]">Partage direct appareil à appareil :</span> Le QR code permet de transférer le plan à un proche sans Internet ni serveur distant. Conservez vos impressions dans un classeur accessible.
           </p>
         </div>
 
@@ -1166,6 +1186,34 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modal QR Code P2P */}
+      <FamilyPlanQrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        currentPlan={{
+          tasks,
+          members,
+          outZoneContact,
+          localContacts,
+          assemblyPoints,
+        }}
+        onImportPlan={handleImportPlan}
+      />
+
+      {/* Modal Export PDF */}
+      <ExportPdfModal
+        isOpen={showExportPdfModal}
+        onClose={() => setShowExportPdfModal(false)}
+        initialGuideKey="plan"
+        familyPlan={{
+          tasks,
+          members,
+          outZoneContact,
+          localContacts,
+          assemblyPoints,
+        }}
+      />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { InventoryItem } from '../services/storage/StorageRepository';
 import { storageService, INITIAL_INVENTORY } from '../services/storage/IndexedDbStorage';
+import { AuditReminderModal } from '../components/AuditReminderModal';
+import { getAuditStatus, AuditStatus } from '../services/notificationService';
 
 interface InventoryViewProps {
   onBack: () => void;
@@ -12,6 +14,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
   const [sortBy, setSortBy] = useState<'expiry' | 'category' | 'status'>('expiry');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [auditStatus, setAuditStatus] = useState<AuditStatus>(() => getAuditStatus());
 
   // New item form
   const [name, setName] = useState('');
@@ -106,6 +110,12 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
     setShowAddModal(false);
   };
 
+  const handleAuditCompleted = async () => {
+    setAuditStatus(getAuditStatus());
+    const loaded = await storageService.getInventoryItems();
+    setItems(loaded);
+  };
+
   // Filtrage et tri
   const filtered = items.filter((it) => filterCategory === 'all' || it.category === filterCategory);
 
@@ -178,6 +188,40 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
           Surveillez l'état de fraîcheur de vos denrées, piles, cartouches filtrantes et médicaments d'urgence pour éviter les mauvaises surprises le jour J.
         </p>
       </header>
+
+      {/* Audit Semestriel & Rappels Web Notification */}
+      <div className="bg-[#001126] text-white p-3.5 rounded-xl border border-[#12263f] flex items-center justify-between gap-3 shadow-sm">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-[#0036ce] text-[#98f6c5] flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[22px]">event_repeat</span>
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#98f6c5] uppercase tracking-wider">
+                Audit Semestriel (6 mois)
+              </span>
+              {auditStatus.isDue && (
+                <span className="bg-[#ffdad6] text-[#ba1a1a] text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
+                  Échu
+                </span>
+              )}
+            </div>
+            <p className="text-[12px] text-[#eef4ff] truncate">
+              {auditStatus.isDue
+                ? "Audit nécessaire : vérifiez vos stocks d'urgence"
+                : `Prochain audit dans ${auditStatus.daysRemaining} jours (${auditStatus.nextAuditDate})`}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAuditModal(true)}
+          className="min-h-[40px] px-3 bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[11px] font-bold uppercase rounded-lg flex items-center gap-1 shrink-0 transition-colors shadow-xs"
+        >
+          <span className="material-symbols-outlined text-[16px]">notifications_active</span>
+          <span>Gérer</span>
+        </button>
+      </div>
 
       {/* Synthèse Alertes Péremptions */}
       <div className="grid grid-cols-2 gap-2">
@@ -492,6 +536,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
           </div>
         </div>
       )}
+
+      {/* Modal Audit Semestriel & Rappels */}
+      <AuditReminderModal
+        isOpen={showAuditModal}
+        onClose={() => setShowAuditModal(false)}
+        inventoryItems={items}
+        onAuditCompleted={handleAuditCompleted}
+      />
     </div>
   );
 };

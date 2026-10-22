@@ -8,6 +8,7 @@ import {
   DetailedQuiz,
 } from '../data/quizData';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
+import { CrisisDrillModal } from '../components/CrisisDrillModal';
 
 interface FormationViewProps {
   onBack: () => void;
@@ -599,107 +600,13 @@ export const FormationView: React.FC<FormationViewProps> = ({
         </footer>
       </div>
 
-      {/* Modal Exercice Chronométré de Confinement */}
-      {showDrillModal && (
-        <div
-          role="dialog"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
-        >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-[#e4efff] pb-2">
-              <h3 className="text-[17px] font-bold text-[#001126]">
-                Simulation Annuelle de Confinement
-              </h3>
-              <button
-                onClick={() => setShowDrillModal(false)}
-                className="text-[#44474d] hover:text-[#001126]"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
+      {/* Modal Exercice Chronométré Immersif de Crise */}
+      <CrisisDrillModal
+        isOpen={showDrillModal}
+        onClose={() => setShowDrillModal(false)}
+        onGoToGuides={onGoToGuides}
+      />
 
-            <p className="text-[12px] text-[#44474d] leading-relaxed">
-              Mettez l'ensemble du foyer en alerte. Testez en temps réel la capacité à s'abriter, calfeutrer les ouvertures et allumer le récepteur radio sous le chronomètre.
-            </p>
-
-            {/* Countdown Box */}
-            <div className="bg-[#12263f] p-4 rounded-xl text-center text-white border border-[#001126] shadow-inner">
-              <span className="font-['Space_Grotesk'] text-[38px] font-bold text-[#98f6c5] tracking-wider">
-                {formatTime(drillSeconds)}
-              </span>
-              <p className="text-[11px] text-[#b4c8e8] mt-0.5 font-['Space_Grotesk'] uppercase">
-                {drillFinished
-                  ? 'Temps écoulé ! Exercice terminé'
-                  : drillRunning
-                  ? 'Exercice chronométré en cours...'
-                  : 'Objectif : Moins de 15 minutes'}
-              </p>
-            </div>
-
-            {/* Checklist des étapes clés pendant le chrono */}
-            <div className="space-y-2 pt-1">
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold uppercase tracking-wider block">
-                Actions à valider pendant l'exercice :
-              </span>
-
-              {[
-                { id: 1, text: "Tous les membres du foyer réunis dans la pièce refuge", time: "0-3 min" },
-                { id: 2, text: "Coupure de la VMC et climatisation effectuée", time: "0-5 min" },
-                { id: 3, text: "Ruban adhésif / boudin de porte mis en place", time: "0-8 min" },
-                { id: 4, text: "Radio France Bleu allumée sur piles / manivelle", time: "0-10 min" },
-              ].map((step) => (
-                <label
-                  key={step.id}
-                  className="flex items-center gap-2.5 p-2 bg-[#eef4ff] rounded-lg cursor-pointer border border-[#d6e4f8] text-[12px]"
-                >
-                  <input
-                    type="checkbox"
-                    checked={!!drillStepsChecked[step.id]}
-                    onChange={() =>
-                      setDrillStepsChecked((prev) => ({
-                        ...prev,
-                        [step.id]: !prev[step.id],
-                      }))
-                    }
-                    className="w-5 h-5 text-[#001126] accent-[#001126]"
-                  />
-                  <span className="flex-1 text-[#0f1c2b] font-medium">{step.text}</span>
-                  <span className="font-['Space_Grotesk'] text-[10px] text-[#44474d] shrink-0 font-bold">
-                    {step.time}
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setDrillRunning(!drillRunning);
-                }}
-                className={`flex-1 h-11 rounded-lg text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase shadow-sm transition-colors ${
-                  drillRunning ? 'bg-[#ba1a1a]' : 'bg-[#001126] hover:bg-[#12263f]'
-                }`}
-              >
-                {drillRunning ? 'Pause' : 'Lancer le chronomètre'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setDrillRunning(false);
-                  setDrillSeconds(900);
-                  setDrillStepsChecked({});
-                  setDrillFinished(false);
-                }}
-                className="h-11 px-3 rounded-lg bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase border border-[#c4c6ce]"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal Quiz Interactif Complet */}
       {activeQuiz && (

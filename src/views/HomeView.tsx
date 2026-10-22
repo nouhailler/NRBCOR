@@ -3,6 +3,7 @@ import { TabType, SubScreen } from '../types';
 import { Tooltip } from '../components/Tooltip';
 import { FamilyPlanData, AppSettings } from '../services/storage/StorageRepository';
 import { storageService } from '../services/storage/IndexedDbStorage';
+import { triggerHaptic } from '../utils/haptics';
 
 interface HomeViewProps {
   onNavigateTab: (tab: TabType) => void;
@@ -48,36 +49,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
-      {/* 1. Bannière de statut réseau & disponibilité locale séparée */}
+      {/* 1. Bannière de statut réseau & fraîcheur doctrinale proéminente */}
       <section className="w-full bg-[#eef4ff] rounded-xl p-4 shadow-sm border border-[#d6e4f8] flex flex-col gap-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className={`w-3 h-3 rounded-full shrink-0 ${isOnline ? 'bg-[#3f9d73] animate-pulse' : 'bg-[#ba1a1a]'}`}></span>
+            <span className={`w-3 h-3 rounded-full shrink-0 ${isOnline ? 'bg-[#16a34a] animate-pulse' : 'bg-[#dc2626]'}`}></span>
             <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider text-[#001126]">
               {isOnline ? 'Connectivité Réseau Détectée' : 'Mode Déconnecté (Hors-Ligne)'}
             </span>
           </div>
           <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase">
-            LOCAL ACTIF
+            LOCAL EMBARQUÉ
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px] pt-1 border-t border-[#d6e4f8]/80">
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-semibold">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[12px] pt-1.5 border-t border-[#d6e4f8]/80">
+          <div className="flex flex-col bg-white p-2.5 rounded-lg border border-[#c4c6ce]">
+            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-bold">
               Disponibilité locale :
             </span>
-            <span className="font-medium text-[#001126]">
-              100% embarqué (9 protocoles & kit d'urgence)
+            <span className="font-semibold text-[#001126] mt-0.5">
+              100% autonome (5 protocoles complets, déshabillage & kits)
             </span>
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-semibold">
-              Fraîcheur doctrinale :
+          <div className="flex flex-col bg-white p-2.5 rounded-lg border border-[#c4c6ce]">
+            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-bold">
+              Fraîcheur doctrinale du corpus :
             </span>
-            <span className="font-medium text-[#0036ce]">
-              Corpus d'État certifié 16 Oct. 2026
+            <span className="font-semibold text-[#0036ce] mt-0.5">
+              Dernière révision : 18 Oct. 2026 (IRSN / DGSCGC / SPF)
             </span>
           </div>
         </div>
@@ -212,7 +213,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </p>
             </div>
             <button
-              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'nucleaire' })}
+              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'radiologique' })}
               type="button"
               className="min-h-[48px] w-full bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded-lg flex items-center justify-between px-3 hover:bg-[#dce9fd] transition-colors"
             >

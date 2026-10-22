@@ -1,5 +1,5 @@
 export interface ProtocolData {
-  id: 'bio' | 'chimique' | 'nucleaire' | 'confinement';
+  id: 'bio' | 'chimique' | 'nucleaire' | 'confinement' | 'radiologique';
   title: string;
   subtitle: string;
   categoryLabel: string;
@@ -696,5 +696,159 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
       title: 'Clause Institutionnelle de Primauté (ASNR / IRSN / SGDSN)',
       text: "Cette fiche réflexe compile les doctrines standardisées de l'Autorité de Sûreté Nucléaire et de Radioprotection (ASNR), de l'Institut de Radioprotection et de Sûreté Nucléaire (IRSN) et du Secrétariat Général de la Défense et de la Sécurité Nationale (SGDSN). En situation réelle, les directives de Monsieur le Préfet de département diffusées via FR-Alert ou la radio locale priment sur toute consigne préétablie."
     }
+  },
+  radiologique: {
+    id: 'radiologique',
+    title: 'Urgence Radiologique & Sources Orphelines',
+    subtitle: 'Rayonnements ionisants, sources scellées perdues, dispersion radiologique et protection ALARA.',
+    categoryLabel: 'RISQUE R • RADIOLOGIQUE',
+    categoryIcon: 'radiology',
+    reviewDate: 'REVUE : 18 OCT. 2026',
+    regulatoryBody: 'IRSN / ASNR / SGDSN • DOCTRINE RADIOLOGIQUE',
+    badgeCriticality: 'RISQUE R • RADIOLOGIQUE',
+    badgeBg: 'bg-[#7c2d12]',
+    docId: 'DOC-ID: RAD-R01',
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCtN5Wu8YQzHl8Uad8fKzbCO_A_CKTZS7F-dtxnWnm4EsQe1433IyWpXlW-7gxZqE1fjDORt2uD_bF5SG1C9ik06oEjJFVEKsNXS0e7if83vIHjZKTpxzP0Trt91n_o_rBoA-wwn_lJxFqSHz7XkROiwAOGE9b4RIeNUrk5mfoERKwVdSl3Kq78iLTe9kI-HNbGL_7WZErnE8aonBR8_liWF_aRRQY6xNcMav-xVtltsFp56oF0w1Q',
+    imageAlt: 'Symbole international de danger radiologique et équipement de radioprotection civile',
+    imageTags: ['DOCTRINE ALARA (TEMPS / DISTANCE / ÉCRAN)', 'DISPERSION RADIOLOGIQUE & SOURCES INDUSTRIELLES'],
+    imageCaption: 'Radioprotection opérationnelle • Doctrine IRSN / Sécurité Civile',
+    imageSpec: 'NORMES IRSN / CIPR 103',
+    offlineBannerText: 'MODE HORS-LIGNE ACTIF • FICHE RADIOLOGIQUE EMBARQUÉE',
+    reflexesTitle: '4 RÉFLEXES VITAUX FACE AU RISQUE RADIOLOGIQUE',
+    reflexesPriority: 'PRIORITÉ 1 VITALE',
+    reflexes: [
+      {
+        num: 1,
+        title: "Principe ALARA : Distance maximale immédiate",
+        description: "Face à une source suspecte (marquage trèfle radioactif, conteneur en plomb égaré), s'éloigner sans délai. La dose diminue selon le carré de la distance : doubler sa distance divise par 4 le débit de dose reçu."
+      },
+      {
+        num: 2,
+        title: "Interposition d'écrans protecteurs denses",
+        description: "Rejoindre un bâtiment en maçonnerie pleine ou béton armé. Les parois légères (verre, cloisons en plâtre, tôle) n'atténuent que faiblement les rayonnements gamma et les rayons X de haute énergie."
+      },
+      {
+        num: 3,
+        title: "Déshabillage immédiat en cas de dispersion (bombe sale)",
+        description: "Si une explosion dispersive s'est produite : retirer immédiatement les vêtements extérieurs de haut en bas sans les secouer pour éliminer ~90% des particules déposées. Les ensacher hermétiquement."
+      },
+      {
+        num: 4,
+        title: "Comprimés d'iode STRICTEMENT INUTILES dans ce cas",
+        description: "L'iode stable ne protège QUE contre l'iode 131 volatil d'un réacteur nucléaire à fission. Elle est totalement sans effet contre les radioéléments industriels ou médicaux (Césium-137, Cobalt-60, Iridium-192, Américium-241)."
+      }
+    ],
+    phases: {
+      avant: [
+        {
+          title: 'Reconnaissance des Marquages de Danger',
+          icon: 'warning',
+          desc: "Mémoriser le trèfle trifolium international (jaune et noir ou magenta) et les étiquettes de transport Classe 7 (Matières Radioactives). Ne jamais manipuler un cylindre ou conteneur métallique lourd abandonné."
+        },
+        {
+          title: 'Kit de Décontamination Rapide Prépositionné',
+          icon: 'inventory_2',
+          desc: "Sacs étanches résistants 100L pour isoler les vêtements souillés, rouleau d'adhésif renforcé, gants nitrile épais, flacons de savon doux liquide."
+        },
+        {
+          title: 'Canal d’Information de Secours',
+          icon: 'radio',
+          desc: "Poste radio FM/DAB+ à piles indépendant du réseau électrique pour capter les alertes de la Préfecture et de l'IRSN."
+        }
+      ],
+      pendant: [
+        {
+          title: 'Éloignement et Protection Face au Vent',
+          icon: 'near_me_disabled',
+          desc: "Si une dispersion d'aérosols radioactifs est suspectée en extérieur, s'éloigner perpendiculairement à la direction du vent pour sortir de l'axe du panache."
+        },
+        {
+          title: 'Confinement Étanche dans un Local Massif',
+          icon: 'meeting_room',
+          desc: "Rejoindre un local central sans fenêtre ou un sous-sol fermé. Fermer toutes les fenêtres, couper la VMC et boucher les aérations directes."
+        },
+        {
+          title: 'Protection Respiratoire de Circonstance',
+          icon: 'masks',
+          desc: "Porter un masque FFP2/FFP3 ou couvrir le nez et la bouche avec un linge sec plié pour empêcher l'inhalation de particules radioactives alpha et bêta."
+        }
+      ],
+      apres: [
+        {
+          title: 'Déshabillage Méthodique & Ensachage',
+          icon: 'checkroom',
+          desc: "Retirer chaussures et vêtements de l'extérieur vers l'intérieur en évitant tout contact avec le visage. Fermer les sacs de vêtements avec du ruban adhésif et les déposer à l'extérieur du lieu de vie."
+        },
+        {
+          title: 'Douche Tiède Savonneuse Sans Friction',
+          icon: 'shower',
+          desc: "Se doucher à l'eau tiède avec du savon doux en insistant sur les mains, le cou, les cheveux et le visage. Ne JAMAIS frotter agressivement pour ne pas irriter la peau et favoriser la pénétration transcutanée."
+        },
+        {
+          title: 'Signalement aux Secours (18 / 112)',
+          icon: 'phone_in_talk',
+          desc: "Indiquer précisément aux sapeurs-pompiers l'emplacement de l'incident, la présence éventuelle de marquages Classe 7 et votre état d'exposition pour organiser le triage radiologique."
+        }
+      ]
+    },
+    forbiddenActions: [
+      {
+        title: "Ne JAMAIS toucher ou ramasser un objet radioactif suspect",
+        description: "Une source scellée orpheline (gammagraphie industrielle, capsule d'irradiation) peut délivrer une dose létale de rayonnement en quelques minutes de contact direct, sans odeur ni sensation immédiate."
+      },
+      {
+        title: "Ne JAMAIS prendre de comprimés d'iode sans accident de centrale",
+        description: "Les urgences radiologiques (sources perdues, bombes sales) impliquent des émetteurs gamma/bêta métalliques. La prise d'iode n'apporte aucune protection et expose à des effets indésirables inutiles."
+      },
+      {
+        title: "Ne JAMAIS frotter la peau avec une brosse ou une éponge abrasive",
+        description: "L'abrasion mécanique crée des micro-lésions épidermiques qui transforment une simple contamination surfacique externe en contamination interne par voie sanguine."
+      },
+      {
+        title: "Ne JAMAIS s'approcher d'un accident de transport Classe 7",
+        description: "Maintenir un périmètre de sécurité d'au moins 100 à 300 mètres en attendant l'arrivée de la Cellule Mobile d'Intervention Radiologique (CMIR)."
+      }
+    ],
+    pedagogy: {
+      title: 'Distinctions Doctrinales Fondamentales',
+      subtitle: 'Comprendre pour réagir sans panique',
+      cards: [
+        {
+          title: 'IRRADIATION EXTERNE',
+          tag: 'Exposition à distance',
+          tagClass: 'bg-surface-container text-secondary',
+          specificity: "Exposition au flux de rayonnements ionisants (gamma, X) émis par une source à distance. Cesse dès que l'on s'éloigne ou s'abrite derrière un écran dense. La victime irradiée N'EST PAS radioactive et ne contamine pas les autres.",
+          icon: 'flare'
+        },
+        {
+          title: 'CONTAMINATION SURFACIQUE',
+          tag: 'Dépôt physique',
+          tagClass: 'bg-error-container text-on-error-container',
+          specificity: "Présence de poussières ou liquides radioactifs déposés sur la peau ou les habits. Le simple retrait des vêtements élimine 90% du dépôt. Nécessite une douche tiède savonneuse sans frotter la peau.",
+          icon: 'grain'
+        },
+        {
+          title: 'INEFFICACITÉ DE L’IODE STABLE',
+          tag: 'Subordonné à l’Iode 131',
+          tagClass: 'bg-[#fef3c7] text-[#92400e]',
+          specificity: "L'iodure de potassium (KI) ne protège QUE la thyroïde contre l'iode 131 volatil d'un accident de réacteur nucléaire. En cas de source orpheline ou de dispersion radiologique (Cobalt-60, Césium-137, Iridium-192), l'iode est totalement sans effet.",
+          icon: 'medication'
+        }
+      ]
+    },
+    emergencySymptoms: {
+      title: "Quand Appeler les Secours Radiologiques ?",
+      intro: "Alerte immédiate des sapeurs-pompiers (18 ou 112) avec précision du risque radiologique :",
+      symptoms: [
+        'Découverte d\'un conteneur suspect portant le trèfle radioactif ou marquage Classe 7',
+        'Exposition directe et prolongée à proximité immédiate d\'une source industrielle égarée',
+        'Explosion avec suspicion de dissémination de poussières radioactives'
+      ]
+    },
+    institutionalClause: {
+      title: 'Doctrine de Radioprotection (IRSN / ASNR / CIPR)',
+      text: "Les recommandations de cette fiche réflexe s'appuient sur les principes ALARA (As Low As Reasonably Achievable) de la Commission Internationale de Protection Radiologique (CIPR publication 103) et la doctrine de gestion des urgences radiologiques de l'Institut de Radioprotection et de Sûreté Nucléaire (IRSN). En situation réelle, les directives opérationnelles du Préfet de département et des équipes CMIR prévalent sur toute consigne préétablie."
+    }
   }
 };
+
