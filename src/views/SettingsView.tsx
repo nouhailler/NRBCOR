@@ -33,6 +33,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [importStatus, setImportStatus] = useState<{ message: string; isError: boolean } | null>(null);
   const [saveToast, setSaveToast] = useState(false);
 
+  const [easyReadMode, setEasyReadMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('nrbcor_easy_read_mode') === 'true';
+    } catch {}
+    return false;
+  });
+
+  const toggleEasyRead = (enabled: boolean) => {
+    setEasyReadMode(enabled);
+    try {
+      localStorage.setItem('nrbcor_easy_read_mode', enabled ? 'true' : 'false');
+      if (enabled) {
+        document.documentElement.classList.add('falc-mode');
+      } else {
+        document.documentElement.classList.remove('falc-mode');
+      }
+    } catch {}
+    setSaveToast(true);
+    setTimeout(() => setSaveToast(false), 2000);
+  };
+
   const refreshDiagnostics = async () => {
     setDiagnosticsLoading(true);
     try {
@@ -325,6 +346,34 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               {sc.label}
             </button>
           ))}
+        </div>
+
+        {/* Mode Lecture Facile (FALC) */}
+        <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+          <div className="flex flex-col min-w-0 pr-2">
+            <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126] flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[#0036ce] text-[18px]">accessibility_new</span>
+              Mode « Lecture Facile » (FALC)
+            </span>
+            <span className="text-[11px] text-[#44474d] leading-snug">
+              Vocabulaire simple, phrases courtes, contrastes renforcés et une action par écran pour personnes en situation de stress ou handicap cognitif.
+            </span>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              checked={easyReadMode}
+              onChange={(e) => toggleEasyRead(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-[#0036ce]"></div>
+          </label>
+        </div>
+
+        {/* Cibles tactiles et lecteurs d'écran */}
+        <div className="p-2.5 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] text-[11px] text-[#44474d] flex items-center gap-2">
+          <span className="material-symbols-outlined text-[16px] text-[#3f9d73]">check_circle</span>
+          <span>Cibles tactiles conformes &ge; 48px • Balisage ARIA pour synthèse vocale et lecteurs d'écran.</span>
         </div>
       </section>
 

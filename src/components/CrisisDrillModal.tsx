@@ -428,15 +428,15 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
               </span>
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-['Space_Grotesk'] text-[10px] text-[#ba1a1a] uppercase font-bold tracking-wider">
-                  Simulation Immersive Chronométrée
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-['Space_Grotesk'] text-[10px] text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                  EXERCICE — AUCUNE ALERTE RÉELLE
                 </span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ffdad6] text-[#93000a] font-bold">
-                  DIRECT
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 font-bold">
+                  SIMULATION
                 </span>
               </div>
-              <h3 className="text-[17px] font-bold text-[#001126] leading-tight">
+              <h3 className="text-[17px] font-bold text-[#001126] leading-tight mt-0.5">
                 {scenario.title}
               </h3>
             </div>

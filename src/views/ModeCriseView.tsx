@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EmergencyCall, SubScreen } from '../types';
 import { triggerHaptic } from '../utils/haptics';
 
@@ -8,18 +8,92 @@ interface ModeCriseViewProps {
   onOpenSubScreen: (screen: SubScreen) => void;
 }
 
+type CrisisScenario = 'inconnu' | 'chimique' | 'nucleaire' | 'biologique';
+type CrisisCountry = 'fr' | 'be' | 'ch' | 'lu';
+
+interface CountryEmergencyData {
+  code: CrisisCountry;
+  name: string;
+  flag: string;
+  numbers: {
+    number: string;
+    label: string;
+    desc: string;
+    role: string;
+  }[];
+}
+
+const EMERGENCY_COUNTRIES: CountryEmergencyData[] = [
+  {
+    code: 'fr',
+    name: 'France',
+    flag: '🇫🇷',
+    numbers: [
+      { number: '15', label: 'SAMU', desc: 'Détresse vitale, malaise, intoxication sévère', role: 'Médical' },
+      { number: '18', label: 'POMPIERS', desc: 'Incendie, explosion, fuite de gaz, sauvetage', role: 'Sinistre' },
+      { number: '17', label: 'POLICE / GENDARMERIE', desc: 'Sécurité publique, ordre, bouclage', role: 'Sécurité' },
+      { number: '112', label: '112 EUROPE', desc: 'Numéro d\'urgence européen universel (même sans SIM)', role: 'Toutes urgences' },
+      { number: '114', label: '114 SMS', desc: 'Numéro silencieux par SMS pour personnes sourdes ou discrétion', role: 'Silencieux' },
+    ]
+  },
+  {
+    code: 'be',
+    name: 'Belgique',
+    flag: '🇧🇪',
+    numbers: [
+      { number: '112', label: '112 SECOURS', desc: 'Ambulance et pompiers (gratuit 24/7)', role: 'Secours' },
+      { number: '100', label: '100 MÉDICAL', desc: 'Aide médicale urgente et pompiers', role: 'Médical' },
+      { number: '101', label: '101 POLICE', desc: 'Police fédérale et interventions urgentes', role: 'Police' },
+      { number: '070245245', label: 'ANTIPOISON', desc: 'Centre antipoisons belge (intoxications aiguës)', role: 'Toxicologie' },
+    ]
+  },
+  {
+    code: 'ch',
+    name: 'Suisse',
+    flag: '🇨🇭',
+    numbers: [
+      { number: '144', label: '144 AMBULANCE', desc: 'Urgences médicales et sauvetage sanitaire', role: 'Médical' },
+      { number: '118', label: '118 POMPIERS', desc: 'Incendie, sinistres industriels et chimiques', role: 'Pompiers' },
+      { number: '117', label: '117 POLICE', desc: 'Police cantonale et ordre public', role: 'Police' },
+      { number: '145', label: '145 TOX INFO', desc: 'Centre national toxicologique suisse', role: 'Toxicologie' },
+    ]
+  },
+  {
+    code: 'lu',
+    name: 'Luxembourg',
+    flag: '🇱🇺',
+    numbers: [
+      { number: '112', label: '112 SECOURS', desc: 'Corps grand-ducal d\'incendie et de secours (CGDIS)', role: 'Secours' },
+      { number: '113', label: '113 POLICE', desc: 'Police grand-ducale', role: 'Police' },
+    ]
+  }
+];
+
 export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
   onBack,
   onOpenCallModal,
   onOpenSubScreen
 }) => {
+  // Scénario sélectionné : Par défaut 'inconnu' pour mise à l'abri immédiate SANS retard de diagnostic
+  const [selectedScenario, setSelectedScenario] = useState<CrisisScenario>('inconnu');
   const [activeAction, setActiveAction] = useState<
     'none' | 'confiner' | 'evacuer' | 'decontamination' | 'appeler'
-  >('none');
+  >('confiner'); // Par défaut confiner déployé pour réflexe immédiat
+
+  const [selectedCountry, setSelectedCountry] = useState<CrisisCountry>(() => {
+    try {
+      const saved = localStorage.getItem('nrbcor_crisis_country');
+      if (saved && ['fr', 'be', 'ch', 'lu'].includes(saved)) return saved as CrisisCountry;
+    } catch {}
+    return 'fr';
+  });
 
   const [isTorchActive, setIsTorchActive] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [deconTimer, setDeconTimer] = useState<number | null>(null);
+  const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const countryData = EMERGENCY_COUNTRIES.find((c) => c.code === selectedCountry) || EMERGENCY_COUNTRIES[0];
 
   // Minuteur de décontamination (15 minutes de rinçage recommandé par la Sécurité Civile)
   useEffect(() => {
@@ -31,6 +105,15 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
     }
     return () => clearInterval(interval);
   }, [deconTimer]);
+
+  // Clean speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleStartDeconTimer = () => {
     triggerHaptic('success');
@@ -48,25 +131,66 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Lecture vocale d'urgence en situation de stress ou basse visibilité
-  const toggleSpeech = (text: string) => {
+  // Controllable Speech Synthesis (Play, Pause, Resume, Stop)
+  const getScenarioSpokenText = () => {
+    if (selectedScenario === 'chimique') {
+      return "Alerte Risque Chimique ou Nuage Toxique. Consigne numéro un : rentrez immédiatement dans le bâtiment en dur le plus proche. Coupez toute ventilation mécanique, hottes et climatisation. Fermez portes et fenêtres et calfeutrez les jointures avec de l'adhésif large. Respirez à travers un linge humide. N'allez pas chercher vos enfants à l'école. Écoutez France Bleu FM.";
+    }
+    if (selectedScenario === 'nucleaire') {
+      return "Alerte Risque Nucléaire ou Radiologique. Consigne vitale : confinez-vous immédiatement dans un bâtiment en maçonnerie lourde, idéalement au centre ou au sous-sol. Coupez les aérations. Ne prenez aucun comprimé d'iode sans ordre formel et explicite du Préfet. Lavez-vous à l'eau tiède sans frotter en cas de doute de dépôt de poussières. Écoutez la radio publique France Bleu.";
+    }
+    if (selectedScenario === 'biologique') {
+      return "Alerte Risque Biologique ou Aérosol Infectieux. Isolez-vous dans une pièce dédiée. Portez un masque filtrant adapté. Lavez-vous les mains fréquemment. Ne partagez aucun ustensile. Suivez les instructions sanitaires diffusées par les autorités.";
+    }
+    // Inconnu / Alerte générale (Doctrine universelle)
+    return "Alerte de Sécurité Civile non identifiée. Ne perdez pas de temps à diagnostiquer le risque. Premier réflexe immédiat : confinez-vous dans le bâtiment en dur le plus proche. Coupez toute ventilation et climatisation. Fermez et calfeutrez portes et fenêtres. N'allez pas chercher vos enfants à l'école, ils sont pris en charge par le plan de mise en sûreté. Écoutez France Bleu sur récepteur radio à piles. Ne prenez aucun comprimé d'iode de manière spontanée sans ordre formel de la Préfecture.";
+  };
+
+  const handlePlaySpeech = () => {
     triggerHaptic('medium');
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+    if (speechState === 'paused') {
+      window.speechSynthesis.resume();
+      setSpeechState('playing');
       return;
     }
 
     window.speechSynthesis.cancel();
+    const text = getScenarioSpokenText();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'fr-FR';
     utterance.rate = 0.95;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    setIsSpeaking(true);
+    utterance.onend = () => setSpeechState('idle');
+    utterance.onerror = () => setSpeechState('idle');
+
+    speechRef.current = utterance;
+    setSpeechState('playing');
     window.speechSynthesis.speak(utterance);
+  };
+
+  const handlePauseSpeech = () => {
+    triggerHaptic('light');
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.pause();
+      setSpeechState('paused');
+    }
+  };
+
+  const handleStopSpeech = () => {
+    triggerHaptic('light');
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setSpeechState('idle');
+    }
+  };
+
+  const handleSelectCountry = (country: CrisisCountry) => {
+    setSelectedCountry(country);
+    try {
+      localStorage.setItem('nrbcor_crisis_country', country);
+    } catch {}
+    triggerHaptic('light');
   };
 
   // Mode lampe torche / écran blanc stroboscopique pour blackout
@@ -118,7 +242,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               Mode Crise Immédiat
             </h1>
             <span className="text-[10px] text-gray-400 font-['Space_Grotesk'] uppercase font-bold tracking-widest">
-              Interface réflexe grand format
+              Réflexes vitaux • Sans fioriture
             </span>
           </div>
         </div>
@@ -151,9 +275,107 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         </div>
       </div>
 
-      {/* Notice Vocale et Radio Officielle */}
+      {/* RAPPEL DE PRIMAUTÉ ABSOLUE DES AUTORITÉS (SÉCURITÉ CIVILE) */}
+      <div className="max-w-2xl mx-auto w-full px-3 mt-2">
+        <div className="p-2.5 bg-red-950/80 border-2 border-red-600 rounded-xl flex items-center gap-2 text-[11px] text-white">
+          <span className="material-symbols-outlined text-[20px] text-red-400 shrink-0">emergency</span>
+          <span className="leading-snug">
+            <strong>PRIMAUTÉ DES POUVOIRS PUBLICS :</strong> Les ordres de la Préfecture, des forces de l'ordre et des pompiers priment en toutes circonstances sur cette application.
+          </span>
+        </div>
+      </div>
+
+      {/* SÉLECTEUR DE SCÉNARIO AVEC OPTION INCONNU PAR DÉFAUT */}
+      <div className="max-w-2xl mx-auto w-full px-3 mt-3 flex flex-col gap-1.5">
+        <span className="text-[10px] font-['Space_Grotesk'] text-gray-400 uppercase font-bold tracking-wider">
+          Nature de l'événement (Ne jamais retarder la mise à l'abri pour diagnostiquer) :
+        </span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedScenario('inconnu');
+              triggerHaptic('light');
+            }}
+            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+              selectedScenario === 'inconnu'
+                ? 'bg-blue-600 text-white border-blue-400 ring-2 ring-blue-300'
+                : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
+            }`}
+          >
+            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+              ❓ Inconnu / Alerte
+            </span>
+            <span className="text-[9px] opacity-80 leading-tight">
+              Réflexe universel
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedScenario('chimique');
+              triggerHaptic('light');
+            }}
+            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+              selectedScenario === 'chimique'
+                ? 'bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300'
+                : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
+            }`}
+          >
+            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+              ☣️ Chimique
+            </span>
+            <span className="text-[9px] opacity-80 leading-tight">
+              Gaz / Fuite Seveso
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedScenario('nucleaire');
+              triggerHaptic('light');
+            }}
+            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+              selectedScenario === 'nucleaire'
+                ? 'bg-yellow-600 text-black border-yellow-400 ring-2 ring-yellow-300'
+                : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
+            }`}
+          >
+            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+              ☢️ Nucléaire
+            </span>
+            <span className="text-[9px] opacity-80 leading-tight">
+              Rejet CNPE / Retombées
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedScenario('biologique');
+              triggerHaptic('light');
+            }}
+            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+              selectedScenario === 'biologique'
+                ? 'bg-emerald-600 text-white border-emerald-400 ring-2 ring-emerald-300'
+                : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
+            }`}
+          >
+            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+              🦠 Biologique
+            </span>
+            <span className="text-[9px] opacity-80 leading-tight">
+              Bio-aérosol / Épidémie
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* SYNTHÈSE VOCALE CONTRÔLABLE & RADIO OFFICIELLE */}
       <div className="max-w-2xl mx-auto w-full px-3 mt-3">
-        <div className="p-3 bg-[#0a1526] rounded-xl border border-blue-500/30 flex items-center justify-between gap-2">
+        <div className="p-3 bg-[#0a1526] rounded-xl border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[18px]">radio</span>
@@ -162,30 +384,54 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               <span className="font-['Space_Grotesk'] text-[12px] font-bold text-blue-300 truncate">
                 RADIO D'URGENCE : France Bleu FM
               </span>
-              <span className="text-[11px] text-gray-300 truncate">
-                Seule source d'instructions officielle en cas de coupure réseau
+              <span className="text-[10px] text-gray-300 truncate">
+                Seule source officielle opérationnelle en blackout
               </span>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              toggleSpeech(
-                "Alerte de Sécurité Civile. Premier réflexe : confinez-vous immédiatement dans le bâtiment en dur le plus proche. Coupez toute ventilation et climatisation. Calfeutrez portes et fenêtres. N'allez pas chercher vos enfants à l'école, ils sont protégés par le plan de mise en sûreté. Écoutez France Bleu sur récepteur radio à piles. Ne prenez aucun comprimé d'iode sans ordre explicite du Préfet."
-              )
-            }
-            className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-['Space_Grotesk'] font-bold uppercase flex items-center gap-1 border transition-colors ${
-              isSpeaking
-                ? 'bg-red-600 text-white border-red-500 animate-pulse'
-                : 'bg-blue-950 text-blue-200 border-blue-700 hover:bg-blue-900'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {isSpeaking ? 'volume_off' : 'volume_up'}
-            </span>
-            <span>{isSpeaking ? 'Arrêter' : 'Voix'}</span>
-          </button>
+          {/* Contrôleur Vocal Avancé (Play / Pause / Stop) */}
+          <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+            {speechState === 'idle' ? (
+              <button
+                type="button"
+                onClick={handlePlaySpeech}
+                className="h-9 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px]">volume_up</span>
+                <span>Lire consignes</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1 bg-gray-900 p-1 rounded-lg border border-gray-700">
+                {speechState === 'playing' ? (
+                  <button
+                    type="button"
+                    onClick={handlePauseSpeech}
+                    className="h-8 px-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">pause</span>
+                    <span>Pause</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handlePlaySpeech}
+                    className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">play_arrow</span>
+                    <span>Reprendre</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleStopSpeech}
+                  className="h-8 px-2 bg-red-700 hover:bg-red-600 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center"
+                >
+                  <span className="material-symbols-outlined text-[15px]">stop</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -268,6 +514,12 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                   <strong>NE PAS ALLER CHERCHER LES ENFANTS À L'ÉCOLE :</strong> Ils sont mis à l'abri par les enseignants selon le PPMS. Ne pas les exposer au panache toxique.
                 </span>
               </div>
+
+              {selectedScenario === 'nucleaire' && (
+                <div className="p-3 bg-yellow-950/60 border border-yellow-500/50 rounded-xl text-[12px] text-yellow-200">
+                  <strong>AVERTISSEMENT IODE STABLE :</strong> Ne prenez AUCUN comprimé d'iode sans ordre explicite du Préfet. L'iode est inutile si le rejet ne contient pas d'iode radioactif.
+                </div>
+              )}
 
               <button
                 type="button"
@@ -466,7 +718,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           )}
         </div>
 
-        {/* BOUTON 4 : APPELER LES SECOURS */}
+        {/* BOUTON 4 : APPELER LES SECOURS (ADAPTÉ AU PAYS CHOISI) */}
         <div className="flex flex-col">
           <button
             type="button"
@@ -486,13 +738,13 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-['Space_Grotesk'] text-[11px] tracking-wider text-red-200 uppercase font-black">
-                  Liaisons d'Urgence 4
+                  Liaisons d'Urgence ({countryData.flag} {countryData.name})
                 </span>
                 <span className="text-[20px] sm:text-[22px] font-black tracking-tight leading-tight">
                   APPELER LES SECOURS
                 </span>
                 <span className="text-[12px] text-red-200 mt-0.5 line-clamp-1">
-                  15 SAMU • 18 Pompiers • 112 Europe • 114 SMS
+                  {countryData.numbers.map((n) => n.number).join(' • ')}
                 </span>
               </div>
             </div>
@@ -502,89 +754,64 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
             </span>
           </button>
 
-          {/* Volet Déployé Appels d'Urgence */}
+          {/* Volet Déployé Appels d'Urgence avec sélecteur de pays */}
           {activeAction === 'appeler' && (
-            <div className="mt-2 p-4 bg-[#380606] border border-red-500/50 rounded-2xl flex flex-col gap-2.5 animate-fadeIn">
-              <span className="text-[11px] font-['Space_Grotesk'] uppercase text-red-200 font-bold">
+            <div className="mt-2 p-4 bg-[#380606] border border-red-500/50 rounded-2xl flex flex-col gap-3 animate-fadeIn">
+              {/* Sélecteur de pays */}
+              <div className="flex items-center justify-between gap-2 border-b border-red-800 pb-2">
+                <span className="text-[11px] font-['Space_Grotesk'] uppercase text-red-200 font-bold">
+                  Pays d'intervention :
+                </span>
+                <div className="flex gap-1">
+                  {EMERGENCY_COUNTRIES.map((c) => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => handleSelectCountry(c.code)}
+                      className={`px-2 py-1 rounded text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                        selectedCountry === c.code
+                          ? 'bg-red-600 text-white shadow'
+                          : 'bg-red-950/80 text-gray-300 hover:bg-red-900'
+                      }`}
+                    >
+                      {c.flag} {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <span className="text-[11px] text-red-200 italic">
                 Ne pas encombrer les lignes sauf urgence vitale avérée :
               </span>
 
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenCallModal({
-                      number: '15',
-                      name: 'SAMU - Détresse Vitale',
-                      subtitle: 'Urgence Médicale',
-                      desc: 'Intoxication aiguë, perte de connaissance, détresse respiratoire.'
-                    })
-                  }
-                  className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-2.5 text-left active:scale-95 transition-all"
-                >
-                  <span className="font-['Space_Grotesk'] text-[24px] font-black text-white">15</span>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white">SAMU</span>
-                    <span className="text-[10px] text-red-200">Médical</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenCallModal({
-                      number: '18',
-                      name: 'Sapeurs-Pompiers - Sauvetage',
-                      subtitle: 'Secours & Incendie',
-                      desc: 'Incendie, explosion, effondrement, fuite toxique visible.'
-                    })
-                  }
-                  className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-2.5 text-left active:scale-95 transition-all"
-                >
-                  <span className="font-['Space_Grotesk'] text-[24px] font-black text-white">18</span>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white">POMPIERS</span>
-                    <span className="text-[10px] text-red-200">Sinistre</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenCallModal({
-                      number: '112',
-                      name: '112 - Urgence Européenne',
-                      subtitle: 'Numéro Unique Européen',
-                      desc: 'Valable depuis n\'importe quel téléphone même sans carte SIM.'
-                    })
-                  }
-                  className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-2.5 text-left active:scale-95 transition-all"
-                >
-                  <span className="font-['Space_Grotesk'] text-[24px] font-black text-white">112</span>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white">112 EUROPE</span>
-                    <span className="text-[10px] text-red-200">Toutes urgences</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenCallModal({
-                      number: '114',
-                      name: '114 - SMS Urgence Sourds / Malentendants',
-                      subtitle: 'Urgence Textuelle Silencieuse',
-                      desc: 'Pour personnes sourdes, aphones ou discrétion absolue requise.'
-                    })
-                  }
-                  className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-2.5 text-left active:scale-95 transition-all"
-                >
-                  <span className="font-['Space_Grotesk'] text-[24px] font-black text-white">114</span>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white">114 SMS</span>
-                    <span className="text-[10px] text-red-200">Silencieux</span>
-                  </div>
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {countryData.numbers.map((num) => (
+                  <button
+                    key={num.number}
+                    type="button"
+                    onClick={() =>
+                      onOpenCallModal({
+                        number: num.number,
+                        name: `${num.number} - ${num.label}`,
+                        subtitle: num.role,
+                        desc: num.desc
+                      })
+                    }
+                    className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-3 text-left active:scale-95 transition-all"
+                  >
+                    <span className="font-['Space_Grotesk'] text-[24px] font-black text-white shrink-0">
+                      {num.number}
+                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white truncate">
+                        {num.label}
+                      </span>
+                      <span className="text-[10px] text-red-200 line-clamp-1">
+                        {num.desc}
+                      </span>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -594,7 +821,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         <button
           type="button"
           onClick={() => onOpenSubScreen({ type: 'carte-perimetres' as any })}
-          className="w-full mt-2 p-3.5 bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded-2xl flex items-center justify-between text-left transition-colors"
+          className="w-full mt-1 p-3.5 bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded-2xl flex items-center justify-between text-left transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-900/50 text-purple-300 flex items-center justify-center shrink-0 border border-purple-500/30">
@@ -610,6 +837,21 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
             </div>
           </div>
           <span className="material-symbols-outlined text-[20px] text-gray-400">arrow_forward</span>
+        </button>
+
+        {/* Accès Fiche de Doctrine Complète (sans surcharger l'écran initial) */}
+        <button
+          type="button"
+          onClick={() => onOpenSubScreen({ type: 'tracabilite' as any })}
+          className="w-full p-3 bg-blue-950/60 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl flex items-center justify-between text-left transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-[20px] text-blue-300">menu_book</span>
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-blue-200">
+              Consulter la Fiche de Doctrine Officielle Complète
+            </span>
+          </div>
+          <span className="material-symbols-outlined text-[18px] text-blue-300">open_in_new</span>
         </button>
       </div>
     </div>

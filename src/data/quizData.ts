@@ -125,6 +125,50 @@ export const IMMERSION_SCENARIOS: QuizQuestion[] = [
         explanation: 'Les cartouches de gaz sans filtre à particules P3 ne bloquent pas les virus et bactéries.'
       }
     ]
+  },
+  {
+    id: 'q-travail-04',
+    scenarioNumber: 'N°04 • LIEU DE TRAVAIL / ENTREPRISE',
+    scenarioType: "Alerte Majeure en Milieu Professionnel",
+    badge: 'EXERCICE DIDACTIQUE — AUCUNE ALERTE RÉELLE',
+    title: 'Une alerte officielle est diffusée pendant que vous êtes au travail',
+    context: '« Il est 14h15, vous êtes dans les bureaux ou l\'atelier de votre entreprise. Une alerte de sécurité civile retentit (sirène ou notification d\'urgence). Un incident industriel majeur est signalé dans la zone d\'activités voisine. »',
+    question: 'Que faites-vous immédiatement pour préserver votre vie et celle de vos collègues ?',
+    source: 'Code du Travail (Art. R4227-28) & INRS / DGSCGC',
+    options: [
+      {
+        letter: 'A',
+        text: 'Prendre vos clés de voiture pour rentrer immédiatement chez vous rejoindre vos proches',
+        isCorrect: false,
+        tag: 'DANGER MORTEL & ENCOMBREMENT',
+        tagColor: 'text-error',
+        explanation: 'La fuite spontanée en véhicule vous expose directement au panache toxique dans l\'habitacle non étanche, et paralyse les axes prioritaires réservés aux pompiers et au SAMU.'
+      },
+      {
+        letter: 'B',
+        text: 'Rester dans les locaux en dur, couper la ventilation (CTA), calfeutrer et appliquer le plan de confinement',
+        isCorrect: true,
+        tag: 'RÉFLEXE OPÉRATIONNEL VALIDÉ',
+        tagColor: 'text-on-tertiary-container',
+        explanation: 'Le bâtiment d\'entreprise constitue un abri collectif solide. Coupez impérativement la centrale de traitement d\'air (CTA) et climatisation, calfeutrez les ouvrants et écoutez France Bleu FM sans saturer les lignes.'
+      },
+      {
+        letter: 'C',
+        text: 'Passer des appels téléphoniques à chaque membre de votre famille',
+        isCorrect: false,
+        tag: 'SATURATION DU RÉSEAU',
+        tagColor: 'text-error',
+        explanation: 'Les communications téléphoniques saturent les antennes relais locales et bloquent les transmissions radio des secours. Utilisez un SMS unique et court vers votre contact hors-zone.'
+      },
+      {
+        letter: 'D',
+        text: 'Sortir sur le parking pour inspecter visuellement l\'origine de l\'alerte',
+        isCorrect: false,
+        tag: 'EXPOSITION DIRECTE',
+        tagColor: 'text-error',
+        explanation: 'Sortir à découvert vous expose instantanément aux retombées toxiques inodores ou invisibles et aux effets de souffle éventuels.'
+      }
+    ]
   }
 ];
 

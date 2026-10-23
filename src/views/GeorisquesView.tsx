@@ -56,6 +56,28 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   const [mapZoom, setMapZoom] = useState<number>(1);
   const [mapMode, setMapMode] = useState<'officiel' | 'pedagogique'>('officiel');
 
+  // Historique des consultations locales (disponibles 100% hors-ligne)
+  const [communeHistory, setCommuneHistory] = useState<Array<{ insee: string; name: string; postalCode?: string; date: string }>>(() => {
+    try {
+      const saved = localStorage.getItem('nrbcor_commune_history');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+
+  const recordCommuneToHistory = (c: { insee: string; name: string; postalCode?: string }) => {
+    try {
+      const current = JSON.parse(localStorage.getItem('nrbcor_commune_history') || '[]');
+      const filtered = current.filter((it: any) => it.insee !== c.insee);
+      const updated = [
+        { insee: c.insee, name: c.name, postalCode: c.postalCode || '', date: new Date().toLocaleDateString('fr-FR') },
+        ...filtered
+      ].slice(0, 8);
+      localStorage.setItem('nrbcor_commune_history', JSON.stringify(updated));
+      setCommuneHistory(updated);
+    } catch {}
+  };
+
   // Monitor Network Status
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -66,6 +88,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
     let isMounted = true;
     let foundCache = false;
+
+    // Enregistrer dans l'historique des consultations locales
+    recordCommuneToHistory(activeCommune);
 
     // Initial check in local storage cache
     try {
@@ -709,6 +734,48 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                       </span>
                     </button>
                   ))}
+                </div>
+              )}
+
+              {/* Historique des consultations locales (Disponibles hors-ligne) */}
+              {communeHistory.length > 0 && (
+                <div className="flex flex-col gap-1 pt-1 border-t border-[#d6e4f8]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">history</span>
+                      Historique local ({communeHistory.length}) :
+                    </span>
+                    <span className="text-[10px] text-[#44474d] italic">Accès hors-ligne</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {communeHistory.map((hist) => (
+                      <button
+                        key={hist.insee}
+                        type="button"
+                        onClick={() => {
+                          setLiveReport(null);
+                          setLastUpdated('');
+                          setRefreshMessage(null);
+                          setSelectedMapNode(null);
+                          const preset = AVAILABLE_COMMUNES.find((ac) => ac.insee === hist.insee);
+                          setActiveCommune({
+                            name: hist.name,
+                            postalCode: hist.postalCode || '00000',
+                            insee: hist.insee,
+                            lat: preset?.lat || 45.75,
+                            lng: preset?.lng || 4.85,
+                            departement: preset?.departement || hist.insee.slice(0, 2),
+                            description: `Commune consultée le ${hist.date}.`
+                          });
+                          setIsEditingCommune(false);
+                        }}
+                        className="px-2.5 py-1 bg-white hover:bg-[#eef4ff] text-[#001126] border border-[#c4c6ce] rounded text-[11px] font-semibold flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[13px] text-[#0036ce]">schedule</span>
+                        <span>{hist.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -1403,13 +1470,21 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </div>
               )}
 
-              {/* Échantillon pédagogique actif */}
+              {/* Échantillon pédagogique actif (séparation visuelle explicite sans confusion possible) */}
               {isPedagogical && (
-                <div className="p-3 rounded-lg bg-[#fff0ed] border border-[#ffdad6] text-[#93000a] text-[12px] flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">school</span>
-                  <div>
-                    <strong className="font-bold">Échantillon Pédagogique Actif :</strong> Ces risques sont affichés à des fins didactiques d'entraînement civil. Ils ne représentent pas l'inventaire officiel de la commune de <strong>{activeCommune.name}</strong>.
+                <div className="p-4 rounded-xl bg-amber-50 border-2 border-dashed border-amber-600 text-amber-950 flex flex-col gap-2 relative overflow-hidden shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[24px] text-amber-700 shrink-0">school</span>
+                    <strong className="font-['Space_Grotesk'] text-[13px] font-black uppercase text-amber-900 tracking-wider">
+                      EXERCICE PÉDAGOGIQUE — SIMULATION DIDACTIQUE
+                    </strong>
                   </div>
+                  <p className="text-[12px] leading-relaxed">
+                    Ce jeu de données est affiché <strong>strictement pour l'entraînement aux bons réflexes</strong>. Il ne reflète pas l'état réglementaire opposable de la commune de <strong>{activeCommune.name}</strong>.
+                  </p>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded self-start">
+                    AUCUNE ALERTE RÉELLE • EXERCICE DIDACTIQUE
+                  </span>
                 </div>
               )}
 

@@ -324,6 +324,14 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
           </button>
         </div>
 
+        {/* Limitation QR Code & Primauté de la Fiche Papier */}
+        <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug flex items-start gap-2">
+          <span className="material-symbols-outlined text-[16px] text-amber-700 shrink-0 mt-0.5">warning</span>
+          <span>
+            <strong>Attention :</strong> Le QR Code nécessite un téléphone chargé et opérationnel. En cas de panne de réseau ou blackout prolongé, <strong>seule la fiche papier imprimée</strong> est utilisable en toute circonstance.
+          </span>
+        </div>
+
         {/* VUE 1 : PARTAGER MON PLAN */}
         {activeTab === 'share' && (
           <div className="flex flex-col items-center gap-3 py-1">

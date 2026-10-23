@@ -175,6 +175,8 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
     }, 3200);
   };
 
+  const [showPocketCardModal, setShowPocketCardModal] = useState(false);
+
   const handleExportPDF = () => {
     setShowExportPdfModal(true);
   };
@@ -873,6 +875,15 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           </button>
 
           <button
+            onClick={() => setShowPocketCardModal(true)}
+            type="button"
+            className="w-full min-h-[48px] bg-white hover:bg-gray-50 text-[#001126] font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border-2 border-[#001126] shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[20px]">badge</span>
+            <span>Fiche Papier N&B & Carte Portefeuille Découpable</span>
+          </button>
+
+          <button
             onClick={handleExportPDF}
             type="button"
             className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
@@ -1214,6 +1225,134 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           assemblyPoints,
         }}
       />
+
+      {/* Modal Fiche Papier Noir & Blanc & Carte Portefeuille Découpable */}
+      {showPocketCardModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-3 sm:p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white text-black w-full max-w-lg rounded-2xl shadow-2xl border-2 border-black flex flex-col max-h-[90vh] overflow-hidden">
+            <div className="p-4 bg-black text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px]">badge</span>
+                <h3 className="font-bold text-[16px]">Fiche Papier N&B & Carte Portefeuille</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPocketCardModal(false)}
+                className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto flex flex-col gap-4 text-[12px]">
+              <p className="text-gray-700 leading-snug">
+                Conçu pour une <strong>lisibilité maximale en noir et blanc</strong> sur n'importe quelle imprimante standard, sans fond sombre, prêt à être découpé et glissé dans la poche ou le cartable de chaque membre du foyer.
+              </p>
+
+              {/* CARTE PORTEFEUILLE DÉCOUPABLE (8.5 x 5.5 cm standard) */}
+              <div className="border-2 border-dashed border-black p-3.5 rounded-xl bg-white flex flex-col gap-2 relative">
+                <div className="flex items-center justify-between border-b border-black pb-1.5">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider block font-['Space_Grotesk']">
+                      CARTE DE SECOURS CIVILE • NRBCOR
+                    </span>
+                    <span className="text-[12px] font-bold block">
+                      Plan Familial de Mise en Sûreté
+                    </span>
+                  </div>
+                  <span className="text-[9px] border border-black px-1 py-0.5 font-bold uppercase">
+                    FORMAT PORTEFEUILLE
+                  </span>
+                </div>
+
+                {/* Membres & besoins vitaux */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold uppercase">Membres du Foyer :</span>
+                  <div className="space-y-0.5">
+                    {members.map((m) => (
+                      <div key={m.id} className="flex justify-between text-[11px] border-b border-gray-200 py-0.5">
+                        <strong className="truncate">{m.role}</strong>
+                        <span className="text-gray-700 truncate max-w-[200px] text-right">{m.details}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contact Relais Hors-Zone */}
+                <div className="border-t border-black pt-1 flex justify-between text-[11px]">
+                  <span><strong>Contact Hors-Zone :</strong> {outZoneContact ? `${outZoneContact.name} (${outZoneContact.phone})` : 'À renseigner'}</span>
+                  <span>{outZoneContact?.dist || '>100 km'}</span>
+                </div>
+
+                {/* Points de rassemblement */}
+                <div className="border-t border-black pt-1 text-[11px] space-y-0.5">
+                  <div>
+                    <strong>Point Primaire : </strong>
+                    {assemblyPoints && assemblyPoints[0] ? `${assemblyPoints[0].name} (${assemblyPoints[0].coords})` : 'Entrée de l’immeuble / portail'}
+                  </div>
+                  <div>
+                    <strong>Point Secondaire : </strong>
+                    {assemblyPoints && assemblyPoints[1] ? `${assemblyPoints[1].name} (${assemblyPoints[1].coords})` : 'Mairie ou gymnase municipal'}
+                  </div>
+                </div>
+
+                {/* Radio */}
+                <div className="border-t border-black pt-1 flex justify-between text-[10px] font-bold">
+                  <span>Radio FM de crise : France Bleu</span>
+                  <span>Urgences : 15 • 18 • 112</span>
+                </div>
+              </div>
+
+              {/* LES 3 SCÉNARIOS D'URGENCE SANS RÉSEAU */}
+              <div className="border border-black rounded-xl p-3 flex flex-col gap-2">
+                <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase text-black">
+                  3 Protocoles de Crise Hors-Réseau :
+                </span>
+
+                <div className="p-2 border border-gray-300 rounded text-[11px]">
+                  <strong>1. Si nous sommes séparés :</strong>
+                  <p className="text-gray-700 mt-0.5 leading-snug">
+                    Rejoindre immédiatement le Point Primaire. Si impossible, envoyer un unique SMS court au Contact Hors-Zone (« Suis à tel endroit, indemne »).
+                  </p>
+                </div>
+
+                <div className="p-2 border border-gray-300 rounded text-[11px]">
+                  <strong>2. Si le téléphone ne fonctionne pas :</strong>
+                  <p className="text-gray-700 mt-0.5 leading-snug">
+                    Rendez-vous programmé au Point Primaire à <strong>H+2</strong> (2h après l'alerte), puis <strong>H+6</strong>, puis le lendemain à <strong>09h00 (H+24)</strong>. Écoutez France Bleu sur récepteur radio à piles.
+                  </p>
+                </div>
+
+                <div className="p-2 border border-gray-300 rounded text-[11px]">
+                  <strong>3. Si le point de rassemblement est inaccessible :</strong>
+                  <p className="text-gray-700 mt-0.5 leading-snug">
+                    Bascule immédiate vers le Point Secondaire à l'extérieur du périmètre de sécurité.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-100 border-t border-black flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="h-10 px-4 bg-black text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-1.5 shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[16px]">print</span>
+                <span>Imprimer en Noir & Blanc</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowPocketCardModal(false)}
+                className="h-10 px-4 bg-white border border-black text-black rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

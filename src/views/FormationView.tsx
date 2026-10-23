@@ -25,6 +25,26 @@ export const FormationView: React.FC<FormationViewProps> = ({
   const currentScenario = IMMERSION_SCENARIOS[scenarioIndex];
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D'>('B');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('tous');
+  const [trainerMode, setTrainerMode] = useState(false);
+
+  // Compétences travaillées en local (sans serveur)
+  const [competencies, setCompetencies] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('nrbcor_competencies_tracked');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return ['Confinement étanche', 'Priorité Radio FM France Bleu'];
+  });
+
+  const recordCompetency = (comp: string) => {
+    if (!competencies.includes(comp)) {
+      const updated = [...competencies, comp];
+      setCompetencies(updated);
+      try {
+        localStorage.setItem('nrbcor_competencies_tracked', JSON.stringify(updated));
+      } catch {}
+    }
+  };
 
   // Drill state
   const [showDrillModal, setShowDrillModal] = useState(false);
@@ -159,7 +179,53 @@ export const FormationView: React.FC<FormationViewProps> = ({
               </p>
             </div>
           </section>
+
+          {/* Mode Formateur / Animateur Toggle */}
+          <div className="mt-1 p-3 bg-white rounded-xl border border-[#c4c6ce] shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-[#0036ce]">co_present</span>
+              <div>
+                <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] block">
+                  Mode Formateur / Animateur d'Exercice
+                </span>
+                <span className="text-[10px] text-[#44474d]">
+                  Affiche les notes pédagogiques, objectifs et débriefing pour animer un groupe
+                </span>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={trainerMode}
+                onChange={(e) => setTrainerMode(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-[#0036ce]"></div>
+            </label>
+          </div>
         </header>
+
+        {/* Compétences Civiles Travaillées en Local */}
+        <section className="bg-[#f8f9ff] rounded-xl p-3 border border-[#d6e4f8] flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#0036ce] flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[16px]">verified</span>
+              Compétences Civiles Validées ({competencies.length}) :
+            </span>
+            <span className="text-[10px] text-gray-500 font-medium">Historique local</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {competencies.map((comp, idx) => (
+              <span
+                key={idx}
+                className="px-2.5 py-1 rounded-full bg-white text-[#005236] border border-[#98f6c5] font-['Space_Grotesk'] text-[11px] font-bold flex items-center gap-1 shadow-xs"
+              >
+                <span className="material-symbols-outlined text-[13px] text-[#005236]">check</span>
+                <span>{comp}</span>
+              </span>
+            ))}
+          </div>
+        </section>
 
         {/* Overall Training Progress Widget */}
         <section className="rounded-xl bg-white p-4 shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
@@ -326,6 +392,26 @@ export const FormationView: React.FC<FormationViewProps> = ({
             </p>
           </div>
 
+          {/* Fiche Animateur / Coaching de Groupe */}
+          {trainerMode && (
+            <div className="p-3 bg-[#fff9ea] rounded-xl border border-[#ffe082] text-[11px] text-[#5c3e00] flex flex-col gap-1.5 animate-in fade-in duration-150">
+              <div className="flex items-center gap-1.5 font-bold uppercase font-['Space_Grotesk'] text-[#7a5200]">
+                <span className="material-symbols-outlined text-[16px]">school</span>
+                <span>Fiche Formateur • Animation de Groupe</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 leading-snug">
+                <div>
+                  <strong>Objectif pédagogique : </strong>
+                  Déconstruire les fausses croyances (fuite en véhicule, saturation d'appels, prise d'iode non ordonnée) et ancrer le réflexe de confinement immédiat en bâtiment dur.
+                </div>
+                <div>
+                  <strong>Conseil d'animation : </strong>
+                  Faire émerger les réponses spontanées du groupe avant d'afficher la correction. Rappeler que le PPMS protège les enfants dans les écoles.
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Simulation Options with instant didactic feedback states */}
           <div className="flex flex-col gap-2.5">
             {currentScenario.options.map((opt) => {
@@ -335,7 +421,10 @@ export const FormationView: React.FC<FormationViewProps> = ({
                 return (
                   <div
                     key={opt.letter}
-                    onClick={() => setSelectedOption(opt.letter)}
+                    onClick={() => {
+                      setSelectedOption(opt.letter);
+                      recordCompetency(currentScenario.title.slice(0, 30));
+                    }}
                     className={`rounded-lg p-3 cursor-pointer transition-all border ${
                       isSelected
                         ? 'bg-[#98f6c5] border-[#005236] text-[#002c1b] shadow-sm'
