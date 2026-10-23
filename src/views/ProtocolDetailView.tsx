@@ -8,12 +8,14 @@ interface ProtocolDetailViewProps {
   protocol: ProtocolData;
   onBack: () => void;
   onOpenCallModal: (call: EmergencyCall) => void;
+  profileMode?: 'simplified' | 'expert';
 }
 
 export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
   protocol,
   onBack,
   onOpenCallModal,
+  profileMode = 'simplified',
 }) => {
   const [activePhase, setActivePhase] = useState<'avant' | 'pendant' | 'apres'>('pendant');
   const [sirenActive, setSirenActive] = useState(false);
@@ -158,6 +160,62 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
             {sirenActive ? 'LECTURE' : 'TEST HORS-LIGNE'}
           </span>
         </button>
+      </div>
+
+      {/* Profil Doctrinal Display Banner */}
+      <div className="mx-4 mb-3">
+        {profileMode === 'simplified' ? (
+          <div className="bg-[#eef4ff] p-3 rounded-xl border border-[#0036ce]/30 flex flex-col gap-2 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">person</span>
+                Grand Public • 3 Réflexes Vitaux Absolus
+              </span>
+              <span className="text-[10px] bg-[#0036ce] text-white px-1.5 py-0.2 rounded font-bold uppercase">
+                Priorité Immédiate
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5 text-center pt-0.5">
+              <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
+                <span className="material-symbols-outlined text-[#0036ce] text-[18px]">meeting_room</span>
+                <span className="font-bold text-[11px] text-[#001126] leading-tight">1. Confinez-vous</span>
+                <span className="text-[10px] text-[#44474d]">En dur, coupez VMC</span>
+              </div>
+              <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
+                <span className="material-symbols-outlined text-[#0036ce] text-[18px]">radio</span>
+                <span className="font-bold text-[11px] text-[#001126] leading-tight">2. Écoutez Radio</span>
+                <span className="text-[10px] text-[#44474d]">France Bleu FM</span>
+              </div>
+              <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
+                <span className="material-symbols-outlined text-[#ba1a1a] text-[18px]">medication</span>
+                <span className="font-bold text-[11px] text-[#ba1a1a] leading-tight">3. Iode sur ordre</span>
+                <span className="text-[10px] text-[#44474d]">Inopérant hors fission</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#001126] text-white p-3.5 rounded-xl border border-[#12263f] flex flex-col gap-2 shadow-sm">
+            <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
+              <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#98f6c5] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">school</span>
+                Volet Formateur & Références Doctrinales
+              </span>
+              <span className="text-[10px] bg-[#98f6c5] text-[#002c1b] px-1.5 py-0.2 rounded font-bold uppercase">
+                Mode Expert
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="bg-white/5 p-2 rounded border border-white/10">
+                <strong className="text-[#98f6c5] block">Cadre Réglementaire :</strong>
+                <span className="text-[#dce9fd] text-[10.5px]">CSI Art. L741-1 • Plans PIRATOX/PIRANET • Directive Seveso III</span>
+              </div>
+              <div className="bg-white/5 p-2 rounded border border-white/10">
+                <strong className="text-[#98f6c5] block">Seuils Dosimétriques :</strong>
+                <span className="text-[#dce9fd] text-[10.5px]">Seuil thyroïde 50 mSv (KI) • Zone PPI 10-20km • Débit alerte 10 µSv/h</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SECTION 1 : LES 4 RÉFLEXES ESSENTIELS IMMÉDIATS (0 - 15 MIN) */}

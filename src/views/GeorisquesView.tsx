@@ -608,6 +608,32 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           )}
         </section>
 
+        {/* Passerelle Hors-Ligne : Carte des Périmètres 100% Autonome */}
+        <section className="bg-[#001126] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#98f6c5] text-[20px]">radar</span>
+              <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider text-white">
+                Carte Hors-Ligne des Périmètres (100% Autonome)
+              </span>
+            </div>
+            <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5]/20 text-[#98f6c5] px-2 py-0.5 rounded font-bold uppercase">
+              Zéro Réseau
+            </span>
+          </div>
+          <p className="text-[12px] text-[#dce9fd] leading-relaxed">
+            Le chaînon manquant en cas de blackout : base statique pré-embarquée des 19 CNPE nucléaires et 22 plateformes Seveso Seuil Haut. Calcul géodésique local immédiat « suis-je dans un rayon de X km » sans aucun transit serveur.
+          </p>
+          <button
+            type="button"
+            onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
+            className="w-full min-h-[42px] bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">map</span>
+            <span>Ouvrir la Carte & Radar Hors-Ligne (41 sites)</span>
+          </button>
+        </section>
+
         {/* Territorial Selector & Privacy Guarantee */}
         <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
           <div className="flex items-center justify-between">
@@ -763,6 +789,90 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 <strong>Garantie de souveraineté :</strong> Aucune télémétrie ni pistage. Les coordonnées GPS restent strictement confinées dans la mémoire vive locale de votre terminal.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* LIAISON DIRECTE MAIRIE & DICRIM COMMUNAL (DILA / PREMIER MINISTRE) */}
+        <section className="bg-gradient-to-br from-[#001126] to-[#12263f] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-[#0036ce] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <span className="material-symbols-outlined text-[22px]">account_balance</span>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#98f6c5] tracking-wider">
+                    Poste de Commandement Municipal
+                  </span>
+                  {mairieContact?.isAuthentifie && (
+                    <span className="bg-[#98f6c5] text-[#002c1b] text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
+                      Vérifié DILA
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-[16px] font-bold text-white truncate">
+                  {mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`}
+                </h2>
+              </div>
+            </div>
+            <span className="font-['Space_Grotesk'] text-[10px] bg-white/10 text-[#dce9fd] px-2 py-0.5 rounded font-bold uppercase shrink-0">
+              C.S.I. L731-3
+            </span>
+          </div>
+
+          {mairieContact?.adressePostale?.ligne && (
+            <div className="text-[12px] text-[#dce9fd] flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[16px] text-[#98f6c5]">location_on</span>
+              <span>{mairieContact.adressePostale.ligne}, {mairieContact.adressePostale.codePostal} {mairieContact.adressePostale.nomCommune}</span>
+            </div>
+          )}
+
+          {/* Quick Action Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            {/* Direct Call Button */}
+            {mairieContact?.telephone ? (
+              <button
+                type="button"
+                onClick={() =>
+                  onOpenCallModal({
+                    number: mairieContact.telephone!,
+                    name: mairieContact.nomOfficiel,
+                    subtitle: 'Standard officiel vérifié (DILA)',
+                    desc: `Poste de commandement / Standard communal pour la commune de ${activeCommune.name}. Source : Annuaire de l'Administration (DILA / Premier ministre).`,
+                  })
+                }
+                className="min-h-[44px] px-3 bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">call</span>
+                <span>Appeler la Mairie ({mairieContact.telephone})</span>
+              </button>
+            ) : (
+              <div className="min-h-[44px] px-3 bg-white/10 text-white/80 font-['Space_Grotesk'] text-[11px] font-semibold rounded-lg flex items-center justify-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">phone_disabled</span>
+                <span>Standard : non synchronisé hors-ligne</span>
+              </div>
+            )}
+
+            {/* Direct DICRIM / PCS Button */}
+            <button
+              type="button"
+              onClick={() => setActiveModalDoc('dicrim')}
+              className="min-h-[44px] px-3 bg-white/10 hover:bg-white/20 text-white font-['Space_Grotesk'] text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/20 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">menu_book</span>
+              <span>Consulter le DICRIM Communal</span>
+            </button>
+          </div>
+
+          <div className="pt-1 border-t border-white/10 flex items-center justify-between text-[11px] text-[#dce9fd]">
+            <span className="truncate">Plan Communal de Sauvegarde (PCS) sous l'autorité du Maire</span>
+            <button
+              type="button"
+              onClick={() => setActiveModalDoc('pcs')}
+              className="text-[#98f6c5] hover:underline font-bold font-['Space_Grotesk'] shrink-0 ml-2 cursor-pointer"
+            >
+              Fiche PCS &rarr;
+            </button>
           </div>
         </section>
 

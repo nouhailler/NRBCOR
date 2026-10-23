@@ -318,6 +318,81 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
               </p>
             </div>
           </div>
+
+          {/* Guide Animaux de Compagnie */}
+          <div
+            onClick={() => onOpenSubScreen({ type: 'animaux' })}
+            role="button"
+            tabIndex={0}
+            className="p-3.5 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#005236] transition-all cursor-pointer flex items-start gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#002c1b] text-[#98f6c5] flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[22px]">pets</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126] group-hover:text-[#002c1b]">
+                  Animaux de Compagnie en Milieu NRBC
+                </span>
+                <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-1.5 py-0.5 rounded font-bold">
+                  VÉTÉRINAIRE
+                </span>
+              </div>
+              <p className="text-[12px] text-[#44474d] mt-0.5 line-clamp-2">
+                Confinement, interdiction de l'iode humain, décontamination douce du pelage et règles CARE d'évacuation.
+              </p>
+            </div>
+          </div>
+
+          {/* Guide Cyber & Hybride */}
+          <div
+            onClick={() => onOpenSubScreen({ type: 'formation' })}
+            role="button"
+            tabIndex={0}
+            className="p-3.5 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#6750a4] transition-all cursor-pointer flex items-start gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#6750a4] text-white flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[22px]">bolt</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126] group-hover:text-[#6750a4]">
+                  Crise Hybride : Blackout + Alerte NRBC
+                </span>
+                <span className="font-['Space_Grotesk'] text-[10px] bg-[#f3edf7] text-[#21005d] px-1.5 py-0.5 rounded font-bold">
+                  SCÉNARIO CYBER
+                </span>
+              </div>
+              <p className="text-[12px] text-[#44474d] mt-0.5 line-clamp-2">
+                Piratage réseau, coupure 4G/5G, pompes à l'arrêt, radio France Bleu FM sur piles et proscription absolue des bougies.
+              </p>
+            </div>
+          </div>
+
+          {/* Carte Hors-Ligne des Périmètres */}
+          <div
+            onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
+            role="button"
+            tabIndex={0}
+            className="p-3.5 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#0036ce] transition-all cursor-pointer flex items-start gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#001126] text-[#98f6c5] flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[22px]">radar</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126] group-hover:text-[#0036ce]">
+                  Carte Hors-Ligne des Périmètres
+                </span>
+                <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#002c1b] px-1.5 py-0.5 rounded font-bold">
+                  RADAR PPI
+                </span>
+              </div>
+              <p className="text-[12px] text-[#44474d] mt-0.5 line-clamp-2">
+                19 CNPE nucléaires et 22 sites Seveso Seuil Haut. Calcul géodésique local immédiat sans réseau.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

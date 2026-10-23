@@ -144,6 +144,13 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </span>
             <div className="flex flex-col gap-1 bg-white rounded-xl p-1.5 border border-[#ffb4ab] shadow-xs">
               <button
+                onClick={() => handleSelectSub({ type: 'mode-crise' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#ffdad6] hover:bg-[#ffb4ab] text-[#93000a] font-black transition-colors border border-[#ff897d]"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#ba1a1a]">crisis_alert</span>
+                <span>Mode Crise Simplifié (Gros Boutons)</span>
+              </button>
+              <button
                 onClick={() => handleSelectTab('reagir')}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#ffdad6]/40 text-[#93000a] font-bold transition-colors"
               >
@@ -259,7 +266,14 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#f0f4f9] text-[#001126] transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px] text-[#0036ce]">radar</span>
-                <span>Risques Locaux & Géorisques (Carte radar)</span>
+                <span>Risques Locaux & Géorisques (En ligne / Cache)</span>
+              </button>
+              <button
+                onClick={() => handleSelectSub({ type: 'carte-perimetres' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#eef4ff] hover:bg-[#dee1ff] text-[#001258] font-bold transition-colors border border-[#c4c6ce]"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#6750a4]">map</span>
+                <span>Carte Hors-Ligne des Périmètres (100% Autonome)</span>
               </button>
             </div>
           </div>

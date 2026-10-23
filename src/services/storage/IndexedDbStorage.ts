@@ -56,6 +56,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     inseeCode: '69383'
   },
   specificNeeds: DEFAULT_SPECIFIC_NEEDS,
+  profileMode: 'simplified',
   onboardingCompleted: false,
   createdAt: '2026-10-12T00:00:00.000Z',
   updatedAt: '2026-10-14T08:00:00.000Z'
@@ -69,6 +70,7 @@ export const CLEAN_SETTINGS: AppSettings = {
   textScale: 'normal',
   savedCommune: undefined,
   specificNeeds: CLEAN_SPECIFIC_NEEDS,
+  profileMode: 'simplified',
   onboardingCompleted: true,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()

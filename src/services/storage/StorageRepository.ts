@@ -13,6 +13,7 @@ export interface AppSettings {
     postalCode?: string;
   };
   specificNeeds?: SpecificNeedsConfig;
+  profileMode?: 'simplified' | 'expert';
   onboardingCompleted: boolean;
   createdAt: string;
   updatedAt: string;

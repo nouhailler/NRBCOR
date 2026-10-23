@@ -136,20 +136,39 @@ export const HomeView: React.FC<HomeViewProps> = ({
             Consignes immédiates sans connexion. Confinement, décontamination et gestes réflexes d'urgence.
           </p>
 
-          <div className="flex flex-col gap-1.5 pt-1">
+          <div className="flex flex-col gap-2 pt-1">
             <button
-              onClick={() => onNavigateTab('reagir')}
+              onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
               type="button"
-              className="w-full min-h-[52px] bg-[#ba1a1a] hover:bg-[#93000a] active:scale-[0.99] text-white rounded-xl flex items-center justify-center gap-2 px-4 shadow-sm transition-all"
+              className="w-full min-h-[52px] bg-[#ba1a1a] hover:bg-[#93000a] active:scale-[0.99] text-white rounded-xl flex items-center justify-center gap-2 px-4 shadow-md transition-all font-['Space_Grotesk'] text-[14px] uppercase font-black"
             >
-              <span className="material-symbols-outlined text-[24px]">bolt</span>
-              <span className="font-['Space_Grotesk'] text-[14px] tracking-wide uppercase font-bold text-center">
-                Ouvrir le mode Réagir maintenant
-              </span>
+              <span className="material-symbols-outlined text-[24px]">crisis_alert</span>
+              <span>Mode Crise Simplifié (Gros Boutons)</span>
             </button>
-            <div className="flex items-center justify-center gap-1.5 pt-1 text-center">
-              <span className="material-symbols-outlined text-[16px] text-[#93000a]/80">info</span>
-              <span className="text-[12px] text-[#93000a]/90 font-medium">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                onClick={() => onNavigateTab('reagir')}
+                type="button"
+                className="min-h-[44px] bg-white hover:bg-[#ffdad6] text-[#93000a] border border-[#ffb4ab] rounded-xl flex items-center justify-center gap-1.5 px-3 text-[12px] font-['Space_Grotesk'] font-bold uppercase transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">bolt</span>
+                <span>Fiches Réagir</span>
+              </button>
+
+              <button
+                onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
+                type="button"
+                className="min-h-[44px] bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl flex items-center justify-center gap-1.5 px-3 text-[12px] font-['Space_Grotesk'] font-bold uppercase transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">radar</span>
+                <span>Carte Périmètres (Radar PPI)</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center gap-1.5 pt-0.5 text-center">
+              <span className="material-symbols-outlined text-[15px] text-[#93000a]/80">info</span>
+              <span className="text-[11px] text-[#93000a]/90 font-medium">
                 Ne déclenche pas d'appel automatique aux secours
               </span>
             </div>

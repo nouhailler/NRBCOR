@@ -10,6 +10,8 @@ interface SettingsViewProps {
   onChangeTextScale: (scale: 'normal' | 'large' | 'extraLarge') => void;
   theme?: 'light' | 'dark' | 'system';
   onChangeTheme?: (theme: 'light' | 'dark' | 'system') => void;
+  profileMode?: 'simplified' | 'expert';
+  onChangeProfileMode?: (mode: 'simplified' | 'expert') => void;
   onDataReloaded?: () => void;
 }
 
@@ -21,6 +23,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onChangeTextScale,
   theme = 'light',
   onChangeTheme,
+  profileMode = 'simplified',
+  onChangeProfileMode,
   onDataReloaded,
 }) => {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -214,6 +218,79 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             }
             className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
           />
+        </div>
+      </section>
+
+      {/* Section : Niveau de Complexité & Profil Doctrinal */}
+      <section className="bg-white p-4 rounded-xl border border-[#c4c6ce] shadow-sm flex flex-col gap-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#e4efff]">
+          <h2 className="text-[16px] font-bold text-[#001126] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0036ce]">tune</span>
+            <span>Profil d'Affichage & Niveau Doctrinal</span>
+          </h2>
+          <span className="font-['Space_Grotesk'] text-[10px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
+            {profileMode === 'simplified' ? 'Grand Public' : 'Expert'}
+          </span>
+        </div>
+
+        <p className="text-[12px] text-[#44474d] leading-relaxed">
+          Adaptez le niveau d'information et la profondeur technique selon votre situation ou votre fonction :
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {/* Option Grand Public */}
+          <button
+            type="button"
+            onClick={() => {
+              onChangeProfileMode?.('simplified');
+              handleUpdate({ profileMode: 'simplified' });
+            }}
+            className={`p-3 rounded-xl border text-left flex flex-col gap-1.5 transition-all cursor-pointer ${
+              profileMode === 'simplified'
+                ? 'bg-[#eef4ff] border-[#0036ce] ring-2 ring-[#0036ce]/20'
+                : 'bg-[#f8f9ff] border-[#c4c6ce] hover:border-[#0036ce]/50'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-[14px] text-[#001126]">
+                <span className="material-symbols-outlined text-[#0036ce] text-[20px]">person</span>
+                <span>Grand Public Simplifié</span>
+              </div>
+              {profileMode === 'simplified' && (
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0036ce]"></span>
+              )}
+            </div>
+            <p className="text-[11.5px] text-[#44474d] leading-snug">
+              Priorité aux 3 réflexes vitaux immédiats (Confinement, Radio, Pas d'iode sans ordre). Fiches concises et scannables sans jargon technique.
+            </p>
+          </button>
+
+          {/* Option Expert / Formateur */}
+          <button
+            type="button"
+            onClick={() => {
+              onChangeProfileMode?.('expert');
+              handleUpdate({ profileMode: 'expert' });
+            }}
+            className={`p-3 rounded-xl border text-left flex flex-col gap-1.5 transition-all cursor-pointer ${
+              profileMode === 'expert'
+                ? 'bg-[#001126] border-[#001126] text-white ring-2 ring-[#98f6c5]/30 shadow-xs'
+                : 'bg-[#f8f9ff] border-[#c4c6ce] hover:border-[#001126]/50'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-[14px] text-inherit">
+                <span className={`material-symbols-outlined text-[20px] ${profileMode === 'expert' ? 'text-[#98f6c5]' : 'text-[#001126]'}`}>school</span>
+                <span>Expert / Formateur Sécurité Civile</span>
+              </div>
+              {profileMode === 'expert' && (
+                <span className="w-2.5 h-2.5 rounded-full bg-[#98f6c5]"></span>
+              )}
+            </div>
+            <p className={`text-[11.5px] leading-snug ${profileMode === 'expert' ? 'text-[#dce9fd]' : 'text-[#44474d]'}`}>
+              Références réglementaires précises (SGDSN, ASN/IRSN, CAS toxicologie, seuils dosimétriques mSv/Gray, zonages PPI/POI, notes pour formateurs).
+            </p>
+          </button>
         </div>
       </section>
 

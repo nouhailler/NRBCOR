@@ -10,10 +10,16 @@ export type SubScreen =
   | { type: 'iode' }
   | { type: 'confinement-guide' }
   | { type: 'siren-guide' }
+  | { type: 'animaux' }
+  | { type: 'cyber-hybride' }
+  | { type: 'carte-perimetres' }
+  | { type: 'mode-crise' }
   | { type: 'inventory' }
   | { type: 'settings' }
   | { type: 'system-settings' }
   | { type: 'suis-je-pret' };
+
+export type ProfileMode = 'simplified' | 'expert';
 
 export interface EmergencyCall {
   number: string;

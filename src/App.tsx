@@ -22,6 +22,9 @@ import { InventoryView } from './views/InventoryView';
 import { SettingsView } from './views/SettingsView';
 import { SystemSettingsView } from './views/SystemSettingsView';
 import { SuisJePretView } from './views/SuisJePretView';
+import { AnimauxGuideView } from './views/AnimauxGuideView';
+import { CartePerimetresView } from './views/CartePerimetresView';
+import { ModeCriseView } from './views/ModeCriseView';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { storageService } from './services/storage/IndexedDbStorage';
@@ -45,6 +48,30 @@ export default function App() {
   const [activeCallModal, setActiveCallModal] = useState<EmergencyCall | null>(null);
   const [isWipeModalOpen, setIsWipeModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+
+  // Mode de profil : Grand Public Simplifié vs Expert / Formateur Sécurité Civile
+  const [profileMode, setProfileMode] = useState<'simplified' | 'expert'>(() => {
+    try {
+      const saved = localStorage.getItem('nrbcor_profile_mode');
+      if (saved === 'simplified' || saved === 'expert') return saved;
+    } catch (e) {}
+    return 'simplified';
+  });
+
+  const handleChangeProfileMode = (mode: 'simplified' | 'expert') => {
+    setProfileMode(mode);
+    try {
+      localStorage.setItem('nrbcor_profile_mode', mode);
+    } catch (e) {}
+    storageService.getSettings().then((s) => {
+      storageService.saveSettings({ ...s, profileMode: mode });
+    });
+    triggerHaptic('medium');
+  };
+
+  const handleToggleProfileMode = () => {
+    handleChangeProfileMode(profileMode === 'simplified' ? 'expert' : 'simplified');
+  };
 
   // Thème Clair / Sombre / Système (accès centralisé via storageService)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => storageService.getInitialTheme());
@@ -273,6 +300,12 @@ export default function App() {
       headerTitle = 'Guide Confinement';
     } else if (subScreen.type === 'siren-guide') {
       headerTitle = 'Signaux d\'Alerte RNA';
+    } else if (subScreen.type === 'animaux') {
+      headerTitle = 'Animaux en Milieu NRBC';
+    } else if (subScreen.type === 'carte-perimetres') {
+      headerTitle = 'Carte Hors-Ligne des Périmètres';
+    } else if (subScreen.type === 'mode-crise') {
+      headerTitle = 'Mode Crise Immédiat';
     } else if (subScreen.type === 'inventory') {
       headerTitle = 'Inventaire Matériel';
     } else if (subScreen.type === 'settings') {
@@ -310,6 +343,22 @@ export default function App() {
       ? 'text-[116%]'
       : 'text-[100%]';
 
+  if (subScreen?.type === 'mode-crise') {
+    return (
+      <div className={`min-h-screen bg-[#050b14] text-white flex flex-col font-['Public_Sans'] selection:bg-red-500/30 ${textScaleClass}`}>
+        <ModeCriseView
+          onBack={handleBack}
+          onOpenCallModal={setActiveCallModal}
+          onOpenSubScreen={handleOpenSubScreen}
+        />
+        <CallModal
+          call={activeCallModal}
+          onClose={() => setActiveCallModal(null)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-[#f8f9ff] text-[#0f1c2b] flex flex-col font-['Public_Sans'] selection:bg-[#d4e3ff] ${textScaleClass}`}>
       {/* Top Fixed Header avec bouton Thème et Installer */}
@@ -324,6 +373,9 @@ export default function App() {
         canInstall={canInstall}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        profileMode={profileMode}
+        onToggleProfileMode={handleToggleProfileMode}
+        onOpenModeCrise={() => handleOpenSubScreen({ type: 'mode-crise' })}
       />
 
       {/* Main Content Area */}
@@ -334,6 +386,7 @@ export default function App() {
               protocol={PROTOCOLS_DATA[subScreen.id]}
               onBack={handleBack}
               onOpenCallModal={setActiveCallModal}
+              profileMode={profileMode}
             />
           ) : subScreen.type === 'georisques' ? (
             <GeorisquesView
@@ -366,6 +419,13 @@ export default function App() {
               onBack={handleBack}
               onGoToConfinement={() => handleOpenSubScreen({ type: 'confinement-guide' })}
             />
+          ) : subScreen.type === 'animaux' ? (
+            <AnimauxGuideView onBack={handleBack} />
+          ) : subScreen.type === 'carte-perimetres' ? (
+            <CartePerimetresView
+              onBack={handleBack}
+              onOpenSubScreen={handleOpenSubScreen}
+            />
           ) : subScreen.type === 'inventory' ? (
             <InventoryView onBack={handleBack} />
           ) : subScreen.type === 'settings' ? (
@@ -378,6 +438,8 @@ export default function App() {
               theme={theme}
               onChangeTheme={setTheme}
               onDataReloaded={handleDataReloaded}
+              profileMode={profileMode}
+              onChangeProfileMode={handleChangeProfileMode}
             />
           ) : subScreen.type === 'system-settings' ? (
             <SystemSettingsView

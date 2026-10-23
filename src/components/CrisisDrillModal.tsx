@@ -4,7 +4,7 @@ import { triggerHaptic } from '../utils/haptics';
 
 export interface DrillScenario {
   id: string;
-  type: 'seveso' | 'nucleaire' | 'radiologique' | 'biologique';
+  type: 'seveso' | 'nucleaire' | 'radiologique' | 'biologique' | 'cyber-hybride';
   title: string;
   subtitle: string;
   badge: string;
@@ -194,6 +194,81 @@ export const DRILL_SCENARIOS: DrillScenario[] = [
             label: 'Refuser : l’iode n’a aucune efficacité contre le Césium ou les sources orphelines',
             pointsDelta: 20,
             feedback: 'RÉFLEXE EXPERT : L’iode stable ne protège que la thyroïde lors d’un accident de réacteur à fission.'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'drill-cyber-hybride',
+    type: 'cyber-hybride',
+    title: 'Attaque Cyber & Crise Hybride : Blackout + Alerte NRBC',
+    subtitle: 'Coupure électrique générale, perte du réseau 4G/5G et émanation chimique simultanée',
+    badge: 'HYBRIDE • BLACKOUT + NRBC',
+    badgeBg: 'bg-[#6750a4]',
+    context: 'Cyberattaque sur le réseau de transport électrique (RTE) entraînant un blackout massif. Par effet domino, les systèmes de ventilation et d’abattage d’une usine chimique proche s’arrêtent. Aucune 4G, coupure des pompes à eau, sirène RNA audible en ville.',
+    initialTimeSec: 210, // 3 min 30 s
+    essentialSteps: [
+      { id: 1, text: 'Allumer immédiatement la radio analogique AM/FM à piles sur la fréquence France Bleu locale', points: 15, timeHint: '0-30s' },
+      { id: 2, text: 'Gagner la pièce de confinement sans ascenseur et sans tenter d’évacuer en voiture', points: 15, timeHint: '0-60s' },
+      { id: 3, text: 'Calfeutrer manuellement ouvertures, bas de portes et bouches d’aération avec adhésif ou linge humide', points: 15, timeHint: '0-100s' },
+      { id: 4, text: 'Discipline stricte d’éclairage : lampes torches LED uniquement (INTERDICTION ABSOLUE de bougies/flammes)', points: 15, timeHint: '0-130s' }
+    ],
+    dilemmas: [
+      {
+        id: 401,
+        question: 'Dilemme 1 : Le réseau mobile est saturé ("Aucun service"). Votre batterie est à 35%. Que faites-vous ?',
+        options: [
+          {
+            id: 'd7-a',
+            label: 'Composer en boucle les numéros d’urgence et laisser l’écran allumé en recherche réseau',
+            pointsDelta: -30,
+            isTrap: true,
+            feedback: 'PIÈGE CRITIQUE : La recherche d’antenne-relais inexistante vide la batterie en moins de 45 minutes. En blackout, les lignes d’urgence sont saturées. Écoutez la radio publique.'
+          },
+          {
+            id: 'd7-b',
+            label: 'Activer le mode économie d’énergie maximal, couper Bluetooth/Wi-Fi et basculer sur la radio FM',
+            pointsDelta: 20,
+            feedback: 'RÉFLEXE EXEMPLAIRE : Préserver la batterie pour un éventuel SMS de crise ou repérage de fin d’alerte. La radio FM sur piles est l’unique vecteur résilient en blackout.'
+          }
+        ]
+      },
+      {
+        id: 402,
+        question: 'Dilemme 2 : Il fait nuit noire dans la pièce calfeutrée et la température baisse. Que faites-vous ?',
+        options: [
+          {
+            id: 'd8-a',
+            label: 'Allumer des bougies pour s’éclairer et réchauffer l’air ambiant',
+            pointsDelta: -40,
+            isTrap: true,
+            feedback: 'DANGER MORTEL : Les bougies en pièce confinée calfeutrée consument l’oxygène vital, émettent du monoxyde de carbone (CO) et risquent d’enflammer d’éventuelles vapeurs toxiques ou solvants.'
+          },
+          {
+            id: 'd8-b',
+            label: 'Utiliser une lampe frontale/torche LED à faisceau doux et s’envelopper dans des couvertures de survie',
+            pointsDelta: 20,
+            feedback: 'EXCELLENT : Zéro consommation d’oxygène, aucun risque d’incendie ou d’explosion thermique. La couverture isolante préserve la chaleur corporelle.'
+          }
+        ]
+      },
+      {
+        id: 403,
+        question: 'Dilemme 3 : L’eau du robinet ne coule plus (surpresseurs à l’arrêt). Que faire des sanitaires ?',
+        options: [
+          {
+            id: 'd9-a',
+            label: 'Vider vos bouteilles d’eau minérale en réserve pour évacuer les WC',
+            pointsDelta: -35,
+            isTrap: true,
+            feedback: 'GRAVE GASPILLAGE : L’eau potable en bouteille est réservée à l’hydratation vitale (3L/j) et aux soins d’urgence. Utilisez un sac poubelle étanche dans la cuvette pour les déjections.'
+          },
+          {
+            id: 'd9-b',
+            label: 'Interdire l’usage de l’eau potable pour les WC et utiliser des sacs étanches fermés hermétiquement',
+            pointsDelta: 20,
+            feedback: 'PARFAIT : Principe de résilience sous blackout : l’eau potable est un bien trop précieux pour être sacrifié dans les canalisations.'
           }
         ]
       }

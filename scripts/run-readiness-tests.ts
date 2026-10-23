@@ -20,6 +20,11 @@ import { getPedagogicalSampleRisks, fetchGeorisquesOnline, searchCommunesOnline 
 import { AVAILABLE_COMMUNES } from '../src/data/georisquesData';
 import { PROTOCOLS_DATA } from '../src/data/protocols';
 import { triggerHaptic } from '../src/utils/haptics';
+import {
+  OFFLINE_INDUSTRIAL_SITES,
+  calculateHaversineDistanceKm,
+  diagnoseUserPerimeters
+} from '../src/data/perimetresData';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -493,6 +498,49 @@ try {
   hapticError = true;
 }
 assert(!hapticError, '10.A - triggerHaptic s\'exécute sans lever d\'exception même sans vibreur physique');
+
+// ========================================================
+// TEST 11 : Carte Hors-Ligne des Périmètres (CNPE & Seveso)
+// ========================================================
+console.log('\n11. TEST CARTE HORS-LIGNE DES PÉRIMÈTRES (100% AUTONOME) :');
+
+const cnpeSites = OFFLINE_INDUSTRIAL_SITES.filter((s) => s.category === 'cnpe');
+const sevesoSites = OFFLINE_INDUSTRIAL_SITES.filter((s) => s.category === 'seveso');
+
+assert(cnpeSites.length >= 19, '11.A - Les 19 CNPE nucléaires français sont tous référencés');
+assert(sevesoSites.length >= 20, '11.B - Au moins 20 sites Seveso Seuil Haut majeurs sont référencés');
+assert(OFFLINE_INDUSTRIAL_SITES.length >= 39, '11.C - Base statique globale d\'au moins 39 sites à haut risque');
+
+// Vérification de la formule Haversine (distance Lyon - CNPE Bugey attendue entre 30 et 40 km)
+const bugey = cnpeSites.find((s) => s.id === 'cnpe-bugey');
+assert(!!bugey, '11.D - CNPE Bugey présent dans la base');
+if (bugey) {
+  const dLyonBugey = calculateHaversineDistanceKm(45.7602, 4.8357, bugey.lat, bugey.lng);
+  assert(dLyonBugey >= 30 && dLyonBugey <= 40, `11.E - Distance géodésique Lyon-Bugey conforme (${dLyonBugey} km attendu ~35 km)`);
+}
+
+// Vérification diagnostic géodésique en zone réflexe immédiate (< 5 km)
+const diagReflex = diagnoseUserPerimeters(45.6706, 4.8583); // Directement à Feyzin
+assert(diagReflex.overallStatus === 'in_reflex', '11.F - Position à Feyzin (<2km) correctement classée in_reflex');
+assert(diagReflex.closestSeveso.isWithinReflex, '11.G - Flag isWithinReflex activé pour Feyzin');
+
+// Vérification diagnostic géodésique en zone PPI (ex: 10 km d'un CNPE)
+if (bugey) {
+  // Coordonnées à ~10 km du Bugey (ex: Lagnieu)
+  const diagPpi = diagnoseUserPerimeters(45.90, 5.34);
+  assert(diagPpi.closestCnpe.isWithinPpi, '11.H - Position à ~12 km du Bugey classée dans le périmètre PPI 20 km');
+}
+
+// Vérification stricte de la doctrine iode pour les sites chimiques Seveso
+const sevesoFeyzin = sevesoSites.find((s) => s.id === 'seveso-feyzin');
+assert(!!sevesoFeyzin, '11.I - Site Seveso Feyzin présent');
+if (sevesoFeyzin) {
+  assert(
+    sevesoFeyzin.officialDoctrine.iodineRule.includes('INUTILE') ||
+      sevesoFeyzin.officialDoctrine.iodineRule.includes('aucun effet'),
+    '11.J - Inutilité stricte de l\'iode stable pour les sites Seveso confirmée dans la base'
+  );
+}
 
 console.log(`\n========================================================`);
 console.log(`🎉 SUITE DE TESTS COMPLÈTE : ${passedTests} / ${totalTests} VÉRIFICATIONS RÉUSSIES (100% SUCCÈS)`);
