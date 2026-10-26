@@ -1,5 +1,6 @@
 import React from 'react';
 import { TabType, SubScreen } from '../types';
+import { NuclearPowerIcon } from './icons/NuclearPowerIcon';
 
 interface HamburgerMenuProps {
   isOpen: boolean;
@@ -199,7 +200,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 onClick={() => handleSelectSub({ type: 'protocol', id: 'nucleaire' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#f0f4f9] text-[#001126] transition-colors"
               >
-                <span className="material-symbols-outlined text-[18px] text-[#ba1a1a]">nuclear_power</span>
+                <NuclearPowerIcon className="w-[18px] h-[18px] text-[#ba1a1a]" />
                 <span>Fiche Nucléaire (Centrale / Accident)</span>
               </button>
               <button

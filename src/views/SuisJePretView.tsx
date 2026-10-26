@@ -35,7 +35,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [familyPlan, setFamilyPlan] = useState<FamilyPlanData>(INITIAL_FAMILY_PLAN);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'missing' | 'expiries' | 'formula'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'besoins' | 'missing_data' | 'missing' | 'expiries' | 'formula'>('dashboard');
   const [expandedPillarId, setExpandedPillarId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -86,7 +86,18 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
     return calculateReadinessScore(config, items, inventoryItems, familyPlan);
   }, [config, items, inventoryItems, familyPlan]);
 
-  const { scoreResult, autonomy, missingItems, expiries, recommendedActions, householdSummary } = dashboardData;
+  const {
+    scoreResult,
+    autonomy,
+    missingItems,
+    expiries,
+    recommendedActions,
+    topThreeActions,
+    missingDataAndEstimates,
+    householdNeedsBreakdown,
+    householdSummary,
+    scoreDelta
+  } = dashboardData;
 
   // Actions rapides
   const handleAddWaterPack = async () => {
@@ -251,7 +262,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
             </div>
 
             <div className="flex flex-col">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span
                   className="font-['Space_Grotesk'] text-[11px] font-bold px-2 py-0.5 rounded-full uppercase"
                   style={{
@@ -261,6 +272,25 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                 >
                   {scoreResult.level.badge}
                 </span>
+
+                {scoreDelta ? (
+                  <span className={`text-[10px] font-['Space_Grotesk'] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                    scoreDelta.delta > 0
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+                      : scoreDelta.delta < 0
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30'
+                      : 'bg-white/10 text-gray-300'
+                  }`}>
+                    <span className="material-symbols-outlined text-[13px]">
+                      {scoreDelta.delta > 0 ? 'trending_up' : scoreDelta.delta < 0 ? 'trending_down' : 'trending_flat'}
+                    </span>
+                    <span>{scoreDelta.delta > 0 ? `+${scoreDelta.delta}` : scoreDelta.delta} pts vs {scoreDelta.previousDate}</span>
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-cyan-300 bg-cyan-900/40 border border-cyan-500/30 px-2 py-0.5 rounded-full font-['Space_Grotesk'] font-semibold">
+                    1re évaluation enregistrée
+                  </span>
+                )}
               </div>
               <h1 className="text-[20px] font-bold text-white tracking-tight leading-snug">
                 {scoreResult.level.title}
@@ -359,6 +389,32 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
 
         <button
           type="button"
+          onClick={() => setActiveTab('besoins')}
+          className={`flex-1 min-h-[38px] px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
+            activeTab === 'besoins'
+              ? 'bg-[#001126] text-white shadow-xs'
+              : 'text-[#44474d] hover:text-[#001126] hover:bg-white/50'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]">family_restroom</span>
+          <span>Besoins Foyer</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('missing_data')}
+          className={`flex-1 min-h-[38px] px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
+            activeTab === 'missing_data'
+              ? 'bg-[#001126] text-white shadow-xs'
+              : 'text-[#44474d] hover:text-[#001126] hover:bg-white/50'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]">troubleshoot</span>
+          <span>Données Estimées ({missingDataAndEstimates.length})</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('missing')}
           className={`flex-1 min-h-[38px] px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
             activeTab === 'missing'
@@ -367,7 +423,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">checklist</span>
-          <span>Manquants ({missingItems.length})</span>
+          <span>Manquants Kit ({missingItems.length})</span>
         </button>
 
         <button
@@ -719,7 +775,66 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
             </div>
           </section>
 
-          {/* SECTION : Actions Recommandées pour Progresser */}
+          {/* SECTION : Top 3 Actions Prioritaires à plus fort impact vital */}
+          {topThreeActions.length > 0 && (
+            <section className="bg-gradient-to-br from-[#001126] to-[#00224d] text-white p-4 sm:p-5 rounded-2xl shadow-md border border-[#0036ce]/40 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#ffd599] text-[22px]">
+                    target
+                  </span>
+                  <div>
+                    <h2 className="font-['Space_Grotesk'] text-[14px] font-bold uppercase tracking-wider text-white">
+                      Top 3 actions prioritaires à plus fort impact vital
+                    </h2>
+                    <p className="text-[11px] text-[#c4c6ce]">
+                      Sélectionnées algorithmiquement pour maximiser la résilience immédiate de votre foyer
+                    </p>
+                  </div>
+                </div>
+                <span className="font-['Space_Grotesk'] text-[10px] bg-[#ffd599]/20 text-[#ffd599] border border-[#ffd599]/30 px-2 py-0.5 rounded-full font-bold uppercase shrink-0">
+                  Priorité vitale
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mt-1">
+                {topThreeActions.map((action, idx) => (
+                  <div
+                    key={action.id}
+                    className="p-3 bg-white/10 hover:bg-white/15 rounded-xl border border-white/15 flex flex-col justify-between gap-3 transition-colors"
+                  >
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#ffd599] text-[#001126] text-[11px] font-['Space_Grotesk'] font-bold flex items-center justify-center">
+                          {idx + 1}
+                        </span>
+                        <span className="font-['Space_Grotesk'] text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded font-bold">
+                          +{action.pointsGain} pts
+                        </span>
+                      </div>
+                      <span className="text-[13px] font-bold text-white leading-snug">
+                        {action.title}
+                      </span>
+                      <p className="text-[11px] text-[#c4c6ce] leading-relaxed line-clamp-2">
+                        {action.description}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleExecuteAction(action)}
+                      className="w-full py-2 px-3 rounded-lg bg-white text-[#001126] hover:bg-white/90 active:bg-white/80 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shadow-xs flex items-center justify-center gap-1.5"
+                    >
+                      <span>Exécuter</span>
+                      <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* SECTION : Toutes les actions recommandées */}
           <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -727,7 +842,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
                   trending_up
                 </span>
                 <span className="font-['Space_Grotesk'] text-[13px] font-bold uppercase tracking-wider text-[#001126]">
-                  Actions recommandées pour progresser
+                  Toutes les actions recommandées
                 </span>
               </div>
               <span className="font-['Space_Grotesk'] text-[11px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold">
@@ -783,6 +898,204 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
               </div>
             )}
           </section>
+        </div>
+      )}
+
+      {/* VUE : BESOINS CALCULÉS SELON LA COMPOSITION DU FOYER */}
+      {activeTab === 'besoins' && (
+        <div className="flex flex-col gap-4 animate-in fade-in duration-200">
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0036ce] text-[22px]">family_restroom</span>
+                <h2 className="text-[15px] font-bold text-[#001126]">
+                  Besoins du foyer calculés selon les normes officielles
+                </h2>
+              </div>
+              <p className="text-[12px] text-[#44474d] mt-0.5">
+                Calcul automatisé pour {householdSummary.adults} adulte(s), {householdSummary.children} enfant(s), {householdSummary.infants} nourrisson(s), {householdSummary.pets} animal(aux) sur une durée cible de {householdSummary.targetDays} jours ({householdSummary.targetDays * 24}h).
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowConfigModal(true)}
+              className="px-3 py-1.5 rounded-lg bg-[#001126] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shrink-0 flex items-center gap-1.5 shadow-xs"
+            >
+              <span className="material-symbols-outlined text-[16px]">tune</span>
+              <span>Ajuster effectifs</span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-[#c4c6ce] overflow-hidden">
+            <div className="p-3 bg-[#f8f9ff] border-b border-[#eef4ff] flex items-center justify-between">
+              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] uppercase">
+                Tableau de dimensionnement logistique
+              </span>
+              <span className="text-[11px] text-[#44474d]">
+                Hypothèse standard Sécurité Civile (Guide ORSEC / PNRS)
+              </span>
+            </div>
+
+            <div className="divide-y divide-[#eef4ff]">
+              {householdNeedsBreakdown.map((row) => (
+                <div key={row.category} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-[#fafbff]">
+                  <div className="flex flex-col gap-1 max-w-xl">
+                    <div className="flex items-center gap-2">
+                      <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
+                        {row.category}
+                      </span>
+                      <span className="text-[11px] font-medium text-[#0036ce] bg-[#eef4ff] px-2 py-0.5 rounded-full">
+                        Besoin total : {row.targetNeed}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#44474d] leading-relaxed">
+                      {row.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end">
+                    <div className="text-right">
+                      <span className="text-[10px] text-[#555962] block uppercase font-['Space_Grotesk']">
+                        Besoin par 24h
+                      </span>
+                      <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
+                        {row.dailyNeed}
+                      </span>
+                    </div>
+
+                    <span
+                      className={`font-['Space_Grotesk'] text-[11px] font-bold px-2.5 py-1 rounded-lg ${
+                        row.status === 'optimal'
+                          ? 'bg-[#98f6c5] text-[#005236]'
+                          : row.status === 'warning'
+                          ? 'bg-[#fff0c2] text-[#855300]'
+                          : 'bg-[#ffdad6] text-[#ba1a1a]'
+                      }`}
+                    >
+                      {row.status === 'optimal'
+                        ? 'Couvert'
+                        : row.status === 'warning'
+                        ? 'Déficit partiel'
+                        : 'Déficit critique'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-[12px] text-blue-900 flex items-start gap-2.5">
+            <span className="material-symbols-outlined text-blue-700 text-[20px] shrink-0 mt-0.5">info</span>
+            <p className="leading-relaxed">
+              <strong>Précision méthodologique :</strong> Les besoins hydriques (eau de boisson + hygiène minimale d'urgence) sont fixés à 3 Litres par jour et par personne selon les recommandations de la Sécurité Civile française et du Ministère de l'Intérieur. L'alimentation prévoit 3 repas équivalents (froides, sans cuisson) par jour et par personne.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* VUE : DONNÉES MANQUANTES ET ESTIMATIONS EXPLICITES */}
+      {activeTab === 'missing_data' && (
+        <div className="flex flex-col gap-4 animate-in fade-in duration-200">
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#0036ce] text-[22px]">troubleshoot</span>
+              <h2 className="text-[15px] font-bold text-[#001126]">
+                Transparence des données & Estimations
+              </h2>
+            </div>
+            <p className="text-[12px] text-[#44474d] leading-relaxed">
+              Pour éviter toute fausse impression de sécurité, le tableau ci-dessous liste explicitement toutes les variables qui ne sont pas encore validées par une saisie d'inventaire précise.
+            </p>
+          </div>
+
+          {/* Règle fondamentale de déontologie */}
+          <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl flex items-start gap-3">
+            <span className="material-symbols-outlined text-amber-700 text-[24px] shrink-0 mt-0.5">warning</span>
+            <div className="text-[12px] text-amber-950 flex flex-col gap-1">
+              <strong className="font-bold text-[13px]">
+                Règle fondamentale : Une case cochée dans une checklist n'est pas une quantité mesurée
+              </strong>
+              <p className="leading-relaxed">
+                Avoir coché « Pack d'eau minérale » dans le kit 72h atteste de votre intention ou présence de base, mais seul l'inventaire quantifié (en Litres ou Rations) permet de vérifier si votre réserve couvre réellement {householdSummary.totalPersons} personnes pendant {householdSummary.targetDays} jours.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            {missingDataAndEstimates.map((item) => (
+              <div
+                key={item.id}
+                className="p-4 bg-white rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="flex flex-col gap-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
+                      {item.label}
+                    </span>
+                    <span className={`text-[10px] font-['Space_Grotesk'] font-bold px-2 py-0.5 rounded uppercase ${
+                      item.impact === 'critique'
+                        ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                        : item.impact === 'important'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                    }`}>
+                      Impact : {item.impact}
+                    </span>
+                    <span className="text-[10px] font-['Space_Grotesk'] text-[#555962] bg-[#f0f4f9] px-2 py-0.5 rounded">
+                      Domaine : {item.category}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-[#44474d] leading-relaxed">
+                    <strong>Constat :</strong> {item.explanation}
+                  </p>
+
+                  <p className="text-[11px] text-[#0036ce] leading-relaxed">
+                    <strong>Action recommandée :</strong> {item.remedyAction}
+                  </p>
+                </div>
+
+                <div className="shrink-0 flex items-center gap-2">
+                  {item.category === 'eau' && (
+                    <button
+                      type="button"
+                      onClick={handleAddWaterPack}
+                      className="px-3 py-1.5 rounded-lg bg-[#001126] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors"
+                    >
+                      +9L d'eau
+                    </button>
+                  )}
+                  {item.category === 'plan' && onNavigateTab && (
+                    <button
+                      type="button"
+                      onClick={() => onNavigateTab('mon-plan')}
+                      className="px-3 py-1.5 rounded-lg bg-[#001126] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors"
+                    >
+                      Ouvrir Plan
+                    </button>
+                  )}
+                  {item.category === 'logistique' && (
+                    <button
+                      type="button"
+                      onClick={handleMarkAllCheckedToday}
+                      className="px-3 py-1.5 rounded-lg bg-[#001126] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors"
+                    >
+                      Valider audit
+                    </button>
+                  )}
+                  {item.category === 'nourriture' && onOpenInventory && (
+                    <button
+                      type="button"
+                      onClick={onOpenInventory}
+                      className="px-3 py-1.5 rounded-lg bg-[#001126] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors"
+                    >
+                      Inventaire
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

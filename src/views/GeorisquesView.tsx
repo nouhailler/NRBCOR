@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { SubScreen, EmergencyCall } from '../types';
 import { CURRENT_COMMUNE, AVAILABLE_COMMUNES, GEORISQUES_ITEMS, CommuneInfo, findClosestCommune } from '../data/georisquesData';
 import {
@@ -11,6 +11,149 @@ import {
 } from '../services/external/georisquesClient';
 import { fetchMairieContact, MairieContact } from '../services/external/mairieDirectoryService';
 import { APP_VERSION } from '../constants/appInfo';
+
+export const PRELOADED_DATASET_DATE = '2026-10-23T18:00:00.000Z';
+export const PRELOADED_DATASET_LABEL = '23 oct. 2026 à 18:00 (constitution du jeu pré-embarqué)';
+
+export type TerritorialDataOrigin = 'live' | 'cache' | 'preload' | 'none';
+
+export interface FreshnessCalculation {
+  origin: TerritorialDataOrigin;
+  timestamp: string | null;
+  formattedDisplay: string;
+  badgeText: string;
+  badgeBg: string;
+  badgeTextCol: string;
+  badgeBorder: string;
+  relativeAge: string;
+  provenanceLabel: string;
+  provenanceDesc: string;
+  isStale: boolean;
+}
+
+export function computeDataFreshness(
+  report: GeorisquesReport | null,
+  inseeCode: string
+): FreshnessCalculation {
+  const isLyon = inseeCode === '69383';
+
+  // 1. Données récupérées en direct (API Géorisques en cours de session)
+  if (report && (report.dataSourceType === 'live_api' || report.dataSourceType === 'live_api_zero_risk')) {
+    const d = new Date(report.retrievedAt);
+    const isValid = !isNaN(d.getTime());
+    const timeStr = isValid
+      ? `${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+      : 'À l’instant';
+
+    return {
+      origin: 'live',
+      timestamp: report.retrievedAt,
+      formattedDisplay: `En direct • ${timeStr}`,
+      badgeText: 'EN DIRECT (FLUX API)',
+      badgeBg: 'bg-[#ecfdf5]',
+      badgeTextCol: 'text-[#065f46]',
+      badgeBorder: 'border-[#a7f3d0]',
+      relativeAge: 'Très récent (instantané en cours de session)',
+      provenanceLabel: 'Interrogation directe de l’API Géorisques',
+      provenanceDesc: 'Données transmises en temps réel par les serveurs officiels de l’État (data.gouv.fr / BRGM).',
+      isStale: false
+    };
+  }
+
+  // 2. Données issues du cache local (stockage sur le terminal)
+  if (report && (report.dataSourceType === 'cached_official' || (report.isOfflineCache && report.dataSourceType !== 'pedagogical_sample'))) {
+    const captureDate = new Date(report.retrievedAt);
+    const isValidDate = !isNaN(captureDate.getTime());
+    const formattedDate = isValidDate
+      ? `${captureDate.toLocaleDateString('fr-FR')} à ${captureDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+      : 'Date non renseignée';
+
+    const now = Date.now();
+    const elapsedMs = isValidDate ? Math.max(0, now - captureDate.getTime()) : 0;
+    const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+    const elapsedHours = Math.floor(elapsedMs / (1000 * 60 * 60));
+
+    let relativeAge = '';
+    let badgeText = '';
+    let badgeBg = '';
+    let badgeTextCol = '';
+    let badgeBorder = '';
+    let isStale = false;
+
+    if (elapsedDays === 0) {
+      relativeAge = elapsedHours <= 1 ? 'Moins d’1 heure' : `Il y a ${elapsedHours} heures (< 24h)`;
+      badgeText = 'CACHE RÉCENT (< 24H)';
+      badgeBg = 'bg-[#f0fdf4]';
+      badgeTextCol = 'text-[#166534]';
+      badgeBorder = 'border-[#bbf7d0]';
+    } else if (elapsedDays <= 7) {
+      relativeAge = `Il y a ${elapsedDays} jour${elapsedDays > 1 ? 's' : ''}`;
+      badgeText = `CACHE (${elapsedDays}J)`;
+      badgeBg = 'bg-[#eff6ff]';
+      badgeTextCol = 'text-[#1e40af]';
+      badgeBorder = 'border-[#bfdbfe]';
+    } else if (elapsedDays <= 30) {
+      relativeAge = `Il y a ${elapsedDays} jours (consultable hors-ligne)`;
+      badgeText = `CACHE (${elapsedDays}J)`;
+      badgeBg = 'bg-[#fefce8]';
+      badgeTextCol = 'text-[#854d0e]';
+      badgeBorder = 'border-[#fef08a]';
+    } else {
+      isStale = true;
+      relativeAge = `Il y a ${elapsedDays} jours — actualisation conseillée`;
+      badgeText = 'CACHE ANCIEN (> 30J)';
+      badgeBg = 'bg-[#fff7ed]';
+      badgeTextCol = 'text-[#c2410c]';
+      badgeBorder = 'border-[#fed7aa]';
+    }
+
+    return {
+      origin: 'cache',
+      timestamp: report.retrievedAt,
+      formattedDisplay: `Cache • ${formattedDate} (${relativeAge})`,
+      badgeText,
+      badgeBg,
+      badgeTextCol,
+      badgeBorder,
+      relativeAge,
+      provenanceLabel: 'Stockage local sécurisé (Cache du terminal)',
+      provenanceDesc: `Dernière sauvegarde locale enregistrée lors d’une connexion réussie. Utilisable sans réseau mais ne reflète pas les éventuelles révisions intervenues depuis ${relativeAge}.`,
+      isStale
+    };
+  }
+
+  // 3. Données locales préchargées (jeu didactique de référence)
+  if (report?.dataSourceType === 'pedagogical_sample' || (isLyon && !report)) {
+    return {
+      origin: 'preload',
+      timestamp: PRELOADED_DATASET_DATE,
+      formattedDisplay: 'Pré-embarqué • 23 oct. 2026',
+      badgeText: 'JEU DIDACTIQUE PRÉCHARGÉ',
+      badgeBg: 'bg-[#f5f3ff]',
+      badgeTextCol: 'text-[#5b21b6]',
+      badgeBorder: 'border-[#ddd6fe]',
+      relativeAge: 'Référence d’entraînement (non issue de l’API en direct)',
+      provenanceLabel: 'Jeu de données pré-embarqué (Référence 23 oct. 2026)',
+      provenanceDesc: 'Jeu de démonstration constitué le 23 octobre 2026 pour permettre l’apprentissage sans dépendre d’une connexion réseau immédiate. Les arrêtés réels doivent être synchronisés.',
+      isStale: false
+    };
+  }
+
+  // 4. Aucune donnée disponible (zéro date artificielle)
+  return {
+    origin: 'none',
+    timestamp: null,
+    formattedDisplay: 'Non synchronisé',
+    badgeText: 'NON SYNCHRONISÉ',
+    badgeBg: 'bg-[#f1f3f9]',
+    badgeTextCol: 'text-[#44474d]',
+    badgeBorder: 'border-[#c4c6ce]',
+    relativeAge: 'Aucune donnée en cache',
+    provenanceLabel: 'Aucune donnée officielle enregistrée',
+    provenanceDesc: 'Ce territoire n’a pas encore été synchronisé avec l’API Géorisques. Aucune date artificielle ni donnée fictive n’est insérée par défaut.',
+    isStale: false
+  };
+}
 
 interface GeorisquesViewProps {
   onBack: () => void;
@@ -41,7 +184,16 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   const [refreshing, setRefreshing] = useState(false);
   const [liveReport, setLiveReport] = useState<GeorisquesReport | null>(null);
   const [refreshMessage, setRefreshMessage] = useState<{ type: 'success' | 'warning' | 'info'; text: string } | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('14 oct. 2026 à 08:00');
+
+  // Modal Sources State
+  const [showSourcesModal, setShowSourcesModal] = useState<boolean>(false);
+
+  // Calcul dynamique et rigoureux de la fraîcheur des données territoriales (Anti-mascarade)
+  const freshness = useMemo(
+    () => computeDataFreshness(liveReport, activeCommune.insee),
+    [liveReport, activeCommune.insee]
+  );
+  const lastUpdated = freshness.formattedDisplay;
 
   // Real Snapshot Export State
   const [exportedFile, setExportedFile] = useState<string | null>(null);
@@ -100,17 +252,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         const parsed: GeorisquesReport = JSON.parse(saved);
         setLiveReport(parsed);
         foundCache = true;
-        if (parsed.retrievedAt) {
-          const d = new Date(parsed.retrievedAt);
-          setLastUpdated(`${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
-        }
       }
     } catch (e) {}
 
     // Si aucun cache pour cette commune, ne JAMAIS conserver les données de la commune précédente !
     if (!foundCache) {
       setLiveReport(null);
-      setLastUpdated('');
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         setRefreshing(true);
         fetchGeorisquesOnline(activeCommune.insee, activeCommune.name)
@@ -118,8 +265,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             if (isMounted) {
               setLiveReport(report);
               setRefreshing(false);
-              const d = new Date(report.retrievedAt);
-              setLastUpdated(`${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
             }
           })
           .catch(() => {
@@ -184,7 +329,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
     // Réinitialisation immédiate des états pour isoler la nouvelle commune
     setLiveReport(null);
-    setLastUpdated('');
     setRefreshMessage(null);
 
     setActiveCommune({
@@ -299,10 +443,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       setRefreshing(false);
       setLiveReport(report);
 
-      const d = new Date(report.retrievedAt);
-      const formatted = `${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-      setLastUpdated(formatted);
-
       if (report.isOfflineCache) {
         setRefreshMessage({
           type: 'info',
@@ -387,6 +527,15 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       sourceDonnees: exportSource,
       statutAuthenticite: exportStatus,
       estDonneesAuthentifiees: isAuthenticLive || isAuthenticLiveZero || isAuthenticCache,
+      fraicheurDonnees: {
+        origine: freshness.origin,
+        timestampCaptureReelle: freshness.timestamp,
+        dateFormatee: freshness.formattedDisplay,
+        ageRelatif: freshness.relativeAge,
+        estAncien: freshness.isStale,
+        provenanceLabel: freshness.provenanceLabel,
+        provenanceDetail: freshness.provenanceDesc
+      },
       fiabiliteSynthese: {
         statut: exportStatus,
         estOfficielDirect: isAuthenticLive || isAuthenticLiveZero,
@@ -531,9 +680,19 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             {isOnline ? 'Connectivité Réseau Détectée' : 'Mode 100% Hors-Ligne Actif'}
           </span>
         </div>
-        <div className="flex items-center gap-1 shrink-0 font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-          <span className="material-symbols-outlined text-[14px]">history</span>
-          <span>{lastUpdated}</span>
+        <div className="flex items-center gap-1.5 shrink-0 font-['Space_Grotesk'] text-[11px]">
+          <span className={`w-2 h-2 rounded-full shrink-0 ${
+            freshness.origin === 'live'
+              ? 'bg-[#16a34a] animate-pulse'
+              : freshness.origin === 'cache'
+              ? (freshness.isStale ? 'bg-[#ea580c]' : 'bg-[#2563eb]')
+              : freshness.origin === 'preload'
+              ? 'bg-[#7c3aed]'
+              : 'bg-[#71717a]'
+          }`}></span>
+          <span className="text-[#001126] font-semibold truncate max-w-[170px] sm:max-w-none">
+            {freshness.formattedDisplay}
+          </span>
         </div>
       </div>
 
@@ -754,7 +913,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                         type="button"
                         onClick={() => {
                           setLiveReport(null);
-                          setLastUpdated('');
                           setRefreshMessage(null);
                           setSelectedMapNode(null);
                           const preset = AVAILABLE_COMMUNES.find((ac) => ac.insee === hist.insee);
@@ -789,7 +947,6 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     type="button"
                     onClick={() => {
                       setLiveReport(null);
-                      setLastUpdated('');
                       setRefreshMessage(null);
                       setSelectedMapNode(null);
                       setActiveCommune(com);
@@ -951,33 +1108,98 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 Dossier Territorial Communal
               </span>
               <span className="text-[17px] font-bold text-[#001126]">
-                {liveReport?.isOfflineCache ? 'Base Locale Hors-Ligne Scellée' : 'Données Géorisques Synchronisées'}
+                {freshness.origin === 'cache'
+                  ? 'Base Locale Hors-Ligne Scellée'
+                  : freshness.origin === 'live'
+                  ? 'Données Géorisques Synchronisées'
+                  : freshness.origin === 'preload'
+                  ? 'Base Didactique Pré-Embarquée'
+                  : 'Dossier Non Synchronisé'}
               </span>
             </div>
-            <span className={`font-['Space_Grotesk'] text-[11px] px-2.5 py-1 rounded font-bold flex items-center gap-1 shrink-0 ${
-              liveReport?.isOfflineCache ? 'bg-[#98f6c5] text-[#005236]' : 'bg-[#dce9fd] text-[#0036ce]'
-            }`}>
-              <span className="material-symbols-outlined text-[14px]">offline_pin</span>
-              {liveReport?.isOfflineCache ? 'CACHE LOCAL' : 'EN DIRECT'}
+            {/* Freshness Badge with dynamic colors */}
+            <span className={`font-['Space_Grotesk'] text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5 shrink-0 border ${freshness.badgeBg} ${freshness.badgeTextCol} ${freshness.badgeBorder}`}>
+              <span className={`w-2 h-2 rounded-full shrink-0 ${
+                freshness.origin === 'live' ? 'bg-[#16a34a] animate-pulse' :
+                freshness.origin === 'cache' ? (freshness.isStale ? 'bg-[#ea580c]' : 'bg-[#2563eb]') :
+                freshness.origin === 'preload' ? 'bg-[#7c3aed]' : 'bg-[#71717a]'
+              }`}></span>
+              <span>{freshness.badgeText}</span>
             </span>
           </div>
 
+          {/* Indicateur de Fraîcheur & Traçabilité */}
           <div className="grid grid-cols-1 gap-2 pt-0.5">
-            <div className="flex items-center justify-between text-[13px] bg-[#eef4ff] px-3 py-2 rounded-lg border border-[#d6e4f8]">
-              <span className="text-[#44474d]">Dernière actualisation :</span>
+            {/* Fraîcheur des données calculée dynamiquement */}
+            <div className="flex items-center justify-between text-[13px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
+              <span className="text-[#44474d] flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-[#0036ce]">schedule</span>
+                <span>Fraîcheur des données :</span>
+              </span>
               <span className="font-['Space_Grotesk'] font-bold text-[#001126]">
-                {lastUpdated}
+                {freshness.relativeAge}
               </span>
             </div>
-            <div className="flex flex-col gap-0.5 text-[13px] bg-[#eef4ff] px-3 py-2 rounded-lg border border-[#d6e4f8]">
-              <span className="text-[#44474d] font-['Space_Grotesk'] text-[10px] uppercase font-bold">
-                Source officielle des données :
+
+            {/* Date réelle de capture / requête / constitution */}
+            <div className="flex items-center justify-between text-[13px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
+              <span className="text-[#44474d] flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-[#0036ce]">calendar_today</span>
+                <span>Date de capture réelle :</span>
               </span>
+              <span className="font-['Space_Grotesk'] font-bold text-[#001126] text-right">
+                {freshness.origin === 'live' && freshness.timestamp ? (
+                  `${new Date(freshness.timestamp).toLocaleDateString('fr-FR')} à ${new Date(freshness.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+                ) : freshness.origin === 'cache' && freshness.timestamp ? (
+                  `${new Date(freshness.timestamp).toLocaleDateString('fr-FR')} à ${new Date(freshness.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+                ) : freshness.origin === 'preload' ? (
+                  '23 oct. 2026 à 18:00 (constitution)'
+                ) : (
+                  <span className="italic text-[#71717a]">Aucune date artificielle</span>
+                )}
+              </span>
+            </div>
+
+            {/* Provenance & Source */}
+            <div className="flex flex-col gap-0.5 text-[12px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
+              <div className="flex items-center justify-between">
+                <span className="text-[#44474d] font-['Space_Grotesk'] text-[10px] uppercase font-bold">
+                  Origine & Méthode de Synchronisation :
+                </span>
+                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#0036ce] uppercase">
+                  {freshness.origin === 'live' ? 'FLUX OFFICIEL DIRECT' :
+                   freshness.origin === 'cache' ? 'STOCKAGE TERMINAL' :
+                   freshness.origin === 'preload' ? 'DIDACTIQUE HORS-LIGNE' : 'NON SYNCHRONISÉ'}
+                </span>
+              </div>
               <span className="text-[#001126] font-medium leading-snug">
-                {liveReport?.source || 'API Géorisques (data.gouv.fr / BRGM) & Préfecture du Rhône'}
+                {freshness.provenanceLabel}
               </span>
+              <p className="text-[11px] text-[#555962] leading-snug mt-0.5">
+                {freshness.provenanceDesc}
+              </p>
             </div>
           </div>
+
+          {/* Avertissement explicite si cache ancien (> 30 jours) */}
+          {freshness.isStale && (
+            <div className="p-2.5 rounded-lg bg-[#fff7ed] border border-[#fed7aa] text-[#c2410c] text-[11px] flex items-start gap-2">
+              <span className="material-symbols-outlined text-[16px] shrink-0 mt-0.5">update</span>
+              <div className="leading-snug">
+                <strong>Données conservées depuis plus de 30 jours :</strong> Les arrêtés PPRT et zonages Seveso restent valables pour votre préparation (évolutions administratives pluriannuelles), mais une actualisation en ligne est conseillée pour vérifier les révisions administratives récentes.
+              </div>
+            </div>
+          )}
+
+          {/* Bouton pour consulter les sources de données */}
+          <button
+            type="button"
+            onClick={() => setShowSourcesModal(true)}
+            className="w-full py-2.5 px-3 rounded-lg bg-white hover:bg-[#f1f3f9] text-[#0036ce] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-[#c4c6ce] transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px]">policy</span>
+            <span>Consulter les sources des données territoriales</span>
+          </button>
 
           {refreshMessage && (
             <div className={`p-2.5 rounded-lg text-[12px] flex items-start gap-2 border ${
@@ -999,7 +1221,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={handleRefreshData}
               disabled={refreshing}
               type="button"
-              className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce] disabled:opacity-60"
+              className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce] disabled:opacity-60 cursor-pointer"
             >
               <span
                 className={`material-symbols-outlined text-[18px] ${
@@ -1949,6 +2171,144 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 type="button"
                 onClick={() => setActiveModalDoc(null)}
                 className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase cursor-pointer"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Consultation des Sources Officielles et Fraîcheur */}
+      {showSourcesModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-xs"
+        >
+          <div className="bg-white max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3.5 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-[#e0e2eb]">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0036ce] text-[22px]">policy</span>
+                <h3 className="text-[17px] font-bold text-[#001126]">
+                  Sources des Données Territoriales
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSourcesModal(false)}
+                aria-label="Fermer"
+                className="w-8 h-8 rounded-full bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] flex items-center justify-center cursor-pointer font-bold text-[14px]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Note sur la fraîcheur et l'anti-mascarade */}
+            <div className="p-3 bg-[#eef4ff] rounded-xl border border-[#d6e4f8] text-[#001126] text-[12px] flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-[#0036ce] font-['Space_Grotesk'] text-[11px] uppercase">
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                Transparence & Règle Anti-Mascarade
+              </div>
+              <p className="text-[11px] text-[#44474d] leading-relaxed">
+                NRBCOR applique un principe de rigueur stricte : <strong>aucune date artificielle n'est insérée</strong>. L'âge réel des données est calculé dynamiquement à partir de la date de capture sur les serveurs de l'État. Une archive locale ancienne conserve toute son utilité pour les zonages réglementaires stables (PPRT/PPI), mais elle ne doit jamais être présentée comme un flux en direct.
+              </p>
+            </div>
+
+            {/* Liste détaillée des bases officielles */}
+            <div className="flex flex-col gap-2.5 text-[12px]">
+              <h4 className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#001126] tracking-wider">
+                Bases de données officielles de l'État :
+              </h4>
+
+              {/* 1. API Géorisques / BRGM */}
+              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#001126] text-[13px]">API Géorisques (data.gouv.fr)</span>
+                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#dce9fd] text-[#0036ce] px-2 py-0.5 rounded">
+                    BRGM / MTES
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                  Portail national d'information sur les risques naturels et technologiques majeurs. Fournit l'inventaire des dossiers communaux, installations classées Seveso et axes de transport de matières dangereuses (TMD).
+                </p>
+                <div className="pt-1 flex items-center justify-between text-[10px] font-['Space_Grotesk'] text-[#0036ce]">
+                  <span>Endpoint : /api/v1/gaspar/risques</span>
+                  <a
+                    href="https://www.georisques.gouv.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-bold flex items-center gap-0.5"
+                  >
+                    georisques.gouv.fr &rarr;
+                  </a>
+                </div>
+              </div>
+
+              {/* 2. Base GASPAR */}
+              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#001126] text-[13px]">Base Nationale GASPAR</span>
+                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#eef4ff] text-[#002c1b] px-2 py-0.5 rounded">
+                    Préfectures / DDTM
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                  <strong>Gestion Assistée des Procédures Administratives relatives aux Risques :</strong> Référentiel administratif consolidant les arrêtés préfectoraux opposables, plans de prévention des risques (PPR) et formalités DICRIM.
+                </p>
+              </div>
+
+              {/* 3. Annuaire Service Public DILA */}
+              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#001126] text-[13px]">Annuaire de l'Administration (DILA)</span>
+                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded">
+                    Premier Ministre
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                  Fournit les coordonnées certifiées du standard officiel de la Mairie et du Poste de Commandement Communal (PCC) pour l'activation des secours locaux.
+                </p>
+              </div>
+
+              {/* 4. geo.api.gouv.fr */}
+              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#001126] text-[13px]">Découpage Administratif (Etalab)</span>
+                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#f1f3f9] text-[#44474d] px-2 py-0.5 rounded">
+                    DINUM
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                  Résolution des centroïdes communaux réels [longitude, latitude], codes postaux et numéros INSEE sans transit serveur externe.
+                </p>
+              </div>
+            </div>
+
+            {/* Distinction Réponse Vide vs Risque Zéro */}
+            <div className="p-3 bg-[#fff0ed] rounded-xl border border-[#ffdad6] text-[#93000a] text-[11px] flex flex-col gap-1">
+              <span className="font-bold uppercase tracking-wider flex items-center gap-1 font-['Space_Grotesk']">
+                <span className="material-symbols-outlined text-[16px]">warning</span>
+                Limites & Portée Réglementaire
+              </span>
+              <p className="leading-relaxed">
+                Une réponse sans résultat dans l'API Géorisques indique uniquement qu'aucun arrêté n'est enregistré dans la base interrogée. Cela ne garantit pas l'absence de tout risque (météorologique, inondation, axes non classés). <strong>Seules les consignes de sécurité civile et les messages FR-Alert du Préfet font foi en direct.</strong>
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-[#e0e2eb]">
+              <a
+                href={`https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#0036ce] text-[12px] font-bold underline flex items-center gap-1"
+              >
+                Fiche officielle de {activeCommune.name}
+                <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowSourcesModal(false)}
+                className="h-10 px-4 rounded-lg bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase cursor-pointer"
               >
                 Fermer
               </button>

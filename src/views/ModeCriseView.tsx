@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EmergencyCall, SubScreen } from '../types';
 import { triggerHaptic } from '../utils/haptics';
+import { EmergencyCoherenceMatrixModal } from '../components/EmergencyCoherenceMatrixModal';
 
 interface ModeCriseViewProps {
   onBack: () => void;
@@ -91,6 +92,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [deconTimer, setDeconTimer] = useState<number | null>(null);
+  const [showCoherenceModal, setShowCoherenceModal] = useState(false);
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const countryData = EMERGENCY_COUNTRIES.find((c) => c.code === selectedCountry) || EMERGENCY_COUNTRIES[0];
@@ -276,12 +278,25 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
       </div>
 
       {/* RAPPEL DE PRIMAUTÉ ABSOLUE DES AUTORITÉS (SÉCURITÉ CIVILE) */}
-      <div className="max-w-2xl mx-auto w-full px-3 mt-2">
-        <div className="p-2.5 bg-red-950/80 border-2 border-red-600 rounded-xl flex items-center gap-2 text-[11px] text-white">
-          <span className="material-symbols-outlined text-[20px] text-red-400 shrink-0">emergency</span>
-          <span className="leading-snug">
-            <strong>PRIMAUTÉ DES POUVOIRS PUBLICS :</strong> Les ordres de la Préfecture, des forces de l'ordre et des pompiers priment en toutes circonstances sur cette application.
-          </span>
+      <div className="max-w-2xl mx-auto w-full px-3 mt-2 flex flex-col gap-2">
+        <div className="p-2.5 bg-red-950/80 border-2 border-red-600 rounded-xl flex items-center justify-between gap-2 text-[11px] text-white">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[20px] text-red-400 shrink-0">emergency</span>
+            <span className="leading-snug">
+              <strong>PRIMAUTÉ DES POUVOIRS PUBLICS :</strong> Les ordres de la Préfecture, des forces de l'ordre et des pompiers priment en toutes circonstances sur cette application.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setShowCoherenceModal(true);
+            }}
+            className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-wider shrink-0 transition-colors flex items-center gap-1 shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[14px]">fact_check</span>
+            <span>Matrice 6 Scénarios P1</span>
+          </button>
         </div>
       </div>
 
@@ -854,6 +869,11 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           <span className="material-symbols-outlined text-[18px] text-blue-300">open_in_new</span>
         </button>
       </div>
+
+      {/* Modal Matrice de Cohérence des 6 Scénarios d'Urgence P1 */}
+      {showCoherenceModal && (
+        <EmergencyCoherenceMatrixModal onClose={() => setShowCoherenceModal(false)} />
+      )}
     </div>
   );
 };

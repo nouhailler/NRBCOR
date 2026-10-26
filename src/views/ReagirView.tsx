@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SubScreen, EmergencyCall } from '../types';
 import { Tooltip } from '../components/Tooltip';
 import { triggerHaptic } from '../utils/haptics';
+import { EmergencyCoherenceMatrixModal } from '../components/EmergencyCoherenceMatrixModal';
 
 interface ReagirViewProps {
   onOpenSubScreen: (screen: SubScreen) => void;
@@ -29,6 +30,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isStressMode, setIsStressMode] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [showCoherenceModal, setShowCoherenceModal] = useState<boolean>(false);
   const [isOnline, setIsOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
@@ -205,7 +207,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 flex-wrap">
           <button
             type="button"
             onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
@@ -213,6 +215,18 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           >
             <span>Ouvrir l'écran réflexe</span>
             <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setShowCoherenceModal(true);
+            }}
+            title="Matrice de Cohérence Opérationnelle (6 Scénarios Critiques)"
+            className="min-h-[44px] px-3 bg-red-800 hover:bg-red-700 text-white rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">fact_check</span>
+            <span>6 Scénarios P1</span>
           </button>
           <button
             type="button"
@@ -860,6 +874,11 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           </span>
         </button>
       </section>
+
+      {/* Modal Matrice de Cohérence des 6 Scénarios d'Urgence P1 */}
+      {showCoherenceModal && (
+        <EmergencyCoherenceMatrixModal onClose={() => setShowCoherenceModal(false)} />
+      )}
     </div>
   );
 };

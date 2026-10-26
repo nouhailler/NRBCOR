@@ -9,6 +9,7 @@ import {
 } from '../data/quizData';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
 import { CrisisDrillModal } from '../components/CrisisDrillModal';
+import { TrainerSessionModal } from '../components/TrainerSessionModal';
 
 interface FormationViewProps {
   onBack: () => void;
@@ -26,6 +27,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D'>('B');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('tous');
   const [trainerMode, setTrainerMode] = useState(false);
+  const [showTrainerModal, setShowTrainerModal] = useState(false);
 
   // Compétences travaillées en local (sans serveur)
   const [competencies, setCompetencies] = useState<string[]>(() => {
@@ -203,6 +205,39 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-[#0036ce]"></div>
             </label>
           </div>
+
+          {/* Console Formateur quand actif */}
+          {trainerMode && (
+            <div className="p-3.5 bg-gradient-to-r from-blue-900 to-[#001126] text-white rounded-xl shadow-md border border-blue-400/40 flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in duration-150">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[20px] text-blue-300">co_present</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white uppercase tracking-wider">
+                      Console d'Exercice Collectif Formateur
+                    </span>
+                    <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-bold uppercase">
+                      Local / Hors-Serveur
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-gray-300">
+                    4 scénarios de simulation • Objectifs pédagogiques • Bilan imprimable pour débriefing
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowTrainerModal(true)}
+                className="w-full sm:w-auto h-9 px-4 bg-white hover:bg-gray-100 text-[#001126] rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shrink-0 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[16px]">play_circle</span>
+                <span>Animer un Exercice</span>
+              </button>
+            </div>
+          )}
         </header>
 
         {/* Compétences Civiles Travaillées en Local */}
@@ -848,6 +883,14 @@ export const FormationView: React.FC<FormationViewProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* Modal Console d'Animation & Exercice Collectif Formateur */}
+      {showTrainerModal && (
+        <TrainerSessionModal
+          onClose={() => setShowTrainerModal(false)}
+          onCompetencyMastered={recordCompetency}
+        />
       )}
     </div>
   );

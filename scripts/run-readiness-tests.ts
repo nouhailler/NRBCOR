@@ -11,8 +11,12 @@
 import {
   calculateWaterAutonomy,
   calculateFoodAutonomy,
-  calculateReadinessScore
+  calculateReadinessScore,
+  getScoreDelta,
+  recordScoreHistory
 } from '../src/utils/readinessScore';
+import { EMERGENCY_SCENARIOS } from '../src/components/EmergencyCoherenceMatrixModal';
+import { TRAINER_SCENARIOS } from '../src/components/TrainerSessionModal';
 import { SECURITY_CORPUS_ITEMS } from '../src/data/securityCorpus';
 import { SpecificNeedsConfig, KitItem } from '../src/types';
 import { InventoryItem, FamilyPlanData } from '../src/services/storage/StorageRepository';
@@ -25,6 +29,7 @@ import {
   calculateHaversineDistanceKm,
   diagnoseUserPerimeters
 } from '../src/data/perimetresData';
+import { computeDataFreshness, PRELOADED_DATASET_DATE } from '../src/views/GeorisquesView';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -541,6 +546,152 @@ if (sevesoFeyzin) {
     '11.J - Inutilité stricte de l\'iode stable pour les sites Seveso confirmée dans la base'
   );
 }
+
+// ========================================================
+// TEST 12 : Gestion de la Fraîcheur des Données Géorisques
+// ========================================================
+console.log('\n12. TEST GESTION DE LA FRAÎCHEUR DES DONNÉES GÉORISQUES (ANTI-MASCARADE) :');
+
+// 12.A - Données en direct
+const freshLive = computeDataFreshness({
+  communeName: 'Paris',
+  inseeCode: '75056',
+  retrievedAt: new Date().toISOString(),
+  source: 'API Géorisques',
+  isOfflineCache: false,
+  dataSourceType: 'live_api',
+  risksCount: 1,
+  risks: []
+}, '75056');
+assert(freshLive.origin === 'live', '12.A - Flux direct classé avec origin = live');
+assert(freshLive.badgeText.includes('DIRECT'), '12.A - Badge direct explicite');
+assert(freshLive.relativeAge.includes('Très récent'), '12.A - Âge relatif très récent');
+
+// 12.B - Données en cache récent (<24h)
+const fiveHoursAgo = new Date(Date.now() - 3600 * 1000 * 5).toISOString();
+const freshCacheRecent = computeDataFreshness({
+  communeName: 'Rouen',
+  inseeCode: '76540',
+  retrievedAt: fiveHoursAgo,
+  source: 'API Géorisques',
+  isOfflineCache: true,
+  dataSourceType: 'cached_official',
+  risksCount: 2,
+  risks: []
+}, '76540');
+assert(freshCacheRecent.origin === 'cache', '12.B - Cache local classé avec origin = cache');
+assert(freshCacheRecent.badgeText.includes('< 24H'), '12.B - Badge cache récent (<24h)');
+assert(!freshCacheRecent.isStale, '12.B - Cache récent non marqué obsolète');
+
+// 12.C - Données en cache ancien (>30 jours)
+const sixtyDaysAgo = new Date(Date.now() - 3600 * 1000 * 24 * 60).toISOString();
+const freshCacheStale = computeDataFreshness({
+  communeName: 'Feyzin',
+  inseeCode: '69085',
+  retrievedAt: sixtyDaysAgo,
+  source: 'API Géorisques',
+  isOfflineCache: true,
+  dataSourceType: 'cached_official',
+  risksCount: 1,
+  risks: []
+}, '69085');
+assert(freshCacheStale.origin === 'cache', '12.C - Cache ancien classé origin = cache');
+assert(freshCacheStale.isStale === true, '12.C - Flag isStale activé pour cache > 30 jours');
+assert(freshCacheStale.badgeText.includes('> 30J'), '12.C - Badge explicite cache ancien');
+
+// 12.D - Données didactiques préchargées
+const freshPreload = computeDataFreshness(null, '69383'); // Lyon sans rapport
+assert(freshPreload.origin === 'preload', '12.D - Lyon sans cache classé origin = preload');
+assert(freshPreload.timestamp === PRELOADED_DATASET_DATE, '12.D - Date de constitution du jeu de données conforme (23 oct. 2026)');
+assert(freshPreload.formattedDisplay.includes('23 oct. 2026'), '12.D - Date du 23 oct. 2026 affichée pour le préchargé');
+
+// 12.E - Territoire non synchronisé : ZÉRO date artificielle
+const freshEmpty = computeDataFreshness(null, '13055'); // Marseille sans rapport
+assert(freshEmpty.origin === 'none', '12.E - Commune inconnue classée origin = none');
+assert(freshEmpty.timestamp === null, '12.E - Aucun timestamp artificiel généré (null)');
+assert(freshEmpty.formattedDisplay === 'Non synchronisé', '12.E - Mention explicite Non synchronisé');
+
+// ========================================================
+// TEST SUITE 13 : MATRICE DE COHÉRENCE DES 6 SCÉNARIOS D'URGENCE (P1)
+// Vérification stricte anti-fausse sécurité
+// ========================================================
+console.log('\n--- 13. MATRICE DE COHÉRENCE DES 6 SCÉNARIOS D\'URGENCE (P1) ---');
+
+assert(EMERGENCY_SCENARIOS.length === 6, '13.1 - La matrice couvre exactement les 6 scénarios critiques requis');
+
+// 13.A - Scénario 1 : Confinement officiel
+const sc1 = EMERGENCY_SCENARIOS.find((s) => s.id === 'confinement');
+assert(!!sc1, '13.A - Scénario 1 présent (Alerte officielle avec consigne de confinement)');
+assert(sc1!.immediateAction.toLowerCase().includes('calfeutrer') || sc1!.immediateAction.toLowerCase().includes('ventilation'), '13.A - Calfeutrage et coupure VMC stipulés');
+assert(sc1!.fatalTraps.some((t) => t.toLowerCase().includes('école') || t.toLowerCase().includes('enfants')), '13.A - Interdiction formelle PPMS d\'aller chercher les enfants à l\'école');
+assert(sc1!.antiFalseSecurityChecks.some((c) => c.toLowerCase().includes('étanche') || c.toLowerCase().includes('sortir')), '13.A - Ne présente jamais une pièce comme étanche sans calfeutrage et interdit de sortir avant la fin d\'alerte');
+
+// 13.B - Scénario 2 : Évacuation
+const sc2 = EMERGENCY_SCENARIOS.find((s) => s.id === 'evacuation');
+assert(!!sc2, '13.B - Scénario 2 présent (Demande d\'évacuation par les autorités)');
+assert(sc2!.officialInstruction.toLowerCase().includes('préfet') || sc2!.officialInstruction.toLowerCase().includes('ordre'), '13.B - Évacuation UNIQUEMENT sur ordre formel');
+assert(sc2!.fatalTraps.some((t) => t.toLowerCase().includes('spontanée')), '13.B - Fuite spontanée non ordonnée dénoncée comme piège mortel');
+
+// 13.C - Scénario 3 : Événement inconnu
+const sc3 = EMERGENCY_SCENARIOS.find((s) => s.id === 'inconnu');
+assert(!!sc3, '13.C - Scénario 3 présent (Événement dont la nature est inconnue)');
+assert(sc3!.antiFalseSecurityChecks.some((c) => c.toLowerCase().includes('premier') || c.toLowerCase().includes('universel')), '13.C - Réflexe universel sans questionnaire préalable ni retard diagnostique');
+assert(sc3!.fatalTraps.some((t) => t.toLowerCase().includes('iode')), '13.C - Automédication à l\'iode proscrite');
+
+// 13.D - Scénario 4 : Coupure de réseau
+const sc4 = EMERGENCY_SCENARIOS.find((s) => s.id === 'hors-ligne');
+assert(!!sc4, '13.D - Scénario 4 présent (Coupure de réseau pendant la consultation)');
+assert(sc4!.immediateAction.toLowerCase().includes('radio') || sc4!.immediateAction.toLowerCase().includes('fm'), '13.D - Bascule sur information hertzienne analogique FM');
+assert(sc4!.fatalTraps.some((t) => t.toLowerCase().includes('absence de signal') || t.toLowerCase().includes('terminée')), '13.D - Absence de réseau ≠ Fin de danger');
+
+// 13.E - Scénario 5 : Fiche absente ou non validée
+const sc5 = EMERGENCY_SCENARIOS.find((s) => s.id === 'donnee_manquante');
+assert(!!sc5, '13.E - Scénario 5 présent (Fiche absente, ancienne ou non validée)');
+assert(sc5!.antiFalseSecurityChecks.some((c) => c.toLowerCase().includes('jamais') && c.toLowerCase().includes('risque nul')), '13.E - Ne conclut JAMAIS au risque zéro à partir de données manquantes');
+
+// 13.F - Scénario 6 : Primauté absolue des ordres officiels
+const sc6 = EMERGENCY_SCENARIOS.find((s) => s.id === 'arbitrage_officiel');
+assert(!!sc6, '13.F - Scénario 6 présent (Contradiction entre fiche et consigne officielle récente)');
+assert(sc6!.officialInstruction.toLowerCase().includes('préfet') || sc6!.officialInstruction.toLowerCase().includes('prévalent'), '13.F - Ordres du Préfet / FR-Alert prévalent en toutes circonstances');
+
+// ========================================================
+// TEST SUITE 14 : TABLEAU DE BORD EXPLICABLE & MODE FORMATEUR
+// ========================================================
+console.log('\n--- 14. TABLEAU DE BORD EXPLICABLE & MODE FORMATEUR ---');
+
+// 14.A - Top 3 Actions prioritaires
+const mockConfig: SpecificNeedsConfig = {
+  adultsCount: 2,
+  childrenCount: 2,
+  infantsCount: 1,
+  elderlyCount: 0,
+  hasPmr: false,
+  hasChronicCondition: false,
+  petsCount: 1,
+  isNearSevesoOrNpp: false,
+  targetDurationDays: 3
+};
+
+const fullDashboard = calculateReadinessScore(mockConfig, [], [], dummyFamilyPlan);
+assert(Array.isArray(fullDashboard.topThreeActions), '14.A - topThreeActions est un tableau');
+assert(fullDashboard.topThreeActions.length <= 3 && fullDashboard.topThreeActions.length > 0, '14.A - topThreeActions retourne jusqu\'à 3 actions prioritaires');
+assert(fullDashboard.topThreeActions[0].pointsGain >= fullDashboard.topThreeActions[fullDashboard.topThreeActions.length - 1].pointsGain, '14.A - Actions ordonnées par gain de points décroissant');
+
+// 14.B - Besoins foyer détaillés
+assert(Array.isArray(fullDashboard.householdNeedsBreakdown), '14.B - householdNeedsBreakdown est calculé');
+const waterNeed = fullDashboard.householdNeedsBreakdown.find((r) => r.category.toLowerCase().includes('eau'));
+assert(waterNeed!.targetNeed.includes('31.5') || waterNeed!.targetNeed.includes('45'), '14.B - Besoins en eau calculés avec précision selon effectif, animal et durée (31.5L boisson + 15L hygiène)');
+
+// 14.C - Données manquantes et estimations explicites
+assert(Array.isArray(fullDashboard.missingDataAndEstimates), '14.C - missingDataAndEstimates est généré');
+assert(fullDashboard.missingDataAndEstimates.some((m) => m.category === 'eau'), '14.C - Manque d\'inventaire d\'eau explicité');
+assert(fullDashboard.missingDataAndEstimates.every((m) => !!m.explanation && !!m.remedyAction), '14.C - Chaque donnée manquante comporte explication et action de remédiation');
+
+// 14.D - Scénarios du Mode Formateur
+assert(TRAINER_SCENARIOS.length >= 4, '14.D - Au moins 4 scénarios de formation collective disponibles');
+const chemTrainer = TRAINER_SCENARIOS.find((t) => t.hazardType === 'chimique');
+assert(!!chemTrainer && chemTrainer.pedagogicalObjectives.length >= 2, '14.D - Objectifs pédagogiques du formateur définis');
+assert(!!chemTrainer && chemTrainer.fatalTraps.length >= 2, '14.D - Pièges à déconstruire en séance définis');
 
 console.log(`\n========================================================`);
 console.log(`🎉 SUITE DE TESTS COMPLÈTE : ${passedTests} / ${totalTests} VÉRIFICATIONS RÉUSSIES (100% SUCCÈS)`);

@@ -63,13 +63,87 @@ export interface HouseholdSummaryInfo {
   hasChronicCondition: boolean;
 }
 
+export interface MissingDataOrEstimate {
+  id: string;
+  category: 'eau' | 'nourriture' | 'plan' | 'sante' | 'logistique';
+  label: string;
+  impact: 'critique' | 'important' | 'informatif';
+  explanation: string;
+  remedyAction: string;
+}
+
+export interface HouseholdNeedRow {
+  category: string;
+  description: string;
+  dailyNeed: string;
+  targetNeed: string;
+  unit: string;
+  status: 'optimal' | 'warning' | 'critical' | 'insufficient';
+}
+
+export interface ScoreHistoryEntry {
+  date: string;
+  timestamp: number;
+  score: number;
+  levelTitle: string;
+  waterHours: number;
+  foodHours: number;
+}
+
+export function recordScoreHistory(entry: ScoreHistoryEntry): void {
+  try {
+    const raw = localStorage.getItem('nrbcor_score_history');
+    const list: ScoreHistoryEntry[] = raw ? JSON.parse(raw) : [];
+    const last = list[list.length - 1];
+    // Éviter d'enregistrer des doublons instantanés à moins de 5 minutes d'intervalle
+    if (last && Date.now() - last.timestamp < 5 * 60 * 1000) {
+      list[list.length - 1] = entry;
+    } else {
+      list.push(entry);
+    }
+    localStorage.setItem('nrbcor_score_history', JSON.stringify(list.slice(-10)));
+  } catch (e) {}
+}
+
+export function getScoreHistory(): ScoreHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem('nrbcor_score_history');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function getScoreDelta(currentScore: number): {
+  previousScore: number;
+  previousDate: string;
+  delta: number;
+} | null {
+  const history = getScoreHistory();
+  if (history.length < 2) return null;
+  const prev = history[history.length - 2];
+  return {
+    previousScore: prev.score,
+    previousDate: prev.date,
+    delta: currentScore - prev.score
+  };
+}
+
 export interface ReadinessDashboardData {
   scoreResult: ReadinessScoreResult;
   autonomy: HouseholdAutonomySummary;
   missingItems: MissingKitItemEntry[];
   expiries: ExpiryAuditEntry;
   recommendedActions: RecommendedAction[];
+  topThreeActions: RecommendedAction[];
+  missingDataAndEstimates: MissingDataOrEstimate[];
+  householdNeedsBreakdown: HouseholdNeedRow[];
   householdSummary: HouseholdSummaryInfo;
+  scoreDelta: {
+    previousScore: number;
+    previousDate: string;
+    delta: number;
+  } | null;
 }
 
 /**
@@ -873,6 +947,168 @@ export function calculateReadinessScore(
     });
   }
 
+  // 6. Identification rigoureuse des informations manquantes et des données estimées
+  const missingDataAndEstimates: MissingDataOrEstimate[] = [];
+
+  if (waterAutonomy.isEstimatedFromCheckboxOnly) {
+    missingDataAndEstimates.push({
+      id: 'miss-water-unmeasured',
+      category: 'eau',
+      label: 'Volume d’eau non quantifié en litres',
+      impact: 'critique',
+      explanation: 'La case « Pack d’eau » est cochée dans la checklist du kit, mais aucun volume en litres n’est enregistré dans votre inventaire. Une case cochée ne vaut pas une quantité mesurée.',
+      remedyAction: 'Ajoutez vos packs de bouteilles d’eau dans l’onglet Inventaire pour certifier vos heures réelles d’autonomie.'
+    });
+  } else if (waterAutonomy.currentValue === 0) {
+    missingDataAndEstimates.push({
+      id: 'miss-water-zero',
+      category: 'eau',
+      label: 'Aucune réserve d’eau potable déclarée',
+      impact: 'critique',
+      explanation: 'Votre autonomie en eau est de 0 heure. L’eau est le premier facteur vital de rupture en crise (déshydratation en 48-72h).',
+      remedyAction: 'Constituez un stock minimal de 3 litres par jour et par personne.'
+    });
+  }
+
+  if (foodAutonomy.isEstimatedFromCheckboxOnly) {
+    missingDataAndEstimates.push({
+      id: 'miss-food-unmeasured',
+      category: 'nourriture',
+      label: 'Rations alimentaires non quantifiées',
+      impact: 'important',
+      explanation: 'Élément coché sans inventaire d’articles réels : l’autonomie calorique ne peut pas être mesurée avec certitude.',
+      remedyAction: 'Recensez vos boîtes de conserves et repas complets sans cuisson dans l’Inventaire.'
+    });
+  } else if (foodAutonomy.currentValue === 0) {
+    missingDataAndEstimates.push({
+      id: 'miss-food-zero',
+      category: 'nourriture',
+      label: 'Aucun aliment de survie sans cuisson recensé',
+      impact: 'important',
+      explanation: 'Les coupures électriques empêchent réfrigération et cuisson micro-ondes / plaques.',
+      remedyAction: 'Prévoyez des conserves prêtes à consommer et des barres énergétiques.'
+    });
+  }
+
+  if (!hasOutZoneContact) {
+    missingDataAndEstimates.push({
+      id: 'miss-outzone',
+      category: 'plan',
+      label: 'Contact relais hors zone (> 100 km) manquant',
+      impact: 'critique',
+      explanation: 'Lors d’un sinistre majeur, les antennes mobiles locales sont saturées. Seuls les SMS brefs vers l’extérieur du département passent.',
+      remedyAction: 'Désignez un proche résidant hors zone dans l’onglet Mon Plan.'
+    });
+  }
+
+  const assemblyPts = familyPlan?.assemblyPoints || [];
+  if (assemblyPts.length === 0) {
+    missingDataAndEstimates.push({
+      id: 'miss-assembly',
+      category: 'plan',
+      label: 'Lieux de rassemblement non convenus',
+      impact: 'important',
+      explanation: 'Sans point de ralliement convenu, les membres du foyer risquent d’errer dans une zone potentiellement dangereuse.',
+      remedyAction: 'Définissez un point primaire (proche) et un point secondaire (repli) dans Mon Plan.'
+    });
+  }
+
+  if (daysSinceLastCheck === 999) {
+    missingDataAndEstimates.push({
+      id: 'miss-audit',
+      category: 'logistique',
+      label: 'Contrôle semestriel des péremptions jamais effectué',
+      impact: 'informatif',
+      explanation: 'Les réserves non vérifiées risquent d’être périmées ou altérées au moment de la crise.',
+      remedyAction: 'Effectuez une revue des stocks et datez la vérification.'
+    });
+  }
+
+  if (config.hasChronicCondition && !chronicKit) {
+    missingDataAndEstimates.push({
+      id: 'miss-chronic',
+      category: 'sante',
+      label: 'Traitements chroniques non sécurisés en réserve',
+      impact: 'critique',
+      explanation: 'Un membre du foyer a un besoin médical continu sans réserve tampon de 15-30 jours.',
+      remedyAction: 'Anticipez les renouvellements d’ordonnances avec votre médecin traitant.'
+    });
+  }
+
+  // 7. Décomposition explicite des besoins selon la composition du foyer
+  const householdNeedsBreakdown: HouseholdNeedRow[] = [
+    {
+      category: 'Eau Potable (Boisson)',
+      description: `${totalPersons} personne(s) x 2,0 L/jour + ${config.petsCount} animal(aux) x 0,5 L/jour`,
+      dailyNeed: `${totalPersons * 2.0 + config.petsCount * 0.5} L`,
+      targetNeed: `${(totalPersons * 2.0 + config.petsCount * 0.5) * config.targetDurationDays} L`,
+      unit: 'Litres scellés',
+      status: waterAutonomy.currentValue >= (totalPersons * 2.0 + config.petsCount * 0.5) * config.targetDurationDays ? 'optimal' : waterAutonomy.currentValue > 0 ? 'warning' : 'critical'
+    },
+    {
+      category: 'Eau Hygiène & Réhydratation',
+      description: `${totalPersons} personne(s) x 1,0 L/jour (toilette minimale, linges, vaisselle d’urgence)`,
+      dailyNeed: `${totalPersons * 1.0} L`,
+      targetNeed: `${totalPersons * 1.0 * config.targetDurationDays} L`,
+      unit: 'Litres',
+      status: waterAutonomy.currentValue >= waterAutonomy.targetValue ? 'optimal' : waterAutonomy.currentValue > 0 ? 'warning' : 'critical'
+    },
+    {
+      category: 'Rations Énergétiques sans cuisson',
+      description: `${Math.max(1, config.adultsCount + config.childrenCount + config.elderlyCount)} pers. x 2 repas froids/jour (~2 000 kcal/pers)`,
+      dailyNeed: `${Math.max(1, config.adultsCount + config.childrenCount + config.elderlyCount) * 2} repas`,
+      targetNeed: `${Math.max(1, config.adultsCount + config.childrenCount + config.elderlyCount) * 2 * config.targetDurationDays} repas`,
+      unit: 'Portions complètes',
+      status: foodAutonomy.currentValue >= foodAutonomy.targetValue ? 'optimal' : foodAutonomy.currentValue > 0 ? 'warning' : 'critical'
+    }
+  ];
+
+  if (config.infantsCount > 0) {
+    householdNeedsBreakdown.push({
+      category: 'Besoins Spécifiques Nourrisson',
+      description: `${config.infantsCount} bébé(s) : eau minérale adaptée, laits 1er/2e âge prêts à l’emploi, petits pots, couches`,
+      dailyNeed: `${config.infantsCount * 3} rations prêtes`,
+      targetNeed: `${config.infantsCount * 3 * config.targetDurationDays} rations prêtes`,
+      unit: 'Rations / repas infantiles',
+      status: 'warning'
+    });
+  }
+
+  if (config.petsCount > 0) {
+    householdNeedsBreakdown.push({
+      category: 'Alimentation & Eau Animaux',
+      description: `${config.petsCount} animal(aux) : croquettes sèches/pâtée + gamelle de transport`,
+      dailyNeed: `${config.petsCount * 0.5}L eau + croquettes`,
+      targetNeed: `${config.petsCount * 0.5 * config.targetDurationDays}L eau`,
+      unit: 'Portions journalières',
+      status: 'optimal'
+    });
+  }
+
+  // 8. Top 3 des actions prioritaires à plus fort impact vital
+  const topThreeActions = [...recommendedActions]
+    .sort((a, b) => {
+      const urgOrder = { high: 3, medium: 2, low: 1 };
+      if (urgOrder[b.urgency] !== urgOrder[a.urgency]) {
+        return urgOrder[b.urgency] - urgOrder[a.urgency];
+      }
+      return b.pointsGain - a.pointsGain;
+    })
+    .slice(0, 3);
+
+  // 9. Évolution de la préparation : calcul du delta par rapport à la dernière évaluation
+  const scoreDelta = getScoreDelta(totalScore);
+
+  // Mémorisation de l'évaluation actuelle dans l'historique local
+  recordScoreHistory({
+    date: new Date().toLocaleDateString('fr-FR'),
+    timestamp: Date.now(),
+    score: totalScore,
+    levelTitle: level.title,
+    waterHours: waterAutonomy.autonomyHours,
+    foodHours: foodAutonomy.autonomyHours
+  });
+
   return {
     scoreResult: {
       totalScore,
@@ -897,6 +1133,9 @@ export function calculateReadinessScore(
       needsPeriodicReview
     },
     recommendedActions,
+    topThreeActions,
+    missingDataAndEstimates,
+    householdNeedsBreakdown,
     householdSummary: {
       totalPersons,
       adults: config.adultsCount,
@@ -907,6 +1146,7 @@ export function calculateReadinessScore(
       targetDays: config.targetDurationDays,
       hasPmr: !!config.hasPmr,
       hasChronicCondition: !!config.hasChronicCondition
-    }
+    },
+    scoreDelta
   };
 }

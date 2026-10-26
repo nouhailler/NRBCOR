@@ -9,6 +9,7 @@ import {
 } from '../data/perimetresData';
 import { AVAILABLE_COMMUNES, CommuneInfo } from '../data/georisquesData';
 import { triggerHaptic } from '../utils/haptics';
+import { NuclearPowerIcon } from '../components/icons/NuclearPowerIcon';
 
 interface CartePerimetresViewProps {
   onBack: () => void;
@@ -254,8 +255,8 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               className="p-2.5 bg-white/90 rounded-lg border border-black/10 flex items-center justify-between cursor-pointer hover:border-[#0036ce] transition-colors"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded bg-[#ffd8e4] text-[#31111d] flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[16px]">nuclear_power</span>
+                <div className="w-7 h-7 rounded bg-[#ffd8e4] text-[#31111d] flex items-center justify-center shrink-0 overflow-hidden">
+                  <NuclearPowerIcon className="w-4 h-4 text-[#31111d]" />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-['Space_Grotesk'] text-[#74777e] uppercase font-bold">
@@ -563,15 +564,17 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
             <div className="flex items-start justify-between gap-2 border-b border-[#e4efff] pb-3">
               <div className="flex items-center gap-2.5">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${
                     selectedSite.site.category === 'cnpe'
                       ? 'bg-[#ffd8e4] text-[#31111d]'
                       : 'bg-[#ffdad6] text-[#93000a]'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[22px]">
-                    {selectedSite.site.category === 'cnpe' ? 'nuclear_power' : 'factory'}
-                  </span>
+                  {selectedSite.site.category === 'cnpe' ? (
+                    <NuclearPowerIcon className="w-5 h-5 text-[#31111d]" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[22px]">factory</span>
+                  )}
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -759,13 +762,15 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden ${
                         isNuclear ? 'bg-[#ffd8e4] text-[#31111d]' : 'bg-[#ffdad6] text-[#93000a]'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[18px]">
-                        {isNuclear ? 'nuclear_power' : 'factory'}
-                      </span>
+                      {isNuclear ? (
+                        <NuclearPowerIcon className="w-4 h-4 text-[#31111d]" />
+                      ) : (
+                        <span className="material-symbols-outlined text-[18px]">factory</span>
+                      )}
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-[13px] font-bold text-[#001126] truncate">
