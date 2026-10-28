@@ -3,6 +3,7 @@ import { SubScreen, EmergencyCall } from '../types';
 import { Tooltip } from '../components/Tooltip';
 import { triggerHaptic } from '../utils/haptics';
 import { EmergencyCoherenceMatrixModal } from '../components/EmergencyCoherenceMatrixModal';
+import { EmergencyReflexModal } from '../components/EmergencyReflexModal';
 
 interface ReagirViewProps {
   onOpenSubScreen: (screen: SubScreen) => void;
@@ -31,6 +32,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
   const [isStressMode, setIsStressMode] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [showCoherenceModal, setShowCoherenceModal] = useState<boolean>(false);
+  const [showReflexModal, setShowReflexModal] = useState<boolean>(false);
   const [isOnline, setIsOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
@@ -190,6 +192,29 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
           <span className="font-bold">18 Octobre 2026</span>
         </div>
       </aside>
+
+      {/* Raccourci d'Urgence Immédiate 1-Tap : Que faire maintenant ? */}
+      <button
+        type="button"
+        onClick={() => {
+          triggerHaptic('warning');
+          setShowReflexModal(true);
+        }}
+        className="w-full min-h-[50px] px-4 bg-[#ba1a1a] hover:bg-[#93000a] text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-black uppercase tracking-wider flex items-center justify-between shadow-lg border-2 border-white/20 active:scale-98 transition-all cursor-pointer"
+      >
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[24px] text-amber-300 animate-pulse">
+            bolt
+          </span>
+          <span className="text-left font-black">
+            QUE FAIRE MAINTENANT ? (Triage 0-60s)
+          </span>
+        </div>
+        <div className="flex items-center gap-1 text-[11px] font-bold text-amber-200">
+          <span>FR • CH • BE • LU</span>
+          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        </div>
+      </button>
 
       {/* Raccourci Proéminent Mode Crise Gros Boutons & Carte Hors-Ligne */}
       <section className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-3.5 shadow-md border-2 border-[#ba1a1a] flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -879,6 +904,13 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
       {showCoherenceModal && (
         <EmergencyCoherenceMatrixModal onClose={() => setShowCoherenceModal(false)} />
       )}
+
+      {/* Modal Que faire maintenant ? (Triage Réflexe 0-60s) */}
+      <EmergencyReflexModal
+        isOpen={showReflexModal}
+        onClose={() => setShowReflexModal(false)}
+        onNavigateToProtocol={(key) => onOpenSubScreen({ type: 'protocol', id: key as any })}
+      />
     </div>
   );
 };

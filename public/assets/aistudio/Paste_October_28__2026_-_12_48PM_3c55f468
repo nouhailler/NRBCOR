@@ -1,0 +1,894 @@
+# PROMPT CODEX — Audit et amélioration complète de NRBCOR
+
+## 1. Contexte du projet
+
+Tu interviens sur le dépôt GitHub suivant :
+
+**Dépôt :** https://github.com/nouhailler/NRBCOR
+
+NRBCOR est une application orientée vers la préparation aux situations d’urgence NRBC (nucléaire, radiologique, biologique et chimique), la sensibilisation aux risques, la préparation des foyers et l’accès à des informations utiles en situation de crise.
+
+L’application possède déjà plusieurs fonctionnalités développées, notamment :
+- un mode crise ;
+- un système de profils ;
+- un plan familial ;
+- des protocoles radiologiques et des consignes de sécurité ;
+- l’intégration des données Géorisques ;
+- des mécanismes de fonctionnement hors ligne ;
+- une fiche de poche exportable ;
+- un historique local et un suivi de formation ;
+- des contrôles et vérifications du contenu.
+
+Ces éléments sont à confirmer dans le code avant toute modification. Le projet doit être amélioré à partir de son état réel, sans recréer les fonctionnalités déjà présentes.
+
+## 2. Objectif général
+
+Réaliser un audit technique, fonctionnel, ergonomique et éditorial, puis implémenter les améliorations manquantes afin de rendre NRBCOR :
+
+1. plus fiable et plus transparent ;
+2. plus utile en situation d’urgence ;
+3. plus robuste hors connexion ;
+4. plus simple à utiliser sous stress ;
+5. plus pratique pour préparer un foyer ;
+6. plus pertinent pour la formation et les exercices ;
+7. plus facile à maintenir et à tester ;
+8. plus accessible, sans dépendance inutile à un serveur.
+
+Conserver autant que possible l’architecture, les technologies, les conventions, le design et les fonctionnalités existantes.
+
+Ne pas réécrire l’application entièrement si cela n’est pas techniquement nécessaire.
+
+## 3. Méthode de travail obligatoire
+
+### Étape 1 — Audit préalable
+
+Avant de modifier le code :
+
+- analyser la structure du dépôt ;
+- lire le README, le cahier des charges, les éventuelles instructions destinées aux agents et la documentation ;
+- examiner `package.json`, les scripts disponibles, les dépendances et la configuration de compilation ;
+- identifier le framework, le système de routage, la gestion de l’état et le stockage des données ;
+- recenser les vues, composants, services, types et fonctionnalités existants ;
+- examiner le mode hors ligne, le service worker, le manifeste PWA et la stratégie de cache ;
+- analyser les tests existants et les éventuels workflows GitHub Actions ;
+- identifier les sources de données externes et les mécanismes de gestion des erreurs ;
+- repérer les éventuelles incohérences, doublons, risques de perte de données et problèmes d’accessibilité.
+
+Produire un tableau de suivi avec les colonnes suivantes :
+
+| Fonctionnalité | État constaté | Problème identifié | Action |
+|---|---|---|---|
+| Déjà fonctionnelle | Vérifiée dans le code et par test | Aucun problème significatif identifié | Conserver |
+| Partiellement fonctionnelle | Implémentation incomplète | Limites identifiées | Compléter |
+| Absente | Non implémentée | Fonctionnalité manquante | Développer |
+| Non vérifiable | Preuve insuffisante | Incertitude documentée | Investiguer |
+
+Ne pas considérer une fonctionnalité comme terminée simplement parce qu’un composant ou un bouton existe. Vérifier son comportement réel.
+
+### Étape 2 — Plan d’implémentation
+
+Après l’audit, établir un plan d’action priorisé.
+
+Traiter d’abord les problèmes de fiabilité, de sécurité, de perte de données et de fonctionnement hors ligne. Développer ensuite les nouvelles fonctionnalités.
+
+Ne pas s’arrêter à la rédaction du rapport : **implémenter effectivement les améliorations retenues**, dans les limites du dépôt et de l’environnement disponibles.
+
+### Étape 3 — Implémentation progressive
+
+- effectuer des modifications limitées et cohérentes ;
+- conserver la compatibilité avec les données existantes ;
+- éviter les nouvelles dépendances si les solutions présentes suffisent ;
+- ne pas ajouter de backend, de compte utilisateur ou de service payant sans nécessité démontrée ;
+- ne jamais supprimer une fonctionnalité existante sans justification ;
+- exécuter les tests adaptés après chaque lot de modifications ;
+- documenter les limites qui ne peuvent pas être corrigées dans l’environnement disponible.
+
+---
+
+# 4. AXE PRIORITAIRE — Fiabilité des informations NRBC
+
+## 4.1 Audit du corpus de sécurité
+
+Examiner le corpus documentaire, notamment `src/data/securityCorpus.ts` si ce fichier existe encore.
+
+Vérifier la présence et la cohérence des métadonnées suivantes pour chaque consigne importante :
+
+- titre ;
+- catégorie de risque ;
+- consigne ;
+- source officielle ;
+- URL de référence ;
+- date de publication ou de mise à jour de la source, lorsqu’elle est connue ;
+- date de dernière vérification effective ;
+- niveau de validation éditoriale ;
+- éventuelles restrictions ou limites d’application ;
+- historique des modifications lorsque pertinent.
+
+Adapter ces champs à l’architecture existante plutôt que d’imposer un nouveau modèle sans nécessité.
+
+Une date de vérification ne doit jamais être actualisée artificiellement pour donner l’impression qu’une information a été contrôlée.
+
+## 4.2 Références officielles
+
+Privilégier les sources pertinentes selon le risque et le pays concerné, par exemple :
+
+- autorités fédérales suisses compétentes, notamment l’OFPP et les autorités sanitaires ;
+- OFSP pour les informations sanitaires relevant de sa compétence ;
+- autorités françaises compétentes, notamment le ministère de l’Intérieur, les autorités sanitaires et les organismes spécialisés ;
+- OMS pour les recommandations sanitaires internationales ;
+- AIEA pour les informations relevant de la sûreté et de la radioprotection ;
+- autorités locales et services de secours pour les instructions opérationnelles applicables.
+
+Vérifier que chaque source est réellement pertinente pour l’affirmation correspondante.
+
+Ne pas remplacer automatiquement une recommandation suisse par une recommandation française, ou inversement.
+
+Si une source n’est pas accessible ou si une affirmation ne peut pas être vérifiée, signaler cette limite. Ne pas inventer de références, de dates, de citations ou de validations par un expert.
+
+## 4.3 Validation des contenus sensibles
+
+Porter une attention particulière :
+
+- aux consignes de mise à l’abri ou d’évacuation ;
+- aux risques chimiques et biologiques ;
+- aux incidents radiologiques et nucléaires ;
+- à la décontamination ;
+- aux symptômes et aux situations nécessitant une prise en charge médicale ;
+- à l’utilisation de l’iode stable ;
+- aux limites des équipements de protection ;
+- aux comportements pouvant augmenter l’exposition ou la contamination.
+
+Ne pas produire de nouvelles posologies, de protocoles médicaux personnalisés ou de consignes techniques dangereuses sur la seule base d’une génération automatique.
+
+Pour l’iode stable, maintenir une mise en garde explicite : son utilisation dépend des consignes des autorités compétentes et de la situation. Il ne protège pas contre tous les effets des rayonnements et ne doit pas être pris systématiquement ou de sa propre initiative.
+
+En cas de doute, conserver la consigne existante si elle est raisonnablement sûre, ajouter un avertissement approprié si nécessaire et signaler le contenu comme nécessitant une validation humaine. Ne jamais marquer un contenu comme validé par un expert si cette validation n’a pas réellement eu lieu.
+
+## 4.4 Contrôles automatiques du contenu
+
+Créer ou renforcer un script de vérification du corpus qui détecte notamment :
+
+- les références officielles manquantes sur les contenus critiques ;
+- les URLs mal formées ;
+- les dates invalides ;
+- les champs obligatoires vides ;
+- les doublons d’identifiants ;
+- les contenus sans statut de validation ;
+- les liens connus comme obsolètes lorsque leur vérification est réellement disponible ;
+- les métadonnées incohérentes.
+
+Les contrôles automatiques ne doivent pas prétendre vérifier la justesse médicale ou scientifique d’une consigne.
+
+Ajouter une documentation expliquant ce qui est contrôlé automatiquement et ce qui nécessite une validation humaine.
+
+---
+
+# 5. Fonctionnement hors ligne et PWA
+
+## 5.1 Audit du fonctionnement hors connexion
+
+Vérifier concrètement :
+
+- l’installation de l’application ;
+- le démarrage après une première visite ;
+- le redémarrage en mode avion ;
+- l’accès aux consignes essentielles ;
+- le fonctionnement du mode crise ;
+- l’accès au plan familial ;
+- l’export des fiches ;
+- le comportement en cas d’interruption de mise à jour ;
+- la récupération après une erreur du service worker.
+
+Ne pas supposer qu’une application est réellement utilisable hors ligne simplement parce qu’elle possède un manifeste PWA.
+
+## 5.2 Classification des fonctionnalités
+
+Identifier clairement les fonctionnalités selon leur disponibilité :
+
+- disponibles hors ligne ;
+- disponibles uniquement en ligne ;
+- partiellement disponibles hors ligne ;
+- dépendantes d’une donnée précédemment téléchargée.
+
+Afficher cette information dans l’interface, sans gêner l’accès rapide aux consignes essentielles.
+
+En mode crise, ne pas bloquer l’affichage des informations locales parce qu’une API est indisponible.
+
+## 5.3 Gestion du cache
+
+Vérifier la stratégie de cache et éviter :
+
+- la suppression accidentelle des ressources essentielles ;
+- l’utilisation d’anciennes données présentées comme actuelles ;
+- les mises à jour qui rendent l’application inutilisable ;
+- les dépendances à des ressources distantes non indispensables ;
+- les boucles de rechargement du service worker.
+
+Prévoir un comportement dégradé clair si une mise à jour échoue.
+
+Ne jamais présenter une donnée ancienne comme une information en temps réel.
+
+## 5.4 Audit du stockage local
+
+Examiner les mécanismes de stockage, notamment les éventuels usages simultanés de `localStorage` et IndexedDB dans `src/views/MonPlanView.tsx` ou les modules équivalents.
+
+Déterminer une stratégie cohérente de source de vérité.
+
+Si une migration entre plusieurs stockages est nécessaire :
+
+- définir des règles explicites de priorité ;
+- préserver les données existantes ;
+- empêcher qu’une donnée ancienne écrase une donnée plus récente ;
+- prévoir une migration idempotente ;
+- gérer les erreurs d’écriture et de lecture ;
+- afficher un message explicite si la sauvegarde échoue.
+
+Ne pas remplacer aveuglément le stockage existant par un nouveau mécanisme.
+
+## 5.5 Sauvegarde et restauration
+
+Mettre en place, si cela manque, une sauvegarde locale exportable du plan familial et des données de préparation pertinentes.
+
+Le format JSON doit être versionné et validé à l’importation.
+
+Prévoir :
+
+- export de sauvegarde ;
+- restauration après confirmation ;
+- vérification de la structure du fichier ;
+- gestion des versions anciennes ;
+- rejet des données invalides ;
+- protection contre l’écrasement accidentel ;
+- message clair en cas de succès ou d’échec.
+
+N’importer que les champs explicitement autorisés. Ne pas exécuter de contenu fourni dans un fichier importé.
+
+La sauvegarde ne doit pas envoyer de données à un serveur.
+
+## 5.6 Audit de persistance
+
+Examiner les indicateurs de stockage dans `src/services/storage/offlineAuditService.ts` ou le service équivalent.
+
+Distinguer :
+
+- stockage accessible ;
+- données effectivement enregistrées ;
+- ressources essentielles disponibles hors ligne ;
+- persistance confirmée par un test ;
+- persistance non garantie par le navigateur.
+
+Ne jamais garantir que les données locales seront conservées indéfiniment : le navigateur ou le système peut les supprimer.
+
+---
+
+# 6. Fiabilisation de Géorisques
+
+Examiner la vue Géorisques, notamment `src/views/GeorisquesView.tsx` si elle existe encore.
+
+## 6.1 États de données distincts
+
+Différencier explicitement :
+
+1. données récupérées avec succès ;
+2. données récupérées précédemment et présentées depuis le cache ;
+3. recherche terminée sans résultat ;
+4. erreur de connexion ;
+5. erreur de l’API ;
+6. réponse invalide ou incomplète ;
+7. données indisponibles ;
+8. données simulées, uniquement si une simulation est réellement utilisée.
+
+Ne jamais confondre une absence de résultat avec une absence de risque.
+
+Un échec de l’API ne doit jamais produire un message laissant entendre qu’aucun risque n’existe.
+
+## 6.2 Dates et fraîcheur
+
+Supprimer toute date codée en dur si elle est présentée comme une date de mise à jour réelle.
+
+Utiliser les métadonnées réellement disponibles :
+
+- date de récupération ;
+- date de consultation du cache ;
+- date de mise à jour de la source, si fournie ;
+- date inconnue lorsque l’information n’est pas disponible.
+
+Une date de récupération locale ne doit pas être confondue avec la date de mise à jour de la source.
+
+Si les données proviennent du cache, le signaler clairement.
+
+## 6.3 Gestion des erreurs
+
+Prévoir des messages compréhensibles et des actions adaptées :
+
+- réessayer la requête ;
+- consulter les dernières données mises en cache ;
+- afficher la date de dernière récupération ;
+- indiquer les limites de la recherche ;
+- renvoyer vers la source officielle lorsque cela est possible.
+
+Ne pas présenter les données mises en cache comme un état actuel garanti du territoire.
+
+Tester les réponses vides, les erreurs HTTP, les délais dépassés, les réponses mal formées et les pertes de réseau.
+
+---
+
+# 7. Tableau de bord de préparation du foyer
+
+Ajouter cette fonctionnalité si elle n’existe pas déjà, en réutilisant le plan familial et les composants disponibles.
+
+## 7.1 Objectif
+
+Permettre à l’utilisateur d’évaluer la préparation de son foyer face à une situation d’urgence et d’identifier les actions à réaliser.
+
+## 7.2 Informations à prendre en compte
+
+Prévoir des catégories configurables :
+
+- eau potable ;
+- alimentation ;
+- éclairage et énergie ;
+- radio et moyens de communication ;
+- trousse de premiers secours ;
+- médicaments et produits personnels nécessaires ;
+- hygiène ;
+- documents importants ;
+- argent liquide et moyens de paiement ;
+- contacts d’urgence ;
+- organisation familiale ;
+- besoins spécifiques des enfants, personnes dépendantes ou animaux ;
+- moyens de transport et lieux de rendez-vous.
+
+Ne pas imposer des quantités universelles lorsque les recommandations officielles varient selon le pays, le contexte ou les besoins des personnes.
+
+## 7.3 Évaluation
+
+Créer un tableau de bord simple présentant :
+
+- les éléments renseignés ;
+- les éléments à vérifier ;
+- les éléments manquants ;
+- les prochaines actions prioritaires ;
+- la date de dernière vérification par l’utilisateur.
+
+Permettre de distinguer :
+
+- « présent et vérifié » ;
+- « présent mais à vérifier » ;
+- « manquant » ;
+- « non applicable ».
+
+Ne pas assimiler une case cochée à une preuve que le matériel est effectivement disponible.
+
+## 7.4 Calculs
+
+Si une estimation de l’autonomie du foyer est proposée :
+
+- expliquer les hypothèses utilisées ;
+- prendre en compte le nombre de personnes ;
+- afficher les unités ;
+- indiquer clairement les limites de l’estimation ;
+- éviter les résultats faussement précis ;
+- s’appuyer sur des recommandations officielles correctement référencées.
+
+Les seuils ne doivent pas être inventés pour obtenir un score attractif.
+
+## 7.5 Interface
+
+Créer une interface accessible depuis le plan familial et le tableau de bord principal.
+
+Prévoir une vue synthétique et une vue détaillée, avec des actions concrètes plutôt qu’un score abstrait.
+
+Conserver les données localement.
+
+---
+
+# 8. Dossier personnel d’urgence et fiche imprimable
+
+Compléter la fiche de poche existante ou développer un dossier d’urgence si cette fonctionnalité est absente.
+
+## 8.1 Contenu configurable
+
+L’utilisateur doit pouvoir sélectionner les informations qu’il souhaite inclure :
+
+- contacts d’urgence ;
+- contacts familiaux ;
+- lieu de rendez-vous ;
+- consignes personnelles d’organisation ;
+- besoins matériels essentiels ;
+- informations utiles en cas de séparation ;
+- liste des documents à emporter ;
+- rappels de sécurité validés.
+
+Ne pas remplir automatiquement le document avec des informations personnelles sensibles.
+
+## 8.2 Formats
+
+Privilégier :
+
+- une fiche compacte adaptée à l’impression ;
+- une version lisible sur mobile ;
+- un export PDF si l’architecture actuelle le permet ;
+- une sauvegarde locale des données sélectionnées.
+
+Le document doit rester lisible en noir et blanc.
+
+Prévoir une mise en page adaptée à une impression A4 et, si pertinent, à un format de poche.
+
+## 8.3 Confidentialité
+
+Avant l’export, afficher un aperçu du contenu et laisser l’utilisateur confirmer les informations incluses.
+
+Ne pas transmettre le document à un serveur.
+
+Ne pas inclure de données sensibles dans un QR code par défaut. Si un QR code est déjà prévu, documenter clairement les risques liés à son contenu et limiter les informations qu’il peut encoder.
+
+Ne jamais prétendre qu’un export a réussi si sa génération a échoué.
+
+## 8.4 Impression
+
+Ajouter une feuille de style d’impression :
+
+- masquage des menus et commandes inutiles ;
+- typographie lisible ;
+- contraste suffisant ;
+- suppression des fonds coûteux en encre ;
+- contrôle des sauts de page ;
+- date de génération clairement identifiée.
+
+Tester l’aperçu d’impression et les éventuelles limites de génération PDF.
+
+---
+
+# 9. Mode formateur et exercices pédagogiques
+
+Développer un mode formateur si l’application ne possède pas déjà une fonctionnalité équivalente.
+
+Ce mode doit rester utilisable localement et ne pas nécessiter de compte ou de serveur.
+
+## 9.1 Scénarios pédagogiques
+
+Prévoir une architecture permettant de créer des exercices de sensibilisation autour de situations comme :
+
+- alerte officielle imposant une mise à l’abri ;
+- accident industriel avec risque chimique ;
+- suspicion de contamination ;
+- événement radiologique ;
+- perte des communications ;
+- coupure électrique prolongée ;
+- séparation des membres d’un foyer.
+
+Les scénarios doivent être pédagogiques et ne doivent pas se substituer aux instructions des services de secours.
+
+Ne pas inventer des protocoles opérationnels. Utiliser les consignes validées présentes dans le corpus ou signaler explicitement les contenus à valider.
+
+## 9.2 Déroulement d’un exercice
+
+Chaque exercice peut comprendre :
+
+1. présentation du contexte ;
+2. objectif pédagogique ;
+3. informations disponibles ;
+4. choix ou actions proposés ;
+5. explication des réponses ;
+6. rappel des sources ;
+7. débriefing ;
+8. pistes d’amélioration.
+
+Les conséquences simulées doivent être présentées comme des éléments pédagogiques et non comme des prédictions certaines d’un événement réel.
+
+## 9.3 Suivi des apprentissages
+
+Permettre de conserver localement :
+
+- les exercices effectués ;
+- les réponses sélectionnées ;
+- les points à revoir ;
+- la date de réalisation ;
+- les objectifs atteints.
+
+Éviter les classements humiliants et les scores donnant une fausse impression de compétence opérationnelle.
+
+Si un score est utilisé, expliquer précisément ce qu’il mesure.
+
+## 9.4 Utilisation en groupe
+
+Prévoir une utilisation par un formateur devant un groupe, sans rendre obligatoire la collecte de données personnelles.
+
+Envisager :
+
+- un affichage projetable ;
+- une progression par étapes ;
+- des questions de discussion ;
+- un débriefing ;
+- une fiche récapitulative imprimable.
+
+L’export d’un bilan doit rester local.
+
+---
+
+# 10. Parcours d’urgence « Que faire maintenant ? »
+
+Ajouter ou améliorer un accès immédiat aux consignes essentielles, si cela manque.
+
+Le parcours doit être accessible depuis l’écran principal et le mode crise.
+
+## 10.1 Principes d’interface
+
+- accès rapide, sans formulaire long ;
+- questions simples et peu nombreuses ;
+- boutons tactiles suffisamment grands ;
+- textes courts ;
+- contraste élevé ;
+- navigation compréhensible ;
+- limitation des distractions ;
+- retour facile à l’écran précédent.
+
+## 10.2 Orientation
+
+Le parcours doit aider l’utilisateur à retrouver la consigne officielle pertinente selon le contexte décrit.
+
+Ne pas prétendre diagnostiquer la nature d’un danger à partir d’une description approximative.
+
+Ne pas retarder un appel aux services d’urgence.
+
+Si la situation est immédiate, rappeler de suivre les instructions des autorités et des secours compétents. Afficher les numéros d’urgence appropriés au pays ou à la région sélectionnés par l’utilisateur, en vérifiant leur exactitude.
+
+Ne pas supposer automatiquement que tous les utilisateurs se trouvent en Suisse ou en France.
+
+## 10.3 Fiabilité
+
+- ne jamais dépendre d’une API pour afficher les consignes essentielles déjà embarquées ;
+- ne pas masquer les avertissements critiques ;
+- éviter les formulations ambiguës ;
+- ne pas présenter une recommandation générale comme une instruction universelle ;
+- conserver la référence officielle accessible.
+
+---
+
+# 11. Accessibilité et utilisation sous stress
+
+Effectuer un audit d’accessibilité des écrans principaux.
+
+Vérifier notamment :
+
+- navigation au clavier ;
+- ordre de tabulation ;
+- focus visible ;
+- noms accessibles des boutons et icônes ;
+- compatibilité avec les lecteurs d’écran ;
+- contrastes ;
+- taille des zones tactiles ;
+- lisibilité des textes ;
+- messages d’erreur compréhensibles ;
+- absence de dépendance exclusive à la couleur ;
+- comportement avec un zoom important ;
+- respect de `prefers-reduced-motion`.
+
+Respecter autant que possible les critères WCAG 2.2 niveau AA.
+
+## 11.1 Ergonomie en situation de crise
+
+Pour le mode crise :
+
+- limiter les animations ;
+- privilégier une hiérarchie visuelle claire ;
+- éviter les longs paragraphes ;
+- distinguer visuellement les avertissements critiques ;
+- afficher la provenance des consignes sans encombrer l’écran ;
+- conserver un accès immédiat aux actions essentielles ;
+- éviter les dialogues de confirmation superflus lorsqu’ils retarderaient une action simple et sûre.
+
+Ne pas supprimer les confirmations nécessaires à la protection des données ou à une opération destructive.
+
+---
+
+# 12. Qualité technique et intégration continue
+
+## 12.1 Vérifications locales
+
+Identifier les commandes existantes dans `package.json` et exécuter les contrôles adaptés, notamment si disponibles :
+
+- tests unitaires ;
+- tests d’intégration ;
+- lint ;
+- vérification TypeScript ;
+- vérification du contenu ;
+- compilation de production.
+
+Ne pas inventer des résultats. Si une commande échoue, analyser l’erreur et corriger les problèmes causés par les modifications.
+
+Ne pas désactiver des tests, masquer des erreurs ou réduire les exigences du lint uniquement pour obtenir une compilation verte.
+
+## 12.2 GitHub Actions
+
+Auditer la présence de workflows dans `.github/workflows/`.
+
+S’il n’existe pas de pipeline adapté, créer un workflow CI qui exécute les contrôles pertinents sur les pull requests et les branches principales :
+
+- installation reproductible des dépendances ;
+- vérification du code ;
+- tests ;
+- vérification du contenu ;
+- build de production.
+
+Utiliser la version de Node.js compatible avec le projet et privilégier le fichier de verrouillage existant.
+
+Éviter les permissions excessives dans les workflows.
+
+Ne jamais inclure de secrets ou de clés API dans le dépôt ou les journaux CI.
+
+## 12.3 Tests fonctionnels
+
+Ajouter ou compléter des tests couvrant au minimum :
+
+- démarrage de l’application ;
+- affichage du mode crise ;
+- disponibilité des consignes essentielles hors ligne ;
+- création et modification du plan familial ;
+- persistance après rechargement ;
+- migration du stockage, si applicable ;
+- sauvegarde et restauration ;
+- export de la fiche de poche ;
+- génération du dossier imprimable ;
+- affichage des différents états Géorisques ;
+- comportement sans réseau ;
+- affichage des avertissements critiques ;
+- parcours d’urgence ;
+- exercices pédagogiques, si développés.
+
+Utiliser les outils de test déjà présents. N’ajouter un framework supplémentaire que si cela apporte un bénéfice concret.
+
+## 12.4 Tests de non-régression
+
+Ne pas se limiter aux nouvelles fonctionnalités.
+
+Vérifier que les fonctionnalités existantes restent utilisables, notamment les profils, le plan familial, les fiches de poche, le mode crise, le suivi de formation et les fonctions de recherche.
+
+---
+
+# 13. Protection des données et sécurité applicative
+
+Effectuer une vérification des données conservées et exportées.
+
+- conserver localement les données personnelles lorsque cela est possible ;
+- limiter les données collectées au strict nécessaire ;
+- ne pas ajouter de télémétrie intrusive ;
+- ne pas transmettre le plan familial à des services externes ;
+- contrôler les fichiers importés ;
+- éviter l’injection de HTML provenant de données utilisateur ;
+- vérifier les liens externes ;
+- ne pas exposer de secrets ;
+- documenter les éventuelles données envoyées aux API externes ;
+- expliquer les limites de la protection offerte par le stockage local.
+
+Ne pas affirmer que l’application est entièrement privée ou sécurisée sans audit correspondant.
+
+Si une fonctionnalité existante envoie des données à un service externe, documenter son fonctionnement et conserver uniquement les transmissions nécessaires.
+
+---
+
+# 14. Documentation à mettre à jour
+
+Mettre à jour les documents existants et créer les éléments manquants utiles.
+
+## README
+
+Documenter :
+
+- objectif de l’application ;
+- principales fonctionnalités ;
+- installation et lancement ;
+- commandes de développement et de test ;
+- fonctionnement hors ligne ;
+- stockage et sauvegardes ;
+- sources de données externes ;
+- limites de l’application ;
+- procédure de signalement d’un contenu potentiellement incorrect.
+
+## Documentation du corpus NRBC
+
+Expliquer :
+
+- comment ajouter une consigne ;
+- quelles sources privilégier ;
+- comment enregistrer une référence ;
+- comment dater une vérification ;
+- comment signaler un contenu en attente de validation ;
+- quels contrôles sont automatiques ;
+- quelles vérifications exigent un expert humain.
+
+## Guide de test
+
+Fournir une checklist reproductible pour tester :
+
+- le mode hors ligne ;
+- le plan familial ;
+- la restauration des données ;
+- les états Géorisques ;
+- l’impression ;
+- le parcours d’urgence ;
+- l’accessibilité des écrans essentiels.
+
+## Historique des modifications
+
+Mettre à jour le changelog si le projet en possède un. Ne pas déclarer une fonctionnalité terminée tant qu’elle n’est pas effectivement implémentée et testée.
+
+---
+
+# 15. Contraintes de conception et de développement
+
+Respecter les règles suivantes :
+
+1. Conserver la technologie et l’architecture existantes lorsqu’elles sont adaptées.
+2. Réutiliser les composants, services et styles déjà présents.
+3. Préserver l’identité visuelle de NRBCOR.
+4. Privilégier une interface claire, mobile-first et utilisable hors ligne.
+5. Éviter les dépendances payantes.
+6. Éviter l’ajout d’un backend ou d’une base de données distante sans justification.
+7. Ne pas ajouter de comptes utilisateurs si cela n’est pas indispensable.
+8. Préserver les données existantes.
+9. Ne pas supprimer les fonctionnalités opérationnelles pour simplifier l’implémentation.
+10. Ne pas inventer de sources officielles ni de résultats de tests.
+11. Ne pas modifier arbitrairement les consignes médicales ou de sécurité.
+12. Ne pas considérer qu’une compilation réussie suffit à valider le comportement fonctionnel.
+13. Ne pas laisser de boutons factices, de liens morts ou de fonctions annoncées mais inactives.
+14. Ne pas ajouter de fausses données présentées comme des données réelles.
+15. Préserver la possibilité d’utiliser l’application sans connexion Internet pour les fonctionnalités essentielles.
+
+Si une fonctionnalité ne peut pas être terminée correctement, documenter la raison, l’état réel et les étapes restantes.
+
+---
+
+# 16. Priorisation de l’implémentation
+
+## Priorité P0 — Fiabilité et sécurité
+
+Traiter en premier :
+
+- les consignes potentiellement erronées ou insuffisamment référencées ;
+- les messages trompeurs concernant les risques ;
+- les problèmes de perte de données ;
+- les erreurs de date ou de fraîcheur des données Géorisques ;
+- les défauts empêchant l’utilisation hors ligne des fonctionnalités essentielles ;
+- les erreurs de compilation et les tests défaillants.
+
+Ne pas attendre le développement des nouvelles fonctionnalités pour corriger les défauts critiques.
+
+## Priorité P1 — Robustesse
+
+Implémenter ensuite :
+
+- les contrôles automatiques du corpus ;
+- la stratégie cohérente de stockage ;
+- la sauvegarde et la restauration ;
+- les tests de non-régression ;
+- la CI GitHub Actions ;
+- les améliorations d’accessibilité essentielles ;
+- la distinction entre données en ligne, en cache et indisponibles.
+
+## Priorité P2 — Préparation du foyer
+
+Développer ou compléter :
+
+- le tableau de bord de préparation ;
+- les actions prioritaires ;
+- le dossier personnel d’urgence ;
+- les exports et l’impression ;
+- l’accès rapide aux consignes.
+
+## Priorité P3 — Formation et finition
+
+Développer ou compléter :
+
+- le mode formateur ;
+- les scénarios pédagogiques ;
+- le suivi des apprentissages ;
+- les bilans imprimables ;
+- les améliorations ergonomiques restantes ;
+- la documentation complète.
+
+Cette priorité ne doit pas empêcher de corriger immédiatement un problème de sécurité découvert en cours de développement.
+
+---
+
+# 17. Livrables attendus
+
+À la fin du travail, fournir un rapport structuré comportant :
+
+## A. État initial
+
+- architecture détectée ;
+- fonctionnalités déjà présentes ;
+- défauts réellement constatés ;
+- tests disponibles ;
+- limitations de l’audit.
+
+## B. Modifications effectuées
+
+Pour chaque modification :
+
+- fonctionnalité concernée ;
+- fichiers modifiés ;
+- comportement avant/après ;
+- justification ;
+- tests effectués ;
+- résultat observé.
+
+## C. Matrice de couverture
+
+| Domaine | État final | Preuve |
+|---|---|---|
+| Corpus NRBC | Terminé / partiel / absent | Tests, fichiers ou validation |
+| Fonctionnement hors ligne | Terminé / partiel / absent | Tests réalisés |
+| Stockage et sauvegarde | Terminé / partiel / absent | Tests de persistance |
+| Géorisques | Terminé / partiel / absent | Tests des états et erreurs |
+| Préparation du foyer | Terminé / partiel / absent | Parcours fonctionnel |
+| Dossier d’urgence | Terminé / partiel / absent | Export et impression |
+| Mode formateur | Terminé / partiel / absent | Scénarios testés |
+| Accessibilité | Terminé / partiel / absent | Contrôles réalisés |
+| CI | Terminé / partiel / absent | Workflow et résultat |
+| Documentation | Terminé / partiel / absent | Fichiers mis à jour |
+
+Ne renseigner « terminé » que si la fonctionnalité est réellement opérationnelle et si les vérifications prévues ont été exécutées.
+
+## D. Résultats des tests
+
+Indiquer les commandes exécutées et les résultats réels :
+
+- tests unitaires ;
+- tests d’intégration ;
+- lint ;
+- vérification TypeScript ;
+- contrôles du corpus ;
+- compilation de production ;
+- tests navigateur ou hors ligne, s’ils ont réellement été exécutés.
+
+Distinguer clairement les tests réussis, échoués, ignorés et impossibles à exécuter.
+
+## E. Points restants
+
+Lister les éléments non implémentés, les validations humaines requises et les problèmes non résolus.
+
+Préciser les éventuelles limitations concernant les API externes, l’accès réseau, les navigateurs ou l’environnement de test.
+
+## F. Résumé final
+
+Présenter :
+
+- les principales améliorations ;
+- les risques corrigés ;
+- les nouvelles fonctionnalités ;
+- les éventuelles régressions ;
+- les commandes nécessaires pour reproduire les tests ;
+- les prochaines actions recommandées.
+
+# 18. Critères d’acceptation
+
+Le travail est considéré comme abouti uniquement si :
+
+- les fonctionnalités existantes ont été préservées ou toute modification est justifiée ;
+- les erreurs critiques identifiées ont été corrigées ou explicitement documentées ;
+- les données mises en cache ne sont pas présentées comme des données actuelles garanties ;
+- les dates affichées reflètent des événements réels ;
+- les données personnelles ne sont pas perdues lors d’une migration ;
+- la sauvegarde et la restauration sont validées par des tests ;
+- les fonctionnalités essentielles restent accessibles hors ligne après leur mise en cache ;
+- les nouveaux parcours fonctionnent réellement ;
+- les exports et impressions ont été vérifiés ;
+- les tests, contrôles et compilations sont exécutés et leurs résultats rapportés honnêtement ;
+- la documentation est cohérente avec l’application ;
+- aucun contenu NRBC critique n’a été modifié sans justification vérifiable ;
+- aucune validation médicale ou experte n’est revendiquée sans preuve.
+
+## Instruction finale à Codex
+
+Commence par examiner le dépôt réel et établir l’état des lieux. Ensuite, implémente les améliorations dans l’ordre de priorité indiqué, en adaptant le plan à ce qui existe déjà.
+
+Ne te contente pas de proposer une liste de recommandations, de créer des composants visuels ou de modifier la documentation : réalise les changements nécessaires dans le code, ajoute les tests correspondants et vérifie leur fonctionnement.
+
+Si le périmètre est trop important pour une seule passe, termine d’abord un lot cohérent et testé, puis poursuis avec les lots suivants. Ne présente jamais un travail partiel comme une implémentation complète.
+
+À la fin, fournis un compte rendu factuel et précis, avec les fichiers modifiés, les tests réellement exécutés, les résultats obtenus et les tâches restant à effectuer.
+
+**La priorité absolue est la fiabilité des informations et la sécurité de l’utilisateur. Les nouvelles fonctionnalités ne doivent jamais compromettre ces deux objectifs.**

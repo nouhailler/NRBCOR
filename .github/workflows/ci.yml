@@ -1,0 +1,49 @@
+name: NRBCOR CI - Intégrité & Sécurité Civile
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  audit-and-build:
+    name: Audit Déontologique, Tests & Compilation PWA
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Configuration de l'environnement Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Installation stricte des dépendances
+        run: npm ci
+
+      - name: 1. Vérification TypeScript & Typage Strict (Lint)
+        run: npm run lint
+
+      - name: 2. Contrôle Automatisé du Corpus Doctrinal & Sources Officielles
+        run: npm run check:content
+
+      - name: 3. Exécution de la Suite de Tests d'Autonomie & Cohérence (227 tests)
+        run: npm test
+
+      - name: 4. Compilation PWA Hors-Ligne (Vite Build)
+        run: npm run build
+
+      - name: 5. Vérification des Assets PWA & Hors-Ligne (Manifest & Service Worker)
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "❌ Erreur : dist/index.html absent de la compilation !"
+            exit 1
+          fi
+          if [ ! -f public/manifest.json ] && [ ! -f dist/manifest.json ]; then
+            echo "❌ Erreur : Web App Manifest introuvable !"
+            exit 1
+          fi
+          echo "✅ Audit CI NRBCOR réussi : PWA autonome et corpus certifiés conformes."

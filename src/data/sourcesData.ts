@@ -59,6 +59,46 @@ export const DOCTRINES_LIST: DoctrineItem[] = [
     integrationDate: '01 Oct. 2026 (v2.4)',
     summary: 'Inventaire cartographique des 1 312 établissements industriels à haut risque et plans de prévention des risques technologiques (PPRT).',
     status: 'Conforme'
+  },
+  {
+    id: 'doc-suisse-ofpp',
+    authority: 'SUISSE • OFPP / BABS & CENAL',
+    title: 'Directives de Protection Civile & Centrale Nationale d’Alarme (CENAL)',
+    refLegal: 'Loi fédérale sur la protection de la population (LPPCi) & Alertswiss',
+    originalDate: '2023-2025',
+    integrationDate: '24 Oct. 2026 (v2.4.2)',
+    summary: 'Alarme générale de la population (sirène son oscillant 1 min), application Alertswiss, abris de protection civile et doctrine iode suisse (rayon 50 km CNPE Beznau, Gösgen, Leibstadt).',
+    status: 'Conforme'
+  },
+  {
+    id: 'doc-suisse-ofsp',
+    authority: 'SUISSE • OFSP / BAG',
+    title: 'Ordonnance sur la distribution de comprimés d’iode (OCI)',
+    refLegal: 'RS 814.52 - Distribution préventive 50 km',
+    originalDate: '2024',
+    integrationDate: '24 Oct. 2026 (v2.4.2)',
+    summary: 'Recommandations médicales fédérales suisses : délivrance par pharmacie, ordre fédéral de prise déclenché par la CENAL.',
+    status: 'Conforme'
+  },
+  {
+    id: 'doc-belgique-nccn',
+    authority: 'BELGIQUE • Centre de Crise National (NCCN) & AFCN',
+    title: 'Plan d’Urgence Nucléaire et Radiologique National',
+    refLegal: 'Arrêté Royal du 17 octobre 2003 révisé & BE-Alert',
+    originalDate: '2023',
+    integrationDate: '24 Oct. 2026 (v2.4.2)',
+    summary: 'Zones de planification d’urgence (20 km pour Doel / Tihange / Chooz), distribution préventive en pharmacie et système d’alerte BE-Alert.',
+    status: 'Conforme'
+  },
+  {
+    id: 'doc-international-aiea',
+    authority: 'INTERNATIONAL • AIEA / IAEA & OMS / WHO',
+    title: 'Preparedness and Response for a Nuclear or Radiological Emergency',
+    refLegal: 'IAEA Safety Standards Series No. GSR Part 7 / WHO EPR-2023',
+    originalDate: '2020-2023',
+    integrationDate: '20 Oct. 2026 (v2.4.1)',
+    summary: 'Niveaux d’intervention génériques opérationnels (OILs), justification de la mise à l’abri et décontamination d’urgence des populations civiles.',
+    status: 'Conforme'
   }
 ];
 

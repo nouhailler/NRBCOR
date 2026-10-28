@@ -6,6 +6,59 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [1.4.0] - 2026-10-28
+
+### 🛡️ P0 & P1 - Audit Déontologique & Corpus de Sécurité Civile
+- **Vérificateur Automatisé de Corpus (`scripts/verify-corpus.ts`)** :
+  - Validation syntaxique RFC 3986 de 100% des URLs institutionnelles (Légifrance, ASNR, Ineris, SGDSN, etc.).
+  - Vérification des champs obligatoires, unicité des identifiants et intégrité des métadonnées juridiques.
+  - Élimination des dates de révision hardcodées factices ; distinction rigoureuse entre validation automatisable par machine et validation humaine médicale/opérationnelle.
+  - Intégration et contrôle des doctrines transfrontalières (Suisse: OFPP/BABS, CENAL, OFSP/BAG ; Belgique: NCCN, AFCN ; International: AIEA, OMS).
+- **Intégration Continue GitHub Actions (`.github/workflows/ci.yml`)** :
+  - Pipeline automatisé exécutant le linter TypeScript strict, l'audit du corpus doctrinal, les 227 tests de résilience et la compilation Vite PWA.
+
+### 🚨 P1 & P2 - Parcours Réflexes d'Urgence & Cohérence Opérationnelle
+- **Matrice de Cohérence des 6 Scénarios Critiques (`EmergencyCoherenceMatrixModal.tsx`)** :
+  - Audit et vérification opérationnelle des 6 cas d'urgence :
+    1. Alerte officielle avec consigne de confinement (calfeutrage, arrêt VMC, aération post-alerte).
+    2. Demande d'évacuation immédiate (itinéraires, consignes d'emport minimal, kit 72h).
+    3. Événement de nature inconnue (pas de déduction hâtive, triptyque temps/distance/écran).
+    4. Coupure de réseau pendant la consultation (mode hors-ligne absolu, radio FM 107.1 / RTS / RTBF).
+    5. Fiche absente, ancienne ou non validée (signalement explicite, prudence maximale).
+    6. Contradiction entre fiche pédagogique et consigne préfectorale (primauté absolue des autorités).
+- **Raccourci 1-Tap « Que faire maintenant ? » (`EmergencyReflexModal.tsx`)** :
+  - Triage réflexe 0-60 secondes pour situation de stress extrême accessible en 1 clic.
+  - Annuaire d'urgence multi-pays contextuel (France, Suisse, Belgique, Luxembourg) avec composition directe 1-tap (`tel:`).
+  - Trame standardisée d'appel aux services de secours (Qui, Où, Quoi, Combien, Actions réalisées).
+
+### 📊 P1 - Tableau de Bord de Préparation Réellement Explicable
+- **Calculs Transparent et Hypothèses Documentées (`readinessScore.ts` & `SuisJePretView.tsx`)** :
+  - Autonomie en eau et alimentation calculée sur une base claire (3 L/pers/jour + besoins spécifiques).
+  - Détail des besoins ventilés selon la composition du foyer (adultes, enfants, nourrissons, aînés, PMR, animaux).
+  - Section dédiée « Informations manquantes & Données estimées » pour ne jamais masquer les approximations.
+  - File d'attente des « 3 actions les plus utiles à effectuer immédiatement ».
+  - Badge d'évolution du score par rapport à l'évaluation précédente (+/- X%).
+  - Distinction stricte entre case cochée dans une checklist et quantité physique mesurée dans l'inventaire.
+
+### 📄 P1 - Dossier de Secours Personnel & Mode Formateur
+- **Générateur de Fiche Personnelle de Secours (`PersonalEmergencyDossierModal.tsx`)** :
+  - Sélection granulaire des rubriques à imprimer (contacts prioritaires, points de repli, besoins spécifiques, données médicales).
+  - Confidentialité 100% locale : avertissement clair, exclusion stricte des données médicales des exports QR code ou partagés.
+  - Feuille de style dédiée pour impression papier noir et blanc économique et compacte (fiche de poche A4).
+- **Simulateur de Session Collective / Mode Formateur (`TrainerSessionModal.tsx`)** :
+  - 4 scénarios d'exercice guidés (Nuage toxique Seveso, Alerte confinement école, Panache nucléaire, Coupure hivernale).
+  - Objectifs pédagogiques formels, pièges mortels à débriefer et fiche de synthèse imprimable.
+
+### 💾 P1 - Sauvegarde & Restauration Sécurisée
+- **Service Dédié (`backupRestoreService.ts`)** :
+  - Validation de schéma JSON avant restauration, protection anti-écrasement involontaire, comptage des entités et compatibilité descendante V1/V2.
+
+### 🎨 P2 - Ergonomie & Correction Graphique
+- **Suppression du texte parasite "NU x _"** :
+  - Remplacement de la ligature défectueuse `nuclear_power` par le composant vectoriel SVG propre `NuclearPowerIcon.tsx` dans `CartePerimetresView.tsx` et `HamburgerMenu.tsx`.
+
+---
+
 ## [1.3.0] - 2026-10-15
 
 ### ✨ Ajouté

@@ -8,11 +8,34 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/PWA-100%25%20Hors--Ligne-98f6c5?style=for-the-badge&logo=pwa&logoColor=001126" alt="PWA Offline" />
-  <img src="https://img.shields.io/badge/Version-v1.2.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.2.0" />
-  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.4%20(Octobre%202026)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
-  <img src="https://img.shields.io/badge/Accessibilité-WCAG%20AA-ba1a1a?style=for-the-badge" alt="WCAG AA" />
+  <img src="https://img.shields.io/badge/Version-v1.4.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.4.0" />
+  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.4.2%20(Transfrontalier%20FR%2FCH%2FBE)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
+  <img src="https://img.shields.io/badge/Audit%20CI-227%20Tests%20OK-brightgreen?style=for-the-badge" alt="Tests OK" />
   <img src="https://img.shields.io/badge/Données-Zéro%20Serveur%20/%20IndexedDB-12263f?style=for-the-badge" alt="Souveraineté des Données" />
 </p>
+
+---
+
+## 📋 Commandes de Contrôle & Intégration Continue
+
+```bash
+# 1. Vérification TypeScript strict
+npm run lint
+
+# 2. Audit automatisé du corpus de sécurité civile (URLs, métadonnées, doctrines FR/CH/BE/LU/AIEA)
+npm run check:content
+
+# 3. Suite complète de tests d'autonomie et de cohérence (227 tests automatisés)
+npm test
+
+# 4. Compilation de production PWA
+npm run build
+```
+
+Pour consulter la documentation détaillée :
+- 📜 [Corpus Doctrinal & Traçabilité Réglementaire](docs/CORPUS_NRBC.md)
+- 🧪 [Protocole de Recette & Checklist de Test](docs/TESTING_CHECKLIST.md)
+- 📦 [Historique des Versions & Mises à Jour](CHANGELOG.md)
 
 ---
 
@@ -22,11 +45,32 @@
   <img src="public/nrbcor_screenshot.jpg" alt="Capture d'Écran NRBCOR sur Mobile et Desktop" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.15); max-width: 100%; height: auto;" />
 </p>
 
-> *Aperçu de l'interface NRBCOR : mode réagir sous stress, fiches doctrinales NRBC, checklist dynamique du kit d'urgence 72h et surveillance des mises à jour en arrière-plan.*
+> *Aperçu de l'interface NRBCOR : mode réagir sous stress, fiches doctrinales NRBC, tableau de bord d'autonomie explicable, générateur de dossier personnel de secours et simulateur formateur collectif.*
 
 ---
 
-## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.2.0)
+## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.4.0)
+
+### 🛡️ 1. Vérificateur Automatisé de Corpus & CI GitHub Actions
+* Script d'audit de conformité `scripts/verify-corpus.ts` exécutable via `npm run check:content`.
+* Contrôle strict des URLs (RFC 3986), complétude des fiches de preuve, dates réelles et présence des doctrines françaises (DGSCGC, ASNR, Ineris, SGDSN), suisses (OFPP/BABS, CENAL, OFSP/BAG), belges (NCCN, AFCN) et internationales (AIEA, OMS).
+* Workflow GitHub Actions `.github/workflows/ci.yml` assurant le passage continu du linter, des 227 tests unitaires, du corpus et du build Vite PWA.
+
+### 🚨 2. Matrice de Cohérence des 6 Scénarios d'Urgence
+* Audit systématique des scénarios critiques (confinement, évacuation ordonnée, incident de nature inconnue, black-out réseau, fiches non encore validées, contradiction officielle).
+* Triage 1-Tap « Que faire maintenant ? » avec annuaire d'urgence direct (France, Suisse, Belgique, Luxembourg) et trame d'appel aux régulateurs de secours.
+
+### 📊 3. Tableau de Bord de Préparation Réellement Explicable
+* Autonomie en eau (3 L/pers/jour) et vivres avec explicitation totale des hypothèses.
+* Décomposition des besoins du foyer, identification des données estimées / manquantes, et file d'attente des 3 actions prioritaires.
+
+### 📄 4. Dossier de Secours Personnel & Mode Formateur Collectif
+* Générateur de fiche personnelle imprimable (A4/format poche) avec sélection granulaire et confidentialité locale garantie (zéro donnée de santé sur le cloud ou dans les QR codes).
+* Mode formateur avec simulateur de sessions d'exercice collectif, objectifs pédagogiques, pièges mortels et fiche de débriefing.
+
+---
+
+## 🌟 Fonctionnalités Précédentes (Mises à Jour v1.2.0 - v1.3.0)
 
 ### 🍔 1. Menu Hamburger avec Organisation Thématique
 * **Regroupement fonctionnel par catégories d'urgence** :
