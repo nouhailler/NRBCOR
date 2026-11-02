@@ -8,8 +8,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/PWA-100%25%20Hors--Ligne-98f6c5?style=for-the-badge&logo=pwa&logoColor=001126" alt="PWA Offline" />
-  <img src="https://img.shields.io/badge/Version-v1.4.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.4.0" />
-  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.4.2%20(Transfrontalier%20FR%2FCH%2FBE)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
+  <img src="https://img.shields.io/badge/Version-v1.5.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.5.0" />
+  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.5%20(Transfrontalier%20FR%2FCH%2FBE)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
   <img src="https://img.shields.io/badge/Audit%20CI-227%20Tests%20OK-brightgreen?style=for-the-badge" alt="Tests OK" />
   <img src="https://img.shields.io/badge/Données-Zéro%20Serveur%20/%20IndexedDB-12263f?style=for-the-badge" alt="Souveraineté des Données" />
 </p>
@@ -45,11 +45,28 @@ Pour consulter la documentation détaillée :
   <img src="public/nrbcor_screenshot.jpg" alt="Capture d'Écran NRBCOR sur Mobile et Desktop" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.15); max-width: 100%; height: auto;" />
 </p>
 
-> *Aperçu de l'interface NRBCOR : mode réagir sous stress, fiches doctrinales NRBC, tableau de bord d'autonomie explicable, générateur de dossier personnel de secours et simulateur formateur collectif.*
+> *Aperçu de l'interface NRBCOR : mode réagir sous stress, fiches doctrinales NRBC, mini-encyclopédie et glossaire complet, tableau de bord d'autonomie explicable, générateur de dossier personnel de secours et simulateur formateur collectif.*
 
 ---
 
-## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.4.0)
+## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.5.0)
+
+### 📚 1. Mini-Encyclopédie Documentée du Risque NRBC
+* **Histoire & Origines** : 4 ères clés décortiquées (naissance en 1914-1925 avec Ypres et le chlore de Fritz Haber, Seconde Guerre Mondiale avec les neurotoxiques organophosphorés et l'atome, Guerre Froide avec le VX et Tchernobyl, ère contemporaine avec le métro de Tokyo, Fukushima et les Novitchok).
+* **Doctrines Géopolitiques comparées** : Étude approfondie des modèles de défense et de résilience des pays et armées (France et son continuum SGDSN/Sécurité Civile, Suisse et ses 370 000 abris civils pour 100% des habitants, États-Unis et le standard MOPP de l'OTAN, Russie et ses troupes autonomes RKhBZ, Israël et les abris Mamad obligatoires).
+* **Arsenal Technologique développé pour combattre le risque** :
+  * *Détection* : Compteurs Geiger-Müller, spectromètres de mobilité ionique (IMS), tubes colorimétriques Dräger, PCR mobile.
+  * *Protection (EPI & Abris)* : Masques panoramiques à cartouche combinée ABEK2P3, combinaisons étanches Type 1, abris en surpression d'air filtré.
+  * *Décontamination* : Déshabillage méthodique (élimination de 80-90% du toxique), Terre de Foulon, solutions alcalines.
+  * *Antidotes* : Auto-injecteurs atropine/pralidoxime, comprimés d'iode stable KI 65mg, chélateurs (Bleu de Prusse, DTPA).
+
+### 📖 2. Glossaire Terminologique & Acronymes A-Z
+* Dictionnaire de plus de 20 fiches complètes avec acronyme, définition courte, définition approfondie, contexte d'usage sur le terrain, note d'origine historique et liens croisés.
+* Moteur de recherche instantané, filtres thématiques (Nucléaire, Chimique, Biologique, Radiologique, Matériel, Secours, Réglementaire) et sélecteur alphabétique A-Z.
+
+---
+
+## 🌟 Fonctionnalités Précédentes (Mise à Jour v1.4.0)
 
 ### 🛡️ 1. Vérificateur Automatisé de Corpus & CI GitHub Actions
 * Script d'audit de conformité `scripts/verify-corpus.ts` exécutable via `npm run check:content`.

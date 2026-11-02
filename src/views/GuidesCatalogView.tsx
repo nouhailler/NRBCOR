@@ -115,6 +115,42 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
         </div>
       </div>
 
+      {/* Bannière Découverte : Encyclopédie & Glossaire NRBC */}
+      <div className="bg-white rounded-xl border-2 border-[#0036ce]/30 p-3.5 shadow-sm flex flex-col gap-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0036ce] text-[22px]">auto_stories</span>
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] uppercase">
+              Encyclopédie & Glossaire des Risques NRBC
+            </span>
+          </div>
+          <span className="font-['Space_Grotesk'] text-[10px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
+            Nouveau v2.5
+          </span>
+        </div>
+        <p className="text-[12px] text-[#44474d] leading-relaxed">
+          Comprendre ce qu'est le risque NRBC, son histoire (d'Ypres 1915 à Fukushima et Novitchok), les doctrines des armées (France, Suisse, USA, Russie, Israël) et l'arsenal technologique développé pour le combattre.
+        </p>
+        <div className="grid grid-cols-2 gap-2 pt-0.5">
+          <button
+            type="button"
+            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'histoire' })}
+            className="p-2.5 rounded-lg bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px] text-[#98f6c5]">history_edu</span>
+            <span>Histoire & Doctrines</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'glossaire' })}
+            className="p-2.5 rounded-lg bg-[#eef4ff] hover:bg-[#dce9fd] text-[#0036ce] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors border border-[#d6e4f8] cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px]">spellcheck</span>
+            <span>Glossaire A-Z</span>
+          </button>
+        </div>
+      </div>
+
       {/* Search Input */}
       <div className="relative">
         <span className="material-symbols-outlined absolute left-3 top-3 text-[#74777e] text-[20px]">

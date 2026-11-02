@@ -17,7 +17,8 @@ export type SubScreen =
   | { type: 'inventory' }
   | { type: 'settings' }
   | { type: 'system-settings' }
-  | { type: 'suis-je-pret' };
+  | { type: 'suis-je-pret' }
+  | { type: 'encyclopedie'; tab?: 'histoire' | 'doctrines' | 'outils' | 'glossaire' };
 
 export type ProfileMode = 'simplified' | 'expert';
 

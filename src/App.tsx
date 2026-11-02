@@ -25,6 +25,7 @@ import { SuisJePretView } from './views/SuisJePretView';
 import { AnimauxGuideView } from './views/AnimauxGuideView';
 import { CartePerimetresView } from './views/CartePerimetresView';
 import { ModeCriseView } from './views/ModeCriseView';
+import { EncyclopedieView } from './views/EncyclopedieView';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { storageService } from './services/storage/IndexedDbStorage';
@@ -312,6 +313,8 @@ export default function App() {
       headerTitle = 'Paramètres & Données';
     } else if (subScreen.type === 'system-settings') {
       headerTitle = 'Système & Mises à Jour';
+    } else if (subScreen.type === 'encyclopedie') {
+      headerTitle = 'Encyclopédie & Glossaire NRBC';
     }
   } else {
     switch (activeTab) {
@@ -457,6 +460,11 @@ export default function App() {
               items={kitItems}
               onToggleItem={handleToggleKitItem}
               onOpenInventory={() => handleOpenSubScreen({ type: 'inventory' })}
+            />
+          ) : subScreen.type === 'encyclopedie' ? (
+            <EncyclopedieView
+              onBack={handleBack}
+              initialTab={subScreen.tab || 'glossaire'}
             />
           ) : null
         ) : (

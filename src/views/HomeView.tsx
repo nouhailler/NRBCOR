@@ -375,6 +375,40 @@ export const HomeView: React.FC<HomeViewProps> = ({
               Simulateur sonore & FR-Alert
             </span>
           </button>
+
+          {/* Encyclopédie & Histoire */}
+          <button
+            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'histoire' })}
+            type="button"
+            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#0036ce] text-left flex flex-col gap-1.5 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#001126] text-[#98f6c5] flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[18px]">history_edu</span>
+            </div>
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#0036ce]">
+              Histoire & Doctrines
+            </span>
+            <span className="text-[11px] text-[#44474d] leading-tight">
+              Origines, armées & traités
+            </span>
+          </button>
+
+          {/* Glossaire A-Z */}
+          <button
+            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'glossaire' })}
+            type="button"
+            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#005236] text-left flex flex-col gap-1.5 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#005236] text-white flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[18px]">spellcheck</span>
+            </div>
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#005236]">
+              Glossaire A-Z
+            </span>
+            <span className="text-[11px] text-[#44474d] leading-tight">
+              Dictionnaire & acronymes
+            </span>
+          </button>
         </div>
       </section>
 

@@ -6,6 +6,35 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [1.5.0] - 2026-11-01
+
+### 📚 Encyclopédie & Glossaire Exhaustif du Risque NRBC
+- **Mini-Encyclopédie Documentée du Risque NRBC (`src/data/encyclopediaData.ts` & `src/views/EncyclopedieView.tsx`)** :
+  - **Définition & Ontologie du Risque** : Nature insidieuse et invisible des agents non conventionnels, différence entre accident industriel/technologique et menace asymétrique/terroriste, composante psychologique et effets de panique.
+  - **Grande Fresque Historique (4 Époques Majeures)** :
+    1. *Naissance de la guerre chimique moderne (1914-1925)* : Ypres 1915 (Fritz Haber et nuage de chlore), phosgène, ypérite en 1917, premiers masques à gaz et Protocole de Genève de 1925.
+    2. *Seconde Guerre Mondiale & Âge Atomique (1936-1945)* : Découverte des neurotoxiques organophosphorés (Tabun, Sarin par Gerhard Schrader), crimes biologiques de l'Unité 731 en Chine, projet Manhattan et détonations d'Hiroshima et Nagasaki.
+    3. *Guerre Froide & Équilibre de la Terreur (1947-1991)* : Synthèse du VX, course aux mégatonnes et doctrine MAD, accident biologique de Sverdlovsk (1979), catastrophe nucléaire de Tchernobyl (1986) et formalisation de la radioprotection ALARA.
+    4. *Ère Contemporaine & Menaces Hybrides (1995-Présent)* : Attentat au Sarin dans le métro de Tokyo par Aum Shinrikyo (1995), attaques à l'anthrax postal (2001), accident de Fukushima (2011), résurgence des Novitchok (Salisbury 2018).
+  - **Conceptualisation par les Différents Pays & Armées** :
+    - *France* : Continuum Défense/Sécurité Nationale, SGDSN, plans gouvernementaux PIRATOX/BIOTOX/PIRATOME, 2e Régiment de Dragons, détachements spécialisés CMIC/CMIR des sapeurs-pompiers et Service de Santé des Armées.
+    - *Suisse* : Modèle fédéral unique au monde de protection civile intégrale, 370 000 abris civils couvrant plus de 100% de la population, centrale CENAL et application Alertswiss, distribution préventive d'iode sur 50 km.
+    - *États-Unis* : Joint CBRN Defense Program (JPEO-CBRND), doctrine MOPP 0 à 4, Strategic National Stockpile (SNS), 20th CBRNE Command et équipes WMD-CST.
+    - *Russie / Ex-URSS* : Troupes autonomes RKhBZ, décontamination thermique massive sur turboréacteurs (TMS-65), abris profonds métropolitains étanches.
+    - *Israël* : Défense passive universelle (Pikoud HaOref), obligation légale des abris résidentiels renforcés (Mamad) dans chaque logement, distribution universelle de kits de masques à gaz civils.
+  - **Arsenal Technologique Développé pour le Combattre** :
+    - *Détection & Mesure* : Compteurs Geiger-Müller, spectromètres de mobilité ionique (IMS), tubes colorimétriques réactifs Dräger, PCR mobile et bandelettes immunologiques.
+    - *Protection Individuelle & Collective* : Masques panoramiques à cartouche combinée ABEK2P3 (explication des bandes A, B, E, K, P3), tenues étanches pressurisées Type 1, abris ventilés sous surpression avec préfiltres et charbon actif.
+    - *Décontamination* : Déshabillage d'urgence méthodique, gants poudreurs à la Terre de Foulon, solutions alcalines et douches tièdes sans abrasion.
+    - *Antidotes & Contre-Mesures* : Auto-injecteurs atropine + pralidoxime contre neurotoxiques, iodure de potassium KI 65 mg pour saturation thyroïdienne, chélateurs (Bleu de Prusse, DTPA).
+- **Glossaire Terminologique Complet A-Z** :
+  - Dictionnaire de plus de 20 notices détaillées couvrant les composantes N, R, B, C, matériel, secours et doctrines.
+  - Recherche textuelle en direct, filtres par catégorie, index alphabétique et liens croisés.
+- **Intégration Ergonomique dans l'Applet** :
+  - Accessible depuis le menu hamburger (Catégorie 2), la grille d'accueil et le catalogue des guides.
+
+---
+
 ## [1.4.0] - 2026-10-28
 
 ### 🛡️ P0 & P1 - Audit Déontologique & Corpus de Sécurité Civile

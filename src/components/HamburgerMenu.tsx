@@ -224,6 +224,20 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <span className="material-symbols-outlined text-[18px] text-[#ba1a1a]">medication</span>
                 <span>Fiche Iode Stable (KI 65mg & Posologie)</span>
               </button>
+              <button
+                onClick={() => handleSelectSub({ type: 'encyclopedie', tab: 'histoire' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001258] font-bold transition-colors border border-[#d6e4f8] mt-1"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#0036ce]">history_edu</span>
+                <span>Encyclopédie & Histoire du Risque NRBC</span>
+              </button>
+              <button
+                onClick={() => handleSelectSub({ type: 'encyclopedie', tab: 'glossaire' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#f8f9ff] hover:bg-[#eef4ff] text-[#001126] font-semibold transition-colors border border-[#e4efff]"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#005236]">spellcheck</span>
+                <span>Glossaire des Termes & Acronymes A-Z</span>
+              </button>
             </div>
           </div>
 
