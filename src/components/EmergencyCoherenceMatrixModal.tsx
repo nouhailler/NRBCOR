@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { getLocalizedEmergencyScenarios } from '../i18n/content/localizedCoherenceMatrix';
+import { useTranslation } from '../i18n/I18nContext';
 
 export interface EmergencyScenarioDefinition {
   id: string;
@@ -134,8 +136,12 @@ interface EmergencyCoherenceMatrixModalProps {
 }
 
 export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixModalProps> = ({ onClose }) => {
+  const { language } = useTranslation();
+  const isEn = language === 'en';
+  const scenarios = useMemo(() => getLocalizedEmergencyScenarios(language), [language]);
+
   const [selectedId, setSelectedId] = useState<string>('confinement');
-  const currentScenario = EMERGENCY_SCENARIOS.find((s) => s.id === selectedId) || EMERGENCY_SCENARIOS[0];
+  const currentScenario = scenarios.find((s) => s.id === selectedId) || scenarios[0];
 
   return (
     <div
@@ -153,14 +159,16 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[16px] font-bold font-['Space_Grotesk'] text-white">
-                  Matrice de Cohérence Opérationnelle (6 Scénarios)
+                  {isEn ? 'Operational Coherence Matrix (6 Scenarios)' : 'Matrice de Cohérence Opérationnelle (6 Scénarios)'}
                 </h2>
                 <span className="text-[10px] bg-red-600 text-white font-['Space_Grotesk'] font-bold px-2 py-0.5 rounded uppercase">
-                  Priorité P1
+                  {isEn ? 'Priority P1' : 'Priorité P1'}
                 </span>
               </div>
               <p className="text-[11px] text-[#c4c6ce]">
-                Garantie déontologique : Zéro fausse impression de sécurité • Primauté absolue des ordres officiels
+                {isEn
+                  ? 'Doctrinal guarantee: Zero false impression of safety • Absolute primacy of official orders'
+                  : 'Garantie déontologique : Zéro fausse impression de sécurité • Primauté absolue des ordres officiels'}
               </p>
             </div>
           </div>
@@ -176,7 +184,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
 
         {/* Barre de navigation des 6 scénarios */}
         <div className="p-2 bg-[#000a16] border-b border-white/10 overflow-x-auto flex gap-1.5 shrink-0">
-          {EMERGENCY_SCENARIOS.map((scenario) => {
+          {scenarios.map((scenario) => {
             const isSelected = scenario.id === selectedId;
             return (
               <button
@@ -190,7 +198,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
                 }`}
               >
                 <span className="material-symbols-outlined text-[16px]">{scenario.icon}</span>
-                <span className="truncate max-w-[170px]">{scenario.title.split('. ')[1]}</span>
+                <span className="truncate max-w-[170px]">{scenario.title.split('. ')[1] || scenario.title}</span>
               </button>
             );
           })}
@@ -203,14 +211,14 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-amber-400 text-[20px]">policy</span>
               <span className="font-['Space_Grotesk'] text-[12px] font-bold text-amber-300 uppercase tracking-wider">
-                Consigne officielle de la Sécurité Civile
+                {isEn ? 'Official Civil Protection Directive' : 'Consigne officielle de la Sécurité Civile'}
               </span>
             </div>
             <p className="text-[13px] text-white font-medium leading-snug">
               {currentScenario.officialInstruction}
             </p>
             <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-[#c4c6ce]">
-              <span className="font-bold text-white">Réflexe immédiat :</span>
+              <span className="font-bold text-white">{isEn ? 'Immediate action:' : 'Réflexe immédiat :'}</span>
               <span>{currentScenario.immediateAction}</span>
             </div>
           </div>
@@ -221,7 +229,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
               <div className="flex items-center gap-2 text-red-300">
                 <span className="material-symbols-outlined text-[20px]">block</span>
                 <h3 className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider">
-                  Pièges mortels & Comportements à proscrire
+                  {isEn ? 'Fatal Traps & Prohibited Behaviors' : 'Pièges mortels & Comportements à proscrire'}
                 </h3>
               </div>
               <ul className="flex flex-col gap-2 text-[11px] text-[#ffd599] leading-relaxed">
@@ -239,7 +247,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
               <div className="flex items-center gap-2 text-blue-300">
                 <span className="material-symbols-outlined text-[20px]">verified</span>
                 <h3 className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider">
-                  Garanties de l'application NRBCOR
+                  {isEn ? 'NRBCOR Application Safeguards' : "Garanties de l'application NRBCOR"}
                 </h3>
               </div>
               <ul className="flex flex-col gap-2 text-[11px] text-blue-100 leading-relaxed">
@@ -257,10 +265,10 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
           <div className="p-3 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-[11px] text-[#c4c6ce]">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[16px] text-[#ffd599]">gavel</span>
-              <span><strong>Cadre de référence :</strong> {currentScenario.civilSecurityReference}</span>
+              <span><strong>{isEn ? 'Legal Reference:' : 'Cadre de référence :'}</strong> {currentScenario.civilSecurityReference}</span>
             </div>
             <span className="font-['Space_Grotesk'] text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
-              CONFORME DOCTRINE
+              {isEn ? 'DOCTRINE COMPLIANT' : 'CONFORME DOCTRINE'}
             </span>
           </div>
         </div>
@@ -268,17 +276,20 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
         {/* Pied de page avec confirmation de primauté */}
         <div className="p-3 sm:p-4 border-t border-white/10 bg-[#000a16] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[11px] text-red-300 text-center sm:text-left leading-tight">
-            ⚠️ <strong>Rappel intangible :</strong> Les instructions des autorités compétentes (Préfet, FR-Alert, Police, Pompiers) priment toujours sur l'application.
+            ⚠️ <strong>{isEn ? 'Strict rule:' : 'Rappel intangible :'}</strong> {isEn
+              ? 'Directives from competent authorities (Prefect, civil protection, Police, Fire Services) always supersede this application.'
+              : "Les instructions des autorités compétentes (Préfet, FR-Alert, Police, Pompiers) priment toujours sur l'application."}
           </p>
           <button
             type="button"
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors shrink-0 shadow-sm"
           >
-            Compris & Fermer
+            {isEn ? 'Understood & Close' : 'Compris & Fermer'}
           </button>
         </div>
       </div>
     </div>
   );
 };
+

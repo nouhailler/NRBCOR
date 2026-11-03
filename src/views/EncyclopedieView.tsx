@@ -1,11 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import {
-  GLOSSARY_TERMS,
-  HISTORICAL_ERAS,
-  COUNTRY_DOCTRINES,
-  NRBC_TOOL_CATEGORIES,
-  GlossaryTerm
-} from '../data/encyclopediaData';
+import { GlossaryTerm } from '../data/encyclopediaData';
+import { getLocalizedEncyclopedia } from '../i18n/content/localizedEncyclopedia';
+import { useTranslation } from '../i18n/I18nContext';
 import { triggerHaptic } from '../utils/haptics';
 
 interface EncyclopedieViewProps {
@@ -19,6 +15,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
   onBack,
   initialTab = 'glossaire'
 }) => {
+  const { language, t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [glossarySearch, setGlossarySearch] = useState('');
   const [glossaryCategory, setGlossaryCategory] = useState<string>('all');
@@ -28,21 +25,27 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
   const [expandedToolCategory, setExpandedToolCategory] = useState<string | null>('detection');
   const [expandedGlossaryId, setExpandedGlossaryId] = useState<string | null>(null);
 
+  // Dynamic localized data according to active language
+  const { glossaryTerms, historicalEras, countryDoctrines, toolCategories } = useMemo(
+    () => getLocalizedEncyclopedia(language),
+    [language]
+  );
+
   // Alphabet pour le filtre rapide du glossaire
   const alphabet = useMemo(() => {
     const letters = new Set<string>();
-    GLOSSARY_TERMS.forEach((t) => {
+    glossaryTerms.forEach((t) => {
       const first = t.term.trim()[0].toUpperCase();
       if (first >= 'A' && first <= 'Z') {
         letters.add(first);
       }
     });
     return Array.from(letters).sort();
-  }, []);
+  }, [glossaryTerms]);
 
   // Filtrage du glossaire
   const filteredGlossary = useMemo(() => {
-    return GLOSSARY_TERMS.filter((term) => {
+    return glossaryTerms.filter((term) => {
       const q = glossarySearch.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -60,17 +63,19 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
 
       return matchesSearch && matchesCat && matchesLetter;
     });
-  }, [glossarySearch, glossaryCategory, selectedLetter]);
+  }, [glossaryTerms, glossarySearch, glossaryCategory, selectedLetter]);
 
   const selectedCountry = useMemo(() => {
-    return COUNTRY_DOCTRINES.find((c) => c.id === selectedCountryId) || COUNTRY_DOCTRINES[0];
-  }, [selectedCountryId]);
+    return countryDoctrines.find((c) => c.id === selectedCountryId) || countryDoctrines[0];
+  }, [countryDoctrines, selectedCountryId]);
 
   const handleTabChange = (tab: TabKey) => {
     triggerHaptic('light');
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const isEn = language === 'en';
 
   return (
     <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pb-28">
@@ -84,11 +89,11 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               className="flex items-center gap-1.5 text-[#98f6c5] hover:text-white transition-colors font-['Space_Grotesk'] text-[13px] font-bold cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-              <span>Retour</span>
+              <span>{t('common.back')}</span>
             </button>
             <div className="flex items-center gap-1.5 bg-[#98f6c5]/20 text-[#98f6c5] border border-[#98f6c5]/30 px-2 py-0.5 rounded-full font-['Space_Grotesk'] text-[10px] uppercase font-bold">
               <span className="material-symbols-outlined text-[14px]">local_library</span>
-              <span>Encyclopédie & Savoirs NRBC</span>
+              <span>{isEn ? 'Encyclopedia & CBRN Knowledge' : 'Encyclopédie & Savoirs NRBC'}</span>
             </div>
           </div>
 
@@ -96,21 +101,21 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#98f6c5] text-[26px]">menu_book</span>
               <h1 className="text-[22px] font-extrabold text-white tracking-tight">
-                Encyclopédie & Glossaire NRBC
+                {t('encyclo.title')}
               </h1>
             </div>
             <p className="text-[12px] text-[#dce9fd] mt-1 leading-relaxed">
-              Origines historiques, conceptualisation géopolitique par les armées, technologies de neutralisation et dictionnaire terminologique complet.
+              {t('encyclo.subtitle')}
             </p>
           </div>
 
           {/* Onglets de navigation principaux */}
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pt-2 border-t border-white/10">
             {[
-              { key: 'glossaire', label: 'Glossaire A-Z', icon: 'spellcheck' },
-              { key: 'histoire', label: 'Histoire & Origines', icon: 'history_edu' },
-              { key: 'doctrines', label: 'Doctrines & Pays', icon: 'public' },
-              { key: 'outils', label: 'Outils & Technologies', icon: 'build' }
+              { key: 'glossaire', label: t('encyclo.tabGlossary'), icon: 'spellcheck' },
+              { key: 'histoire', label: t('encyclo.tabHistory'), icon: 'history_edu' },
+              { key: 'doctrines', label: t('encyclo.tabDoctrines'), icon: 'public' },
+              { key: 'outils', label: t('encyclo.tabTools'), icon: 'build' }
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -146,7 +151,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                   type="text"
                   value={glossarySearch}
                   onChange={(e) => setGlossarySearch(e.target.value)}
-                  placeholder="Rechercher un terme, acronyme (Sarin, ALARA, Sievert, MOPP, CMIC)..."
+                  placeholder={t('encyclo.searchPlaceholder')}
                   className="w-full h-11 pl-10 pr-10 bg-[#f8f9ff] border border-[#c4c6ce] rounded-xl text-[14px] text-[#001126] placeholder-[#74777e] focus:outline-none focus:border-[#0036ce]"
                 />
                 {glossarySearch && (
@@ -163,14 +168,14 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               {/* Filtres par catégorie */}
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                 {[
-                  { id: 'all', label: 'Tous' },
-                  { id: 'chimique', label: 'Chimique' },
-                  { id: 'nucleaire', label: 'Nucléaire' },
-                  { id: 'radiologique', label: 'Radiologique' },
-                  { id: 'biologique', label: 'Biologique' },
-                  { id: 'materiel', label: 'Matériel & EPI' },
-                  { id: 'secours', label: 'Secours' },
-                  { id: 'reglementaire', label: 'Doctrines' }
+                  { id: 'all', label: isEn ? 'All' : 'Tous' },
+                  { id: 'chimique', label: isEn ? 'Chemical' : 'Chimique' },
+                  { id: 'nucleaire', label: isEn ? 'Nuclear' : 'Nucléaire' },
+                  { id: 'radiologique', label: isEn ? 'Radiological' : 'Radiologique' },
+                  { id: 'biologique', label: isEn ? 'Biological' : 'Biologique' },
+                  { id: 'materiel', label: isEn ? 'Gear & PPE' : 'Matériel & EPI' },
+                  { id: 'secours', label: isEn ? 'Civil Rescue' : 'Secours' },
+                  { id: 'reglementaire', label: isEn ? 'Doctrines' : 'Doctrines' }
                 ].map((cat) => (
                   <button
                     key={cat.id}
@@ -201,7 +206,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                       : 'text-[#74777e] hover:bg-[#eef4ff]'
                   }`}
                 >
-                  Tous
+                  {isEn ? 'All' : 'Tous'}
                 </button>
                 {alphabet.map((letter) => (
                   <button
@@ -226,7 +231,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
             {/* Compteur de résultats */}
             <div className="flex items-center justify-between px-1 text-[12px] font-['Space_Grotesk'] text-[#74777e]">
               <span>
-                {filteredGlossary.length} terme{filteredGlossary.length > 1 ? 's' : ''} répertorié{filteredGlossary.length > 1 ? 's' : ''}
+                {filteredGlossary.length} {isEn ? (filteredGlossary.length > 1 ? 'terms indexed' : 'term indexed') : (filteredGlossary.length > 1 ? 'termes répertoriés' : 'terme répertorié')}
               </span>
               <span>Glossaire NRBCOR v2.5</span>
             </div>
@@ -237,17 +242,17 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                 const isExpanded = expandedGlossaryId === t.id;
                 const categoryBadge =
                   t.category === 'chimique'
-                    ? { bg: 'bg-[#ffdad6]', text: 'text-[#93000a]', label: 'Chimique' }
+                    ? { bg: 'bg-[#ffdad6]', text: 'text-[#93000a]', label: isEn ? 'Chemical' : 'Chimique' }
                     : t.category === 'nucleaire'
-                    ? { bg: 'bg-[#ffd8e4]', text: 'text-[#31111d]', label: 'Nucléaire' }
+                    ? { bg: 'bg-[#ffd8e4]', text: 'text-[#31111d]', label: isEn ? 'Nuclear' : 'Nucléaire' }
                     : t.category === 'radiologique'
-                    ? { bg: 'bg-[#ffeedd]', text: 'text-[#7c2d12]', label: 'Radiologique' }
+                    ? { bg: 'bg-[#ffeedd]', text: 'text-[#7c2d12]', label: isEn ? 'Radiological' : 'Radiologique' }
                     : t.category === 'biologique'
-                    ? { bg: 'bg-[#dcfce7]', text: 'text-[#14532d]', label: 'Biologique' }
+                    ? { bg: 'bg-[#dcfce7]', text: 'text-[#14532d]', label: isEn ? 'Biological' : 'Biologique' }
                     : t.category === 'materiel'
-                    ? { bg: 'bg-[#e0e7ff]', text: 'text-[#3730a3]', label: 'Équipements' }
+                    ? { bg: 'bg-[#e0e7ff]', text: 'text-[#3730a3]', label: isEn ? 'Equipment' : 'Équipements' }
                     : t.category === 'secours'
-                    ? { bg: 'bg-[#fef3c7]', text: 'text-[#92400e]', label: 'Sécurité Civile' }
+                    ? { bg: 'bg-[#fef3c7]', text: 'text-[#92400e]', label: isEn ? 'Civil Rescue' : 'Sécurité Civile' }
                     : { bg: 'bg-[#e2e8f0]', text: 'text-[#1e293b]', label: 'Doctrines' };
 
                 return (
@@ -281,7 +286,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                           setExpandedGlossaryId(isExpanded ? null : t.id);
                         }}
                         className="p-1 rounded-lg hover:bg-[#eef4ff] text-[#0036ce] transition-colors"
-                        title={isExpanded ? 'Réduire' : 'Développer la notice'}
+                        title={isExpanded ? (isEn ? 'Collapse' : 'Réduire') : (isEn ? 'Expand details' : 'Développer la notice')}
                       >
                         <span className="material-symbols-outlined text-[20px]">
                           {isExpanded ? 'expand_less' : 'expand_more'}
@@ -296,13 +301,13 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                     {isExpanded && (
                       <div className="pt-2 border-t border-[#eef4ff] flex flex-col gap-2.5 text-[12px] animate-in fade-in duration-150">
                         <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#e4efff] text-[#001126] leading-relaxed">
-                          <strong>Définition complète : </strong>
+                          <strong>{t('encyclo.fullDefinition')} </strong>
                           {t.fullDef}
                         </div>
 
                         <div className="flex flex-col gap-1">
                           <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#74777e] uppercase">
-                            Contexte d'application & Réalité terrain :
+                            {t('encyclo.contextApplication')}
                           </span>
                           <p className="text-[#44474d] leading-relaxed">
                             {t.contextUsage}
@@ -315,7 +320,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                               history
                             </span>
                             <span>
-                              <strong>Origine historique :</strong> {t.historicalNote}
+                              <strong>{t('encyclo.historicalOrigin')}</strong> {t.historicalNote}
                             </span>
                           </div>
                         )}
@@ -323,10 +328,10 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                         {t.seeAlso && t.seeAlso.length > 0 && (
                           <div className="flex items-center gap-1.5 flex-wrap pt-1">
                             <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#74777e]">
-                              Voir aussi :
+                              {t('encyclo.seeAlso')}
                             </span>
                             {t.seeAlso.map((relatedId) => {
-                              const related = GLOSSARY_TERMS.find((r) => r.id === relatedId);
+                              const related = glossaryTerms.find((r) => r.id === relatedId);
                               if (!related) return null;
                               return (
                                 <button
@@ -355,7 +360,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                 <div className="bg-white p-8 rounded-xl border border-[#c4c6ce] text-center flex flex-col items-center gap-2">
                   <span className="material-symbols-outlined text-[36px] text-[#74777e]">search_off</span>
                   <span className="text-[14px] font-bold text-[#001126]">
-                    Aucun terme ne correspond à votre recherche
+                    {isEn ? 'No terms match your search' : 'Aucun terme ne correspond à votre recherche'}
                   </span>
                   <button
                     type="button"
@@ -366,7 +371,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                     }}
                     className="mt-2 px-3 py-1.5 bg-[#001126] text-white rounded-lg text-[12px] font-['Space_Grotesk'] font-bold"
                   >
-                    Réinitialiser les filtres
+                    {isEn ? 'Reset filters' : 'Réinitialiser les filtres'}
                   </button>
                 </div>
               )}
@@ -381,19 +386,21 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
           <div className="flex flex-col gap-4">
             <div className="bg-[#001126] text-white p-4 rounded-xl border border-[#12263f] flex flex-col gap-2">
               <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#98f6c5]">
-                Perspective Historique & Évolution Doctrinale
+                {isEn ? 'Historical Perspective & Doctrinal Evolution' : 'Perspective Historique & Évolution Doctrinale'}
               </span>
               <h2 className="text-[18px] font-bold text-white">
-                Comment l'Homme a Appris à Combattre l'Invisible
+                {isEn ? 'How Humanity Learned to Combat the Invisible' : "Comment l'Homme a Appris à Combattre l'Invisible"}
               </h2>
               <p className="text-[12px] text-[#dce9fd] leading-relaxed">
-                Le risque NRBC n'est pas né d'un seul bloc : il résulte de la rencontre successive de la révolution chimique (1915), de la physique nucléaire (1945), des manipulations biologiques industrielles (1970) et de la vulnérabilité des sociétés urbaines interconnectées.
+                {isEn
+                  ? 'CBRN hazards emerged progressively from the chemical revolution (1915), nuclear physics (1945), industrial bio-manipulation (1970), and the acute vulnerability of modern urban societies.'
+                  : "Le risque NRBC n'est pas né d'un seul bloc : il résulte de la rencontre successive de la révolution chimique (1915), de la physique nucléaire (1945), des manipulations biologiques industrielles (1970) et de la vulnérabilité des sociétés urbaines interconnectées."}
               </p>
             </div>
 
             {/* Liste chronologique des 4 grandes ères */}
             <div className="flex flex-col gap-3">
-              {HISTORICAL_ERAS.map((era) => {
+              {historicalEras.map((era) => {
                 const isExpanded = expandedEra === era.id;
 
                 return (
@@ -435,7 +442,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
 
                         <div className="flex flex-col gap-3">
                           <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#001126] tracking-wide">
-                            Événements Fondateurs & Leçons Apprises :
+                            {isEn ? 'Landmark Events & Key Lessons Learned:' : 'Événements Fondateurs & Leçons Apprises :'}
                           </span>
 
                           <div className="space-y-3">
@@ -460,7 +467,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                                     psychology
                                   </span>
                                   <span>
-                                    <strong>Leçon tactique & doctrinale :</strong> {evt.lessonLearned}
+                                    <strong>{isEn ? 'Tactical & doctrinal takeaway:' : 'Leçon tactique & doctrinale :'}</strong> {evt.lessonLearned}
                                   </span>
                                 </div>
                               </div>
@@ -473,7 +480,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                             military_tech
                           </span>
                           <div>
-                            <strong>Impact sur la doctrine de sécurité :</strong> {era.doctrinalImpact}
+                            <strong>{isEn ? 'Impact on security doctrine:' : 'Impact sur la doctrine de sécurité :'}</strong> {era.doctrinalImpact}
                           </div>
                         </div>
                       </div>
@@ -492,7 +499,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
           <div className="flex flex-col gap-4">
             {/* Sélecteur de pays */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-white p-1.5 rounded-xl border border-[#c4c6ce]">
-              {COUNTRY_DOCTRINES.map((c) => (
+              {countryDoctrines.map((c) => (
                 <button
                   key={c.id}
                   type="button"
@@ -519,7 +526,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="text-[24px]">{selectedCountry.flag}</span>
                     <h2 className="text-[18px] font-bold text-[#001126]">
-                      Doctrine {selectedCountry.country}
+                      {isEn ? `${selectedCountry.country} Doctrine` : `Doctrine ${selectedCountry.country}`}
                     </h2>
                   </div>
                   <span className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#0036ce] mt-0.5">
@@ -532,7 +539,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
                 <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#e4efff]">
                   <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#74777e] block mb-1">
-                    Organismes & Commandement :
+                    {isEn ? 'Agencies & Command Structure:' : 'Organismes & Commandement :'}
                   </span>
                   <span className="font-semibold text-[#001126]">
                     {selectedCountry.organization}
@@ -540,7 +547,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                 </div>
                 <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#e4efff]">
                   <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#74777e] block mb-1">
-                    Posture Stratégique :
+                    {isEn ? 'Strategic Posture:' : 'Posture Stratégique :'}
                   </span>
                   <span className="text-[#44474d] leading-relaxed">
                     {selectedCountry.posture}
@@ -551,7 +558,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               {/* Piliers conceptuels */}
               <div className="flex flex-col gap-2">
                 <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#001126]">
-                  Concepts Clés & Spécificités Nationales :
+                  {isEn ? 'Key Concepts & National Specifics:' : 'Concepts Clés & Spécificités Nationales :'}
                 </span>
                 <div className="space-y-1.5">
                   {selectedCountry.keyConcepts.map((concept, i) => (
@@ -572,7 +579,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               <div className="p-3.5 bg-white rounded-xl border border-[#c4c6ce] flex flex-col gap-1.5">
                 <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#ba1a1a] flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[16px]">shield</span>
-                  Modèle de Protection Civile des Populations :
+                  {isEn ? 'Civil Protection & Sheltering Architecture:' : 'Modèle de Protection Civile des Populations :'}
                 </span>
                 <p className="text-[12px] text-[#44474d] leading-relaxed">
                   {selectedCountry.civilProtectionModel}
@@ -582,7 +589,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
               {/* Unités d'élite */}
               <div className="flex flex-col gap-1.5">
                 <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#74777e]">
-                  Unités Militaires & Spécialisées Majeures :
+                  {isEn ? 'Primary Military & Specialized Units:' : 'Unités Militaires & Spécialisées Majeures :'}
                 </span>
                 <ul className="text-[12px] text-[#001126] space-y-1 pl-5 list-disc">
                   {selectedCountry.militaryUnits.map((u, i) => (
@@ -598,7 +605,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                 <div className="p-3 bg-[#e8f5e9] rounded-xl border border-[#c8e6c9] flex flex-col gap-1">
                   <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#1b5e20] flex items-center gap-1">
                     <span className="material-symbols-outlined text-[15px]">add_circle</span>
-                    Points Forts du Dispositif :
+                    {isEn ? 'Strategic Strengths:' : 'Points Forts du Dispositif :'}
                   </span>
                   <ul className="space-y-1 text-[#2e7d32] pl-4 list-disc text-[11px]">
                     {selectedCountry.strengthsAndLimitations.strengths.map((s, i) => (
@@ -610,7 +617,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                 <div className="p-3 bg-[#fff3e0] rounded-xl border border-[#ffe0b2] flex flex-col gap-1">
                   <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#e65100] flex items-center gap-1">
                     <span className="material-symbols-outlined text-[15px]">warning</span>
-                    Limites & Vulnérabilités :
+                    {isEn ? 'Limitations & Vulnerabilities:' : 'Limites & Vulnérabilités :'}
                   </span>
                   <ul className="space-y-1 text-[#b26a00] pl-4 list-disc text-[11px]">
                     {selectedCountry.strengthsAndLimitations.limitations.map((l, i) => (
@@ -630,19 +637,21 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
           <div className="flex flex-col gap-4">
             <div className="bg-[#001126] text-white p-4 rounded-xl border border-[#12263f] flex flex-col gap-2">
               <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#98f6c5]">
-                Arsenal Technologique & Contre-Mesures
+                {isEn ? 'Technological Countermeasures & Gear' : 'Arsenal Technologique & Contre-Mesures'}
               </span>
               <h2 className="text-[18px] font-bold text-white">
-                Les Armes de la Survie face au Péril Invisible
+                {isEn ? 'Survival Technologies Against the Invisible Hazard' : 'Les Armes de la Survie face au Péril Invisible'}
               </h2>
               <p className="text-[12px] text-[#dce9fd] leading-relaxed">
-                De la cartouche de charbon actif de Nicolaï Zelinsky en 1915 aux spectromètres Raman à visée laser contemporains, découvrez le fonctionnement physique et chimique des outils créés pour détecter, filtrer, décontaminer et soigner.
+                {isEn
+                  ? 'From Nikolai Zelinsky\'s 1915 activated carbon canister to modern laser Raman spectrometers, explore the physical and chemical principles developed to detect, filter, decontaminate, and treat.'
+                  : 'De la cartouche de charbon actif de Nicolaï Zelinsky en 1915 aux spectromètres Raman à visée laser contemporains, découvrez le fonctionnement physique et chimique des outils créés pour détecter, filtrer, décontaminer et soigner.'}
               </p>
             </div>
 
             {/* Catégories d'outils */}
             <div className="flex flex-col gap-3">
-              {NRBC_TOOL_CATEGORIES.map((cat) => {
+              {toolCategories.map((cat) => {
                 const isExpanded = expandedToolCategory === cat.id;
 
                 return (
@@ -702,20 +711,20 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                               </div>
 
                               <div className="text-[12px] text-[#44474d] leading-relaxed">
-                                <strong>Principe de fonctionnement : </strong>
+                                <strong>{isEn ? 'Operating Principle:' : 'Principe de fonctionnement : '}</strong>
                                 {tool.principle}
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
                                 <div className="p-2 bg-white rounded-lg border border-[#c4c6ce] text-[#001126]">
                                   <strong className="block text-[#0036ce] font-['Space_Grotesk']">
-                                    Genèse historique :
+                                    {isEn ? 'Historical Inception:' : 'Genèse historique :'}
                                   </strong>
                                   <span>{tool.history}</span>
                                 </div>
                                 <div className="p-2 bg-[#ffdad6]/40 rounded-lg border border-[#ffdad6] text-[#93000a]">
                                   <strong className="block text-[#ba1a1a] font-['Space_Grotesk']">
-                                    Limites opérationnelles :
+                                    {isEn ? 'Operational Limits:' : 'Limites opérationnelles :'}
                                   </strong>
                                   <span>{tool.limits}</span>
                                 </div>
@@ -727,7 +736,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                                     person
                                   </span>
                                   <span>
-                                    <strong>Équivalent / Application civile :</strong> {tool.civilianEquivalent}
+                                    <strong>{isEn ? 'Civilian Equivalent / Application:' : 'Équivalent / Application civile :'}</strong> {tool.civilianEquivalent}
                                   </span>
                                 </div>
                               )}
@@ -746,3 +755,4 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
     </div>
   );
 };
+

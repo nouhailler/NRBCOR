@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { KitItem, SubScreen, TabType } from '../types';
-import { KIT_CATEGORIES } from '../data/kitData';
+import { getLocalizedKitCategories, getLocalizedKitItems } from '../i18n/content/localizedKit';
+import { useTranslation } from '../i18n/I18nContext';
 import { Tooltip } from '../components/Tooltip';
 import { SuisJePretView } from './SuisJePretView';
 
@@ -25,6 +26,9 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   onOpenSubScreen,
   defaultMode = 'suis-je-pret',
 }) => {
+  const { language, t } = useTranslation();
+  const isEn = language === 'en';
+
   const [viewMode, setViewMode] = useState<'suis-je-pret' | 'kit'>(defaultMode);
   const [peopleCount, setPeopleCount] = useState<number>(3);
   const [durationDays, setDurationDays] = useState<number>(3);
@@ -33,16 +37,20 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState(1);
 
+  // Localized categories and items
+  const kitCategories = useMemo(() => getLocalizedKitCategories(language), [language]);
+  const localizedItems = useMemo(() => getLocalizedKitItems(items, language), [items, language]);
+
   // Dynamic calculations
   const totalWaterLitres = peopleCount * 3 * durationDays;
   const totalRations = peopleCount * durationDays;
 
-  const totalItems = items.length;
-  const completedCount = items.filter((it) => it.completed).length;
+  const totalItems = localizedItems.length;
+  const completedCount = localizedItems.filter((it) => it.completed).length;
   const missingCount = totalItems - completedCount;
   const progressPercent = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
-  const filteredItems = filterMode === 'all' ? items : items.filter((it) => !it.completed);
+  const filteredItems = filterMode === 'all' ? localizedItems : localizedItems.filter((it) => !it.completed);
 
   const handleAddNewItem = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +60,8 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
       id: `custom-${Date.now()}`,
       category: newCategory,
       title: newTitle.trim(),
-      subtitle: 'Article personnalisé ajouté par le foyer.',
-      tag: 'Personnalisé',
+      subtitle: isEn ? 'Custom household item added by user.' : 'Article personnalisé ajouté par le foyer.',
+      tag: isEn ? 'Custom' : 'Personnalisé',
       completed: false,
     };
     onAddItem(newItem);
@@ -77,7 +85,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
         }`}
       >
         <span className="material-symbols-outlined text-[18px]">speed</span>
-        <span>Tableau de bord « Suis-je prêt ? »</span>
+        <span>{t('readiness.title')}</span>
       </button>
 
       <button
@@ -90,7 +98,11 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
         }`}
       >
         <span className="material-symbols-outlined text-[18px]">backpack</span>
-        <span>Kit 72h détaillé ({completedCount}/{totalItems})</span>
+        <span>
+          {isEn
+            ? `Detailed 72h Kit (${completedCount}/${totalItems})`
+            : `Kit 72h détaillé (${completedCount}/${totalItems})`}
+        </span>
       </button>
     </div>
   );
@@ -98,7 +110,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   if (viewMode === 'suis-je-pret') {
     return (
       <SuisJePretView
-        items={items}
+        items={localizedItems}
         onToggleItem={onToggleItem}
         onOpenInventory={onOpenInventory}
         onNavigateTab={onNavigateTab}
@@ -123,11 +135,11 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
             cloud_off
           </span>
           <span className="font-['Space_Grotesk'] text-[11px] font-semibold truncate text-[#001126]">
-            Stockage 100% local (IndexedDB) • Aucune donnée transmise
+            {isEn ? '100% Local Storage (IndexedDB) • Zero data sent' : 'Stockage 100% local (IndexedDB) • Aucune donnée transmise'}
           </span>
         </div>
         <span className="font-['Space_Grotesk'] text-[11px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase flex-shrink-0">
-          Chiffré
+          {isEn ? 'Encrypted' : 'Chiffré'}
         </span>
       </div>
 
@@ -351,7 +363,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
                 : 'bg-[#e4efff] text-[#44474d] hover:text-[#001126]'
             }`}
           >
-            Tout ({totalItems})
+            {isEn ? `All (${totalItems})` : `Tout (${totalItems})`}
           </button>
           <button
             type="button"
@@ -362,13 +374,13 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
                 : 'bg-[#e4efff] text-[#44474d] hover:text-[#001126]'
             }`}
           >
-            À compléter ({missingCount})
+            {isEn ? `To Complete (${missingCount})` : `À compléter (${missingCount})`}
           </button>
         </div>
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
-          title="Ajouter un article personnalisé"
+          title={isEn ? 'Add custom item' : 'Ajouter un article personnalisé'}
           className="min-h-[48px] w-12 rounded-lg bg-[#dce9fd] hover:bg-[#d6e4f8] text-[#001126] flex items-center justify-center flex-shrink-0 transition-colors shadow-sm"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
@@ -377,7 +389,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
 
       {/* Catégories Normées avec Checkbox Touch-Friendly */}
       <div className="flex flex-col gap-4">
-        {KIT_CATEGORIES.map((cat) => {
+        {kitCategories.map((cat) => {
           const categoryItems = filteredItems.filter((it) => it.category === cat.id);
           if (categoryItems.length === 0 && filterMode === 'todo') return null;
 
@@ -423,19 +435,23 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
                         className={`font-['Space_Grotesk'] text-[11px] px-1.5 py-0.5 rounded font-bold flex-shrink-0 ${
                           item.completed
                             ? 'bg-[#98f6c5] text-[#005236]'
-                            : item.tag === 'Manquant'
+                            : item.tag === 'Manquant' || item.tag === 'Missing'
                             ? 'bg-[#ffdad6] text-[#93000a]'
                             : 'bg-[#e4efff] text-[#001126]'
                         }`}
                       >
-                        {item.completed ? 'Prêt' : item.tag}
+                        {item.completed ? (isEn ? 'Ready' : 'Prêt') : item.tag}
                       </span>
                     </div>
                     <p className="text-[12px] text-[#44474d] mt-0.5 leading-snug">
                       {item.id === 'k1'
-                        ? `Statut : Réserve calculée pour ${peopleCount} pers. / ${durationDays} jours = ${totalWaterLitres}L.`
+                        ? (isEn
+                            ? `Status: Calculated reserve for ${peopleCount} pers. / ${durationDays} days = ${totalWaterLitres}L.`
+                            : `Statut : Réserve calculée pour ${peopleCount} pers. / ${durationDays} jours = ${totalWaterLitres}L.`)
                         : item.id === 'k3'
-                        ? `Conserves, céréales et rations (${totalRations} rations calculées).`
+                        ? (isEn
+                            ? `Canned goods, grains and rations (${totalRations} calculated rations).`
+                            : `Conserves, céréales et rations (${totalRations} rations calculées).`)
                         : item.subtitle}
                     </p>
                   </div>
@@ -450,10 +466,12 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
                   </span>
                   <div className="min-w-0 flex-1">
                     <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#0036ce]">
-                      Rappel Légal & Sanitaire
+                      {isEn ? 'Legal & Health Notice' : 'Rappel Légal & Sanitaire'}
                     </span>
                     <p className="text-[12px] text-[#44474d] mt-0.5 leading-snug">
-                      Les comprimés d'<strong className="text-[#001126] font-semibold">iode stable (iodure de potassium)</strong> ne doivent JAMAIS faire l'objet d'une automédication préventive sans consigne préfectorale explicite (distribution réservée aux rayons PPI nucléaires ou stocks d'État).
+                      {isEn
+                        ? 'Stable potassium iodide (KI) tablets must NEVER be self-administered without an explicit government decree (distribution restricted to nuclear emergency response zones or national stockpiles).'
+                        : "Les comprimés d'iode stable (iodure de potassium) ne doivent JAMAIS faire l'objet d'une automédication préventive sans consigne préfectorale explicite (distribution réservée aux rayons PPI nucléaires ou stocks d'État)."}
                     </p>
                   </div>
                 </div>
@@ -471,7 +489,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
           className="w-full min-h-[48px] rounded-lg bg-[#001126] hover:bg-[#12263f] text-white text-[14px] font-bold flex items-center justify-center gap-2 active:opacity-90 shadow-sm transition-colors"
         >
           <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
-          <span>Exporter l'inventaire (PDF / Impression locale)</span>
+          <span>{isEn ? 'Export inventory (PDF / Local Print)' : "Exporter l'inventaire (PDF / Impression locale)"}</span>
         </button>
 
         <button
@@ -480,17 +498,19 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
           className="w-full min-h-[48px] rounded-lg bg-[#eef4ff] hover:bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors border border-[#d6e4f8]"
         >
           <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-          <span>Réinitialiser les états cochés</span>
+          <span>{isEn ? 'Reset completed checklist' : 'Réinitialiser les états cochés'}</span>
         </button>
 
         <div className="text-center px-2 py-2">
           <p className="text-[12px] text-[#44474d] leading-relaxed">
-            Recommandations conformes au guide <span className="font-medium text-[#001126]">« Tous Responsables »</span> (Ministère de l'Intérieur) et au Plan d'Urgence Familial de la Direction Générale de la Sécurité Civile (DGSCGC).
+            {isEn
+              ? 'Recommendations aligned with European Civil Protection guidelines and French DGSCGC Family Disaster Plan.'
+              : 'Recommandations conformes au guide « Tous Responsables » (Ministère de l\'Intérieur) et au Plan d\'Urgence Familial de la Direction Générale de la Sécurité Civile (DGSCGC).'}
           </p>
           <div className="flex items-center justify-center gap-2 mt-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#3f9d73]"></span>
             <span className="font-['Space_Grotesk'] text-[11px] uppercase tracking-wider text-[#44474d] font-bold">
-              NRBCOR PWA v4.7 • Mode Hors-Ligne Prêt
+              NRBCOR PWA v4.7 • {isEn ? 'Offline Mode Active' : 'Mode Hors-Ligne Prêt'}
             </span>
           </div>
         </div>
@@ -503,17 +523,19 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
         >
           <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">Ajouter un article</h3>
+            <h3 className="text-[18px] font-bold text-[#001126]">
+              {isEn ? 'Add Custom Item' : 'Ajouter un article'}
+            </h3>
             <form onSubmit={handleAddNewItem} className="flex flex-col gap-3">
               <div>
                 <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
-                  Nom de l'article :
+                  {isEn ? 'Item title:' : "Nom de l'article :"}
                 </label>
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Ex : Masque FFP3 enfant, piles D..."
+                  placeholder={isEn ? 'E.g., Pediatric FFP3 mask, D batteries...' : 'Ex : Masque FFP3 enfant, piles D...'}
                   className="w-full h-12 px-3 border border-[#c4c6ce] rounded-lg text-[14px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
                   autoFocus
                 />
@@ -521,14 +543,14 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
 
               <div>
                 <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
-                  Catégorie :
+                  {isEn ? 'Category:' : 'Catégorie :'}
                 </label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(Number(e.target.value))}
                   className="w-full h-12 px-3 border border-[#c4c6ce] rounded-lg text-[14px] text-[#001126] bg-white focus:outline-none focus:border-[#0036ce]"
                 >
-                  {KIT_CATEGORIES.map((c) => (
+                  {kitCategories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
@@ -542,13 +564,13 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
                   onClick={() => setShowAddModal(false)}
                   className="h-11 px-4 rounded-lg bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase"
                 >
-                  Annuler
+                  {isEn ? 'Cancel' : 'Annuler'}
                 </button>
                 <button
                   type="submit"
                   className="h-11 px-4 rounded-lg bg-[#001126] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase shadow-sm"
                 >
-                  Ajouter
+                  {isEn ? 'Add' : 'Ajouter'}
                 </button>
               </div>
             </form>
