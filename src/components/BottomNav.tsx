@@ -1,5 +1,6 @@
 import React from 'react';
 import { TabType } from '../types';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface BottomNavProps {
   currentTab: TabType;
@@ -7,12 +8,13 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab }) => {
+  const { t } = useTranslation();
   const tabs: { id: TabType; label: string; icon: string; isEmergency?: boolean }[] = [
-    { id: 'accueil', label: 'Accueil', icon: 'home' },
-    { id: 'reagir', label: 'Réagir', icon: 'emergency', isEmergency: true },
-    { id: 'guides', label: 'Guides', icon: 'local_library' },
-    { id: 'preparation', label: 'Préparation', icon: 'backpack' },
-    { id: 'mon-plan', label: 'Mon Plan', icon: 'group' },
+    { id: 'accueil', label: t('nav.home'), icon: 'home' },
+    { id: 'reagir', label: t('nav.react'), icon: 'emergency', isEmergency: true },
+    { id: 'guides', label: t('nav.guides'), icon: 'local_library' },
+    { id: 'preparation', label: t('nav.prep'), icon: 'backpack' },
+    { id: 'mon-plan', label: t('nav.myPlan'), icon: 'group' },
   ];
 
   return (

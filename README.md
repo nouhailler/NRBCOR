@@ -7,10 +7,16 @@
 </p>
 
 <p align="center">
+  <a href="README.en.md"><strong>🇬🇧 English Documentation (README.en.md)</strong></a> • 
+  <a href="docs/I18N_IMPLEMENTATION_REPORT.md"><strong>🌐 Rapport d'Implémentation i18n</strong></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/PWA-100%25%20Hors--Ligne-98f6c5?style=for-the-badge&logo=pwa&logoColor=001126" alt="PWA Offline" />
-  <img src="https://img.shields.io/badge/Version-v1.5.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.5.0" />
-  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.5%20(Transfrontalier%20FR%2FCH%2FBE)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
-  <img src="https://img.shields.io/badge/Audit%20CI-227%20Tests%20OK-brightgreen?style=for-the-badge" alt="Tests OK" />
+  <img src="https://img.shields.io/badge/Bilingue-FR%20%2F%20EN%20Int%C3%A9gral-0036ce?style=for-the-badge" alt="Bilingue FR/EN" />
+  <img src="https://img.shields.io/badge/Version-v1.6.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.6.0" />
+  <img src="https://img.shields.io/badge/Corpus%20Doctrinal-v2.6%20(Transfrontalier%20FR%2FCH%2FBE%2FLU)-3f9d73?style=for-the-badge" alt="Doctrines Officielles" />
+  <img src="https://img.shields.io/badge/Audit%20CI-273%20Tests%20OK-brightgreen?style=for-the-badge" alt="Tests OK" />
   <img src="https://img.shields.io/badge/Données-Zéro%20Serveur%20/%20IndexedDB-12263f?style=for-the-badge" alt="Souveraineté des Données" />
 </p>
 
@@ -25,14 +31,19 @@ npm run lint
 # 2. Audit automatisé du corpus de sécurité civile (URLs, métadonnées, doctrines FR/CH/BE/LU/AIEA)
 npm run check:content
 
-# 3. Suite complète de tests d'autonomie et de cohérence (227 tests automatisés)
+# 3. Suite complète de tests (autonomie, cohérence & parité i18n : 273 tests)
 npm test
 
-# 4. Compilation de production PWA
+# 4. Audit spécifique de l'internationalisation bilingue (FR/EN)
+npm run test:i18n
+
+# 5. Compilation de production PWA
 npm run build
 ```
 
 Pour consulter la documentation détaillée :
+- 🌐 [Rapport d'Implémentation de l'Internationalisation](docs/I18N_IMPLEMENTATION_REPORT.md)
+- 🇬🇧 [English Documentation](README.en.md)
 - 📜 [Corpus Doctrinal & Traçabilité Réglementaire](docs/CORPUS_NRBC.md)
 - 🧪 [Protocole de Recette & Checklist de Test](docs/TESTING_CHECKLIST.md)
 - 📦 [Historique des Versions & Mises à Jour](CHANGELOG.md)
@@ -49,7 +60,19 @@ Pour consulter la documentation détaillée :
 
 ---
 
-## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.5.0)
+## 🌟 Nouvelles Fonctionnalités Majeures (Mise à Jour v1.6.0)
+
+### 🌐 1. Internationalisation Intégrale Bilingue (Français & Anglais)
+* **Architecture i18n 100% hors-ligne & souveraine** : Aucun recours à des APIs distantes de traduction. Les 248 clés de traduction sont embarquées directement dans le service worker PWA.
+* **Sélecteur de langue instantané et accessible** : Bascule FR / EN compacte dans la barre de titre et variante complète accessible dans le tiroir du menu et l'écran des paramètres.
+* **Corpus CBRN bilingue** : Protocoles Nucléaire, Radiologique, Biologique, Chimique et Confinement traduits avec une rigueur terminologique experte (ALARA, Shelter-in-place, Seveso, Biotox, KI 65mg).
+* **Préservation des doctrines nationales (FR, CH, BE, LU)** : Les numéros d'urgence (15, 18, 112, 144, 100, 114) et spécificités juridiques (PPI français 20km, Alertswiss 50km, BE-Alert) sont rigoureusement préservés et explicités sans fausse anglicisation.
+* **Synthèse vocale bilingue** : Lecture audio des consignes de sécurité sous stress en français (`fr-FR`) ou en anglais (`en-US`).
+* **Suite de 46 tests automatisés de parité i18n** : `npm run test:i18n` garantit 0 clé orpheline et 0 régression.
+
+---
+
+## 🌟 Fonctionnalités Précédentes (Mise à Jour v1.5.0)
 
 ### 📚 1. Mini-Encyclopédie Documentée du Risque NRBC
 * **Histoire & Origines** : 4 ères clés décortiquées (naissance en 1914-1925 avec Ypres et le chlore de Fritz Haber, Seconde Guerre Mondiale avec les neurotoxiques organophosphorés et l'atome, Guerre Froide avec le VX et Tchernobyl, ère contemporaine avec le métro de Tokyo, Fukushima et les Novitchok).

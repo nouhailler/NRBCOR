@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../i18n/I18nContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
   currentTitle?: string;
@@ -33,6 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleProfileMode,
   onOpenModeCrise,
 }) => {
+  const { t } = useTranslation();
   const [isOnline, setIsOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
@@ -163,11 +166,14 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
+          {/* Sélecteur de Langue Compact (FR | EN) */}
+          <LanguageSwitcher variant="compact" />
+
           {/* Les 2 boutons empilés verticalement l'un au-dessous de l'autre (En Ligne au-dessus, Crise en dessous) */}
           <div className="flex flex-col items-end justify-center gap-1 shrink-0">
             {/* 1. Bouton / Badge statut réseau En Ligne au-dessus */}
             <span
-              title={isOnline ? 'Réseau Internet détecté et opérationnel' : 'Aucun réseau détecté - Fonctionnement sur base locale'}
+              title={isOnline ? t('common.onlineBadge') : t('common.offlineBadge')}
               className={`font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded-full uppercase font-bold flex items-center gap-1 shadow-2xs shrink-0 ${
                 isOnline
                   ? 'bg-[#98f6c5] text-[#005236] border border-[#005236]/20'
@@ -175,19 +181,19 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isOnline ? 'bg-[#005236]' : 'bg-[#93000a]'}`}></span>
-              <span>{isOnline ? 'En Ligne' : 'Hors Ligne'}</span>
+              <span>{isOnline ? t('common.online') : t('common.offline')}</span>
             </span>
 
             {/* 2. Bouton SOS Mode Crise en dessous */}
             {onOpenModeCrise && (
               <button
                 onClick={onOpenModeCrise}
-                title="Activer le Mode Crise Immédiat (Gros Boutons Réflexes)"
-                className="h-7 px-2.5 rounded-md bg-[#ba1a1a] hover:bg-[#93000a] text-white flex items-center gap-1 font-['Space_Grotesk'] text-[11px] font-black uppercase transition-all shadow-sm active:scale-95 animate-pulse border border-red-400 shrink-0"
+                title={t('crisis.subtitle')}
+                className="h-7 px-2.5 rounded-md bg-[#ba1a1a] hover:bg-[#93000a] text-white flex items-center gap-1 font-['Space_Grotesk'] text-[11px] font-black uppercase transition-all shadow-sm active:scale-95 animate-pulse border border-red-400 shrink-0 cursor-pointer"
                 type="button"
               >
                 <span className="material-symbols-outlined text-[15px]">emergency</span>
-                <span>CRISE</span>
+                <span>{t('nav.crisisButton')}</span>
               </button>
             )}
           </div>

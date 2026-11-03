@@ -14,6 +14,7 @@ export interface AppSettings {
   };
   specificNeeds?: SpecificNeedsConfig;
   profileMode?: 'simplified' | 'expert';
+  language?: 'fr' | 'en';
   onboardingCompleted: boolean;
   createdAt: string;
   updatedAt: string;

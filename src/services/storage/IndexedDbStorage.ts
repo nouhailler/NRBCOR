@@ -57,6 +57,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   specificNeeds: DEFAULT_SPECIFIC_NEEDS,
   profileMode: 'simplified',
+  language: 'fr',
   onboardingCompleted: false,
   createdAt: '2026-10-12T00:00:00.000Z',
   updatedAt: '2026-10-14T08:00:00.000Z'

@@ -10,7 +10,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "check:content": "tsx scripts/verify-corpus.ts",
-    "test": "tsx scripts/run-readiness-tests.ts"
+    "test:i18n": "tsx scripts/run-i18n-tests.ts",
+    "test": "tsx scripts/run-readiness-tests.ts && tsx scripts/run-i18n-tests.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

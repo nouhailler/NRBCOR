@@ -3,6 +3,8 @@ import { ProtocolData } from '../data/protocols';
 import { EmergencyCall } from '../types';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
 import { triggerHaptic } from '../utils/haptics';
+import { useTranslation } from '../i18n/I18nContext';
+import { getLocalizedProtocol } from '../i18n/content/localizedProtocols';
 
 interface ProtocolDetailViewProps {
   protocol: ProtocolData;
@@ -12,11 +14,14 @@ interface ProtocolDetailViewProps {
 }
 
 export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
-  protocol,
+  protocol: initialProtocol,
   onBack,
   onOpenCallModal,
   profileMode = 'simplified',
 }) => {
+  const { t, language } = useTranslation();
+  const protocol = getLocalizedProtocol(initialProtocol.id, language);
+
   const [activePhase, setActivePhase] = useState<'avant' | 'pendant' | 'apres'>('pendant');
   const [sirenActive, setSirenActive] = useState(false);
 
@@ -44,18 +49,18 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
           <button
             onClick={onBack}
             type="button"
-            className="h-12 px-3 bg-[#dce9fd] hover:bg-[#d6e4f8] active:bg-[#cedbef] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
+            className="h-12 px-3 bg-[#dce9fd] hover:bg-[#d6e4f8] active:bg-[#cedbef] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span>HUB D'URGENCE</span>
+            <span>{language === 'fr' ? "HUB D'URGENCE" : 'EMERGENCY HUB'}</span>
           </button>
 
           <div className="flex items-center gap-1.5">
             <button
               onClick={handlePrintProtocol}
               type="button"
-              title="Imprimer cette fiche réflexe pour le classeur d'urgence"
-              className="h-12 w-12 bg-white border border-[#c4c6ce] hover:bg-[#e4efff] text-[#001126] rounded flex items-center justify-center transition-colors shadow-sm"
+              title={language === 'fr' ? "Imprimer cette fiche réflexe pour le classeur d'urgence" : 'Print emergency card'}
+              className="h-12 w-12 bg-white border border-[#c4c6ce] hover:bg-[#e4efff] text-[#001126] rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">print</span>
             </button>
@@ -133,14 +138,16 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
               {protocol.offlineBannerText}
             </span>
           </div>
-          <span className="text-[#98f6c5] text-[11px] font-['Space_Grotesk'] font-bold">100% DISPO</span>
+          <span className="text-[#98f6c5] text-[11px] font-['Space_Grotesk'] font-bold">
+            {language === 'fr' ? '100% DISPO' : '100% READY'}
+          </span>
         </div>
 
         {/* Bouton de test audio de sirène intégrée */}
         <button
           onClick={toggleSirenAudio}
           type="button"
-          className={`h-11 px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-between transition-all border ${
+          className={`h-11 px-3 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-between transition-all border cursor-pointer ${
             sirenActive
               ? 'bg-[#ba1a1a] text-white border-[#ba1a1a] animate-pulse'
               : 'bg-white hover:bg-[#ffdad6]/60 text-[#ba1a1a] border-[#ffdad6]'
@@ -152,12 +159,12 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
             </span>
             <span>
               {sirenActive
-                ? "Arrêter la sirène d'alerte RNA"
-                : "Écouter le signal sonore national d'alerte (1 min 41s)"}
+                ? (language === 'fr' ? "Arrêter la sirène d'alerte RNA" : 'Stop civil defense siren')
+                : (language === 'fr' ? "Écouter le signal sonore national d'alerte (1 min 41s)" : 'Play national alert siren signal (1 min 41s)')}
             </span>
           </div>
           <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">
-            {sirenActive ? 'LECTURE' : 'TEST HORS-LIGNE'}
+            {sirenActive ? (language === 'fr' ? 'LECTURE' : 'PLAYING') : (language === 'fr' ? 'TEST HORS-LIGNE' : 'OFFLINE TEST')}
           </span>
         </button>
       </div>
@@ -169,27 +176,39 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
             <div className="flex items-center justify-between">
               <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase tracking-wider flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px]">person</span>
-                Grand Public • 3 Réflexes Vitaux Absolus
+                {language === 'fr' ? 'Grand Public • 3 Réflexes Vitaux Absolus' : 'General Public • 3 Vital Absolute Reflexes'}
               </span>
               <span className="text-[10px] bg-[#0036ce] text-white px-1.5 py-0.2 rounded font-bold uppercase">
-                Priorité Immédiate
+                {language === 'fr' ? 'Priorité Immédiate' : 'Immediate Priority'}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-1.5 text-center pt-0.5">
               <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
                 <span className="material-symbols-outlined text-[#0036ce] text-[18px]">meeting_room</span>
-                <span className="font-bold text-[11px] text-[#001126] leading-tight">1. Confinez-vous</span>
-                <span className="text-[10px] text-[#44474d]">En dur, coupez VMC</span>
+                <span className="font-bold text-[11px] text-[#001126] leading-tight">
+                  {language === 'fr' ? '1. Confinez-vous' : '1. Shelter inside'}
+                </span>
+                <span className="text-[10px] text-[#44474d]">
+                  {language === 'fr' ? 'En dur, coupez VMC' : 'Solid walls, cut HVAC'}
+                </span>
               </div>
               <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
                 <span className="material-symbols-outlined text-[#0036ce] text-[18px]">radio</span>
-                <span className="font-bold text-[11px] text-[#001126] leading-tight">2. Écoutez Radio</span>
-                <span className="text-[10px] text-[#44474d]">France Bleu FM</span>
+                <span className="font-bold text-[11px] text-[#001126] leading-tight">
+                  {language === 'fr' ? '2. Écoutez Radio' : '2. Listen to Radio'}
+                </span>
+                <span className="text-[10px] text-[#44474d]">
+                  {language === 'fr' ? 'France Bleu FM' : 'Emergency FM/DAB+'}
+                </span>
               </div>
               <div className="bg-white p-2 rounded-lg border border-[#d6e4f8] flex flex-col items-center gap-0.5">
                 <span className="material-symbols-outlined text-[#ba1a1a] text-[18px]">medication</span>
-                <span className="font-bold text-[11px] text-[#ba1a1a] leading-tight">3. Iode sur ordre</span>
-                <span className="text-[10px] text-[#44474d]">Inopérant hors fission</span>
+                <span className="font-bold text-[11px] text-[#ba1a1a] leading-tight">
+                  {language === 'fr' ? '3. Iode sur ordre' : '3. Iodine on order'}
+                </span>
+                <span className="text-[10px] text-[#44474d]">
+                  {language === 'fr' ? 'Inopérant hors fission' : 'Fission only'}
+                </span>
               </div>
             </div>
           </div>
@@ -198,19 +217,19 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
             <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
               <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#98f6c5] uppercase tracking-wider flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px]">school</span>
-                Volet Formateur & Références Doctrinales
+                {language === 'fr' ? 'Volet Formateur & Références Doctrinales' : 'Trainer Panel & Regulatory Doctrinal References'}
               </span>
               <span className="text-[10px] bg-[#98f6c5] text-[#002c1b] px-1.5 py-0.2 rounded font-bold uppercase">
-                Mode Expert
+                {t('nav.expert')}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <div className="bg-white/5 p-2 rounded border border-white/10">
-                <strong className="text-[#98f6c5] block">Cadre Réglementaire :</strong>
+                <strong className="text-[#98f6c5] block">{language === 'fr' ? 'Cadre Réglementaire :' : 'Regulatory Framework:'}</strong>
                 <span className="text-[#dce9fd] text-[10.5px]">CSI Art. L741-1 • Plans PIRATOX/PIRANET • Directive Seveso III</span>
               </div>
               <div className="bg-white/5 p-2 rounded border border-white/10">
-                <strong className="text-[#98f6c5] block">Seuils Dosimétriques :</strong>
+                <strong className="text-[#98f6c5] block">{language === 'fr' ? 'Seuils Dosimétriques :' : 'Dosimetric Thresholds:'}</strong>
                 <span className="text-[#dce9fd] text-[10.5px]">Seuil thyroïde 50 mSv (KI) • Zone PPI 10-20km • Débit alerte 10 µSv/h</span>
               </div>
             </div>
@@ -262,11 +281,11 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
               format_list_bulleted
             </span>
             <h3 className="text-[18px] text-[#001126] font-bold">
-              Séquençage Opérationnel
+              {language === 'fr' ? 'Séquençage Opérationnel' : 'Operational Sequencing'}
             </h3>
           </div>
           <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-semibold">
-            3 PHASES D'ACTION
+            {language === 'fr' ? "3 PHASES D'ACTION" : '3 ACTION PHASES'}
           </span>
         </div>
 
@@ -276,37 +295,37 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
             onClick={() => setActivePhase('avant')}
             role="tab"
             aria-selected={activePhase === 'avant'}
-            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center ${
+            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center cursor-pointer ${
               activePhase === 'avant'
                 ? 'bg-[#001126] text-white shadow-sm'
                 : 'text-[#44474d] hover:text-[#001126]'
             }`}
           >
-            1. AVANT
+            {language === 'fr' ? '1. AVANT' : '1. BEFORE'}
           </button>
           <button
             onClick={() => setActivePhase('pendant')}
             role="tab"
             aria-selected={activePhase === 'pendant'}
-            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center ${
+            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center cursor-pointer ${
               activePhase === 'pendant'
                 ? 'bg-[#001126] text-white shadow-sm'
                 : 'text-[#44474d] hover:text-[#001126]'
             }`}
           >
-            2. PENDANT
+            {language === 'fr' ? '2. PENDANT' : '2. DURING'}
           </button>
           <button
             onClick={() => setActivePhase('apres')}
             role="tab"
             aria-selected={activePhase === 'apres'}
-            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center ${
+            className={`h-12 rounded font-['Space_Grotesk'] text-[12px] font-bold transition-all flex items-center justify-center cursor-pointer ${
               activePhase === 'apres'
                 ? 'bg-[#001126] text-white shadow-sm'
                 : 'text-[#44474d] hover:text-[#001126]'
             }`}
           >
-            3. APRÈS
+            {language === 'fr' ? '3. APRÈS' : '3. AFTER'}
           </button>
         </div>
 
@@ -318,235 +337,125 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
                 <span className="material-symbols-outlined text-[#0036ce] text-[18px]">
                   {step.icon}
                 </span>
-                {step.title}
+                <span>{step.title}</span>
               </h4>
               {step.desc && (
-                <p className="text-[13px] text-[#0f1c2b] leading-relaxed">{step.desc}</p>
+                <p className="text-[13px] text-[#44474d] leading-relaxed">
+                  {step.desc}
+                </p>
               )}
               {step.items && (
-                <ul className="text-[13px] text-[#0f1c2b] space-y-1.5 list-disc list-inside">
-                  {step.items.map((it, i) => (
-                    <li key={i}>{it}</li>
+                <ul className="flex flex-col gap-1.5 mt-2">
+                  {step.items.map((item, itemIdx) => (
+                    <li key={itemIdx} className="text-[12.5px] text-[#001126] flex items-start gap-2">
+                      <span className="material-symbols-outlined text-[#0036ce] text-[14px] shrink-0 mt-0.5">
+                        check_circle
+                      </span>
+                      <span>{item}</span>
+                    </li>
                   ))}
                 </ul>
-              )}
-              {step.tip && (
-                <div className={`mt-2 p-2 bg-white rounded flex items-center gap-2 border border-[#c4c6ce] ${step.tipColor || 'text-[#44474d]'}`}>
-                  <span className="material-symbols-outlined text-[18px] text-[#0036ce]">
-                    {step.tipIcon || 'info'}
-                  </span>
-                  <span className="text-[12px] font-medium leading-snug">{step.tip}</span>
-                </div>
               )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* SECTION 3 : À NE JAMAIS FAIRE • DANGERS MORTELS */}
-      <section className="mx-4 mb-5 bg-[#ffdad6] text-[#93000a] rounded-xl p-4 shadow-sm border border-[#ffb4ab]">
+      {/* SECTION 3 : LES GESTES STRICTEMENT INTERDITS */}
+      <section className="mx-4 mb-5 bg-[#ffdad6] rounded-xl p-4 shadow-sm border border-[#ffb4ab]">
         <div className="flex items-center gap-2 mb-3">
-          <span className="material-symbols-outlined text-[#ba1a1a] text-[24px]">dangerous</span>
-          <h3 className="text-[18px] text-[#ba1a1a] font-bold uppercase tracking-tight">
-            À NE JAMAIS FAIRE • DANGERS MORTELS
+          <span className="material-symbols-outlined text-[#ba1a1a] text-[24px]">
+            do_not_disturb_on
+          </span>
+          <h3 className="text-[18px] text-[#ba1a1a] font-bold">
+            {language === 'fr' ? 'Gestes Strictement Interdits' : 'Strictly Prohibited Actions'}
           </h3>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          {protocol.forbiddenActions.map((action, i) => (
-            <div
-              key={i}
-              className="bg-white p-3 rounded-lg flex gap-2.5 items-start border border-[#ffdad6]"
-            >
-              <span className="material-symbols-outlined text-[#ba1a1a] shrink-0 text-[20px] mt-0.5">
-                cancel
+          {protocol.forbiddenActions.map((action, idx) => (
+            <div key={idx} className="bg-white p-3 rounded-lg border border-[#ffb4ab] flex flex-col gap-1">
+              <span className="text-[14px] font-bold text-[#ba1a1a]">
+                {action.title}
               </span>
-              <div className="text-[#0f1c2b]">
-                <h4 className="font-['Space_Grotesk'] text-[13px] font-bold text-[#ba1a1a]">
-                  {action.title}
-                </h4>
-                <p className="text-[13px] text-[#44474d] mt-0.5 leading-relaxed">
-                  {action.description}
-                </p>
-              </div>
+              <p className="text-[12.5px] text-[#44474d] leading-relaxed">
+                {action.description}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* SECTION 4 : TECHNIQUE DE CALFEUTREMENT (Si disponible pour Confinement) */}
-      {protocol.technicalSection && (
-        <section className="mx-4 mb-5 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[18px] text-[#001126] font-bold">
-              {protocol.technicalSection.title}
-            </h3>
-            <span className="font-['Space_Grotesk'] text-[11px] bg-[#e4efff] px-2 py-0.5 rounded text-[#0036ce] font-bold">
-              {protocol.technicalSection.badge}
-            </span>
-          </div>
+      {/* SECTION 4 : PÉDAGOGIE & CARTE D'AGENTS */}
+      {protocol.pedagogy && (
+        <section className="mx-4 mb-5 bg-white rounded-xl p-4 shadow-sm border border-[#c4c6ce]">
+          <h3 className="text-[18px] text-[#001126] font-bold mb-1">
+            {protocol.pedagogy.title}
+          </h3>
+          {protocol.pedagogy.subtitle && (
+            <p className="text-[12px] text-[#74777e] mb-3">
+              {protocol.pedagogy.subtitle}
+            </p>
+          )}
 
           <div className="grid grid-cols-1 gap-2.5">
-            {protocol.technicalSection.steps.map((st, i) => (
-              <div
-                key={i}
-                className="bg-white p-3.5 rounded-xl shadow-sm flex items-start gap-3 border border-[#c4c6ce]"
-              >
-                <div className="w-10 h-10 rounded-lg bg-[#e4efff] text-[#001126] flex items-center justify-center flex-shrink-0">
-                  <span className="material-symbols-outlined text-[22px]">{st.icon}</span>
+            {protocol.pedagogy.cards.map((card, i) => (
+              <div key={i} className="bg-[#f8f9ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[13px] text-[#001126]">
+                    {card.title}
+                  </span>
+                  <span className={`text-[10px] font-['Space_Grotesk'] font-bold px-2 py-0.5 rounded uppercase ${card.tagClass}`}>
+                    {card.tag}
+                  </span>
                 </div>
-                <div className="flex flex-col min-w-0">
-                  <h4 className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
-                    {st.title}
-                  </h4>
-                  <p className="text-[13px] text-[#44474d] mt-0.5 leading-relaxed">
-                    {st.desc}
-                  </p>
-                </div>
+                {card.examples && (
+                  <span className="text-[11px] text-[#0036ce] font-semibold">
+                    {language === 'fr' ? 'Exemples :' : 'Examples:'} {card.examples}
+                  </span>
+                )}
+                <p className="text-[12px] text-[#44474d] leading-relaxed">
+                  {card.specificity}
+                </p>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* SECTION 4 BIS : PÉDAGOGIE / TYPOLOGIE / TABLE IODE */}
-      {protocol.pedagogy && (
-        <section className="mx-4 mb-5 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[18px] text-[#001126] font-bold">
-              {protocol.pedagogy.title}
-            </h3>
-            {protocol.pedagogy.subtitle && (
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-                {protocol.pedagogy.subtitle}
-              </span>
-            )}
-          </div>
-
-          {protocol.pedagogy.cards.map((card, i) => (
-            <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce]">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="font-['Space_Grotesk'] text-[12px] uppercase font-bold text-[#001126] flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[18px] text-[#0036ce]">
-                    {card.icon}
-                  </span>
-                  {card.title}
-                </span>
-                <span className={`px-2 py-0.5 rounded text-[11px] font-['Space_Grotesk'] font-bold ${card.tagClass}`}>
-                  {card.tag}
-                </span>
-              </div>
-              {card.examples && (
-                <p className="text-[13px] text-[#0f1c2b] mb-2 italic">
-                  <em>Exemples :</em> {card.examples}
-                </p>
-              )}
-              <div className="bg-[#eef4ff] p-2.5 rounded text-[13px] text-[#44474d] leading-relaxed border border-[#d6e4f8]">
-                <strong>Spécificité :</strong> {card.specificity}
-              </div>
-            </div>
-          ))}
-
-          {/* Table Posologie Iode (si applicable) */}
-          {protocol.pedagogy.table && (
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce]">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5 text-[#001126] font-bold">
-                  <span className="material-symbols-outlined text-[#0036ce] text-[20px]">
-                    vaccines
-                  </span>
-                  <h4 className="font-['Space_Grotesk'] text-[13px] uppercase">
-                    {protocol.pedagogy.table.title}
-                  </h4>
-                </div>
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#e4efff] px-2 py-0.5 rounded text-[#44474d]">
-                  {protocol.pedagogy.table.authority}
-                </span>
-              </div>
-              <p className="text-[12px] text-[#44474d] mb-3">
-                {protocol.pedagogy.table.desc}
-              </p>
-
-              <div className="flex flex-col gap-1.5">
-                {protocol.pedagogy.table.rows.map((row, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-center justify-between p-2.5 rounded-lg text-[13px] ${
-                      row.isWarning
-                        ? 'bg-[#dce9fd] text-[#ba1a1a] font-bold'
-                        : 'bg-[#eef4ff] text-[#001126]'
-                    }`}
-                  >
-                    <span>{row.label}</span>
-                    <span className="font-['Space_Grotesk'] font-bold">
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {protocol.pedagogy.table.footnote && (
-                <p className="text-[11px] text-[#44474d] italic mt-2">
-                  {protocol.pedagogy.table.footnote}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Protocoles de désinfection domestique (si applicable) */}
-          {protocol.pedagogy.disinfection && (
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce]">
-              <div className="flex items-center gap-1.5 mb-2 text-[#002c1b] font-['Space_Grotesk'] text-[12px] font-bold uppercase">
-                <span className="material-symbols-outlined text-[18px] text-[#3f9d73]">
-                  sanitizer
-                </span>
-                {protocol.pedagogy.disinfection.title}
-              </div>
-              <div className="grid grid-cols-1 gap-2 text-[13px]">
-                {protocol.pedagogy.disinfection.items.map((it, i) => (
-                  <div
-                    key={i}
-                    className="p-2 bg-[#eef4ff] rounded flex items-center justify-between border border-[#d6e4f8]"
-                  >
-                    <span>{it.name}</span>
-                    <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#001126]">
-                      {it.condition}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* SECTION 5 : SIGNES D'URGENCE & PAVÉ D'APPEL DIRECT */}
-      <section className="mx-4 mb-5 bg-[#dce9fd] rounded-xl p-4 shadow-sm border border-[#c4c6ce]">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="material-symbols-outlined text-[#ba1a1a] text-[22px]">emergency</span>
-          <h3 className="text-[18px] text-[#001126] font-bold">
-            {protocol.emergencySymptoms.title}
-          </h3>
-        </div>
-        <p className="text-[13px] text-[#0f1c2b] mb-3 leading-relaxed">
+      {/* SECTION 5 : SIGNES CLINIQUES D'ALERTE */}
+      <section className="mx-4 mb-5 bg-white rounded-xl p-4 shadow-sm border border-[#c4c6ce]">
+        <h3 className="text-[18px] text-[#001126] font-bold mb-1 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#ba1a1a]">medical_services</span>
+          <span>{protocol.emergencySymptoms.title}</span>
+        </h3>
+        <p className="text-[12px] text-[#74777e] mb-2">
           {protocol.emergencySymptoms.intro}
         </p>
 
-        {/* Puces critères médicaux */}
-        <div className="grid grid-cols-2 gap-2 mb-4 text-[13px] text-[#0f1c2b]">
-          {protocol.emergencySymptoms.symptoms.map((symp, i) => (
-            <div
-              key={i}
-              className="bg-white p-2 rounded-lg flex items-center gap-1.5 border border-[#c4c6ce]"
-            >
-              <span className="material-symbols-outlined text-[#ba1a1a] text-[16px] shrink-0">
-                priority_high
+        <ul className="flex flex-col gap-1.5">
+          {protocol.emergencySymptoms.symptoms.map((s, idx) => (
+            <li key={idx} className="text-[12.5px] text-[#001126] flex items-start gap-2">
+              <span className="material-symbols-outlined text-[#ba1a1a] text-[16px] shrink-0 mt-0.5">
+                warning
               </span>
-              <span className="leading-snug">{symp}</span>
-            </div>
+              <span>{s}</span>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Pavé de boutons d'appel direct */}
+        {protocol.emergencySymptoms.alertNote && (
+          <div className="mt-3 p-2.5 bg-[#ffdad6]/50 rounded border border-[#ffb4ab] text-[11.5px] text-[#93000a] font-semibold">
+            {protocol.emergencySymptoms.alertNote}
+          </div>
+        )}
+      </section>
+
+      {/* Raccourcis d'Urgence Téléphonique Directe */}
+      <section className="mx-4 mb-4 flex flex-col gap-2">
+        <h3 className="font-['Space_Grotesk'] text-[12px] uppercase font-bold text-[#44474d] px-1">
+          {language === 'fr' ? 'Numéros d\'urgence officiels' : 'Official Emergency Numbers'}
+        </h3>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() =>
@@ -554,11 +463,11 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
                 number: '15',
                 name: 'SAMU - Urgences Médicales',
                 subtitle: '15 • SAMU',
-                desc: 'Appel d\'urgence vitale pour régulation médicale immédiate.',
+                desc: language === 'fr' ? "Appel d'urgence vitale pour régulation médicale immédiate." : 'Urgent medical triage & critical response.',
               })
             }
             type="button"
-            className="h-12 bg-[#001126] active:bg-[#12263f] text-white rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm"
+            className="h-12 bg-[#001126] active:bg-[#12263f] text-white rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px] text-[#ffdad6]">
               phone_in_talk
@@ -572,11 +481,11 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
                 number: '18',
                 name: 'Sapeurs-Pompiers',
                 subtitle: '18 • POMPIERS',
-                desc: 'Secours incendie, toxiques et risques imminents.',
+                desc: language === 'fr' ? 'Secours incendie, toxiques et risques imminents.' : 'Firefighters & hazardous materials response.',
               })
             }
             type="button"
-            className="h-12 bg-[#001126] active:bg-[#12263f] text-white rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm"
+            className="h-12 bg-[#001126] active:bg-[#12263f] text-white rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px] text-[#ffdad6]">
               fire_truck
@@ -590,11 +499,11 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
                 number: '112',
                 name: "112 - Urgence Européenne",
                 subtitle: '112 • EUROPE',
-                desc: "Numéro universel d'urgence européen.",
+                desc: language === 'fr' ? "Numéro universel d'urgence européen." : 'Universal European emergency number.',
               })
             }
             type="button"
-            className="h-12 bg-white active:bg-[#e4efff] text-[#001126] border border-[#c4c6ce] rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm"
+            className="h-12 bg-white active:bg-[#e4efff] text-[#001126] border border-[#c4c6ce] rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">call</span>
             <span>112 • EUROPE</span>
@@ -606,14 +515,14 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
                 number: '114',
                 name: '114 - SMS Sourds & Muets',
                 subtitle: '114 • SMS SOURDS',
-                desc: 'Contact silencieux par SMS.',
+                desc: language === 'fr' ? 'Contact silencieux par SMS.' : 'Silent SMS contact for deaf / hearing impaired.',
               })
             }
             type="button"
-            className="h-12 bg-white active:bg-[#e4efff] text-[#001126] border border-[#c4c6ce] rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm"
+            className="h-12 bg-white active:bg-[#e4efff] text-[#001126] border border-[#c4c6ce] rounded-lg flex items-center justify-center gap-2 font-['Space_Grotesk'] text-[13px] font-bold transition-colors shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">sms</span>
-            <span>114 • SMS SOURDS</span>
+            <span>114 • SMS</span>
           </button>
         </div>
       </section>
@@ -624,15 +533,17 @@ export const ProtocolDetailView: React.FC<ProtocolDetailViewProps> = ({
           <span className="material-symbols-outlined text-[#3f9d73] text-[22px]">verified</span>
           <div className="flex flex-col">
             <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#001126] uppercase">
-              Statut Doctrinal : Corpus Validé
+              {language === 'fr' ? 'Statut Doctrinal : Corpus Validé' : 'Doctrinal Status: Validated Corpus'}
             </span>
             <span className="text-[11px] text-[#44474d]">
-              Source officielle vérifiée • Révision éditoriale du 16 Octobre 2026
+              {language === 'fr'
+                ? 'Source officielle vérifiée • Révision éditoriale du 16 Octobre 2026'
+                : 'Verified official source • Editorial revision Oct 16, 2026'}
             </span>
           </div>
         </div>
         <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase shrink-0">
-          CONFORME ÉTAT
+          {language === 'fr' ? 'CONFORME ÉTAT' : 'GOV COMPLIANT'}
         </span>
       </div>
 
