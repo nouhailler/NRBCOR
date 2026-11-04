@@ -3,7 +3,7 @@
 **Version Applicative :** v1.6.0 PWA  
 **Date d'implémentation :** Novembre 2026  
 **Dépôt de référence :** [https://github.com/nouhailler/NRBCOR](https://github.com/nouhailler/NRBCOR)  
-**Couverture de tests :** 273 tests automatisés réussis (227 tests d'autonomie/cohérence + 46 tests de parité i18n)  
+**Couverture de tests :** 469 tests automatisés réussis (227 tests d'autonomie/cohérence + 242 tests de parité et intégrité i18n)  
 **Statut CI / Build :** TypeScript Strict 100% OK • Corpus Sécurité Civile 100% Validé • Build Vite PWA Succès
 
 ---

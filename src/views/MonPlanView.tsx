@@ -9,6 +9,8 @@ import {
 } from '../data/familyPlanData';
 import { EmergencyCall, FamilyMember, ContactPerson, AssemblyPoint } from '../types';
 import { Tooltip } from '../components/Tooltip';
+import { useTranslation } from '../i18n/I18nContext';
+import { getLocalizedPlanTasks } from '../i18n/content/localizedFamilyPlan';
 
 import { storageService } from '../services/storage/IndexedDbStorage';
 import { FamilyPlanQrModal } from '../components/FamilyPlanQrModal';
@@ -24,6 +26,8 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
   onOpenCallModal,
   onOpenWipeModal,
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
   const [isDiscreet, setIsDiscreet] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showExportPdfModal, setShowExportPdfModal] = useState(false);
@@ -781,7 +785,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
 
         {/* Checklist items */}
         <div className="space-y-2 pt-1">
-          {tasks.map((task) => (
+          {getLocalizedPlanTasks(tasks, language).map((task) => (
             <label
               key={task.id}
               className="flex items-center gap-3 p-2.5 bg-[#eef4ff] rounded-lg cursor-pointer min-h-[48px] hover:bg-[#e4efff] transition-colors border border-[#d6e4f8]"
@@ -808,7 +812,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 </span>
               ) : (
                 <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] uppercase font-bold shrink-0">
-                  À planifier
+                  {isEn ? 'To plan' : 'À planifier'}
                 </span>
               )}
             </label>

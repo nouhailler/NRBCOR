@@ -20,8 +20,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentTitle = 'Accueil',
-  subtitle = 'Protection Civile & Risques NRBC',
+  currentTitle,
+  subtitle,
   showBack = false,
   onBack,
   onOpenMenu,
@@ -36,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenModeCrise,
 }) => {
   const { t } = useTranslation();
+  const displayTitle = currentTitle || t('nav.home');
   const [isOnline, setIsOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
@@ -59,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Bouton Hamburger ou Retour */}
           {showBack && onBack ? (
             <button
-              aria-label="Retour"
+              aria-label={t('common.back')}
               onClick={onBack}
               className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0"
               type="button"
@@ -68,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           ) : (
             <button
-              aria-label="Ouvrir le menu complet"
+              aria-label={t('nav.openMenu')}
               onClick={onOpenMenu}
               className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0 border border-[#c4c6ce] shadow-xs"
               type="button"
@@ -90,9 +91,9 @@ export const Header: React.FC<HeaderProps> = ({
                 NRBCOR
               </span>
               <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#44474d] truncate">
-                <span className="text-[#001126] font-semibold truncate">{currentTitle}</span>
+                <span className="text-[#001126] font-semibold truncate">{displayTitle}</span>
                 <span className="text-[#c4c6ce] hidden sm:inline">•</span>
-                <span className="text-[#3f9d73] font-medium truncate hidden sm:inline">Stockage Autonome v1.2</span>
+                <span className="text-[#3f9d73] font-medium truncate hidden sm:inline">{t('header.autonomousStorage')} v1.2</span>
               </div>
             </div>
           </div>
@@ -105,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
             {onToggleProfileMode && (
               <button
                 onClick={onToggleProfileMode}
-                title={profileMode === 'simplified' ? "Mode actuel : Grand Public Simplifié (Cliquer pour Mode Expert)" : "Mode actuel : Expert / Formateur (Cliquer pour Mode Grand Public)"}
+                title={profileMode === 'simplified' ? t('header.profileSimplifiedTooltip') : t('header.profileExpertTooltip')}
                 className={`h-9 px-2 rounded-lg items-center gap-1 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-all border cursor-pointer shrink-0 flex ${
                   profileMode === 'simplified'
                     ? 'bg-[#eef4ff] hover:bg-[#dce9fd] text-[#0036ce] border-[#0036ce]/30'
@@ -116,26 +117,26 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="material-symbols-outlined text-[16px]">
                   {profileMode === 'simplified' ? 'person' : 'school'}
                 </span>
-                <span>{profileMode === 'simplified' ? 'Grand Public' : 'Expert'}</span>
+                <span>{profileMode === 'simplified' ? t('nav.simplified') : t('nav.expert')}</span>
               </button>
             )}
 
             {onInstallClick && (
               <button
                 onClick={onInstallClick}
-                title="Installer l'application sur votre écran mobile ou ordinateur"
+                title={t('header.installTitle')}
                 className="h-9 px-2.5 rounded-lg bg-[#001258] hover:bg-[#0024a8] text-white items-center gap-1.5 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shadow-xs shrink-0 hidden md:flex"
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">install_mobile</span>
-                <span>Installer</span>
+                <span>{t('nav.install')}</span>
               </button>
             )}
 
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                title={theme === 'dark' ? 'Basculer en Thème Clair' : 'Basculer en Thème Sombre'}
+                title={theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
                 className="w-9 h-9 rounded-full bg-white hover:bg-[#e4efff] text-[#001126] flex items-center justify-center transition-colors shadow-xs border border-[#c4c6ce] shrink-0"
                 type="button"
               >
@@ -147,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenSources}
-              title="Sources & Traçabilité (v2.4)"
+              title={`${t('nav.sources')} (v2.4)`}
               className="w-9 h-9 rounded-full bg-[#001126] hover:bg-[#12263f] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
               type="button"
             >
@@ -157,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}
-                title="Paramètres Système & Mises à jour"
+                title={t('nav.settings')}
                 className="w-9 h-9 rounded-full bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] flex items-center justify-center transition-colors shadow-sm shrink-0"
                 type="button"
               >

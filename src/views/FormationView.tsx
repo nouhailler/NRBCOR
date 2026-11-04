@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { SubScreen } from '../types';
-import {
-  IMMERSION_SCENARIOS,
-  ADDITIONAL_MODULES,
-  QUIZ_IRRADIATION_CONTAMINATION,
-  QUIZ_DECONTAMINATION,
-  DetailedQuiz,
-} from '../data/quizData';
+import { DetailedQuiz } from '../data/quizData';
+import { useTranslation } from '../i18n/I18nContext';
+import { getLocalizedQuizData } from '../i18n/content/localizedQuiz';
 import { playRNASiren, stopSiren } from '../utils/sirenAudio';
 import { CrisisDrillModal } from '../components/CrisisDrillModal';
 import { TrainerSessionModal } from '../components/TrainerSessionModal';
@@ -22,8 +18,13 @@ export const FormationView: React.FC<FormationViewProps> = ({
   onOpenSubScreen,
   onGoToGuides,
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+  const localizedData = getLocalizedQuizData(language);
+  const { immersionScenarios, additionalModules, quizIrradiation, quizDecontamination } = localizedData;
+
   const [scenarioIndex, setScenarioIndex] = useState(0);
-  const currentScenario = IMMERSION_SCENARIOS[scenarioIndex];
+  const currentScenario = immersionScenarios[scenarioIndex] || immersionScenarios[0];
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D'>('B');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('tous');
   const [trainerMode, setTrainerMode] = useState(false);
@@ -85,10 +86,10 @@ export const FormationView: React.FC<FormationViewProps> = ({
   };
 
   const handleNextScenario = () => {
-    const nextIdx = (scenarioIndex + 1) % IMMERSION_SCENARIOS.length;
+    const nextIdx = (scenarioIndex + 1) % immersionScenarios.length;
     setScenarioIndex(nextIdx);
     // Default to the correct option or neutral
-    setSelectedOption(IMMERSION_SCENARIOS[nextIdx].options.find((o) => o.isCorrect)?.letter || 'B');
+    setSelectedOption(immersionScenarios[nextIdx].options.find((o) => o.isCorrect)?.letter || 'B');
   };
 
   const handleToggleSiren = (type: 'alerte' | 'fin') => {
@@ -126,11 +127,11 @@ export const FormationView: React.FC<FormationViewProps> = ({
         <div className="flex items-center gap-2 min-w-0">
           <span className="inline-block w-2 h-2 rounded-full bg-[#98f6c5] animate-pulse"></span>
           <span className="font-['Space_Grotesk'] text-[11px] tracking-wider uppercase font-bold truncate">
-            100% Hors-Ligne • Sauvegarde IndexedDB
+            {isEn ? '100% Offline • Sovereign IndexedDB Storage' : '100% Hors-Ligne • Sauvegarde IndexedDB'}
           </span>
         </div>
         <span className="font-['Space_Grotesk'] text-[11px] font-bold text-white bg-[#001126] px-2 py-0.5 rounded">
-          BASE LOCALE v2.4
+          {isEn ? 'LOCAL BASE v2.4' : 'BASE LOCALE v2.4'}
         </span>
       </aside>
 
@@ -143,10 +144,10 @@ export const FormationView: React.FC<FormationViewProps> = ({
             className="h-12 px-3 bg-[#dce9fd] hover:bg-[#d6e4f8] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span>RETOUR</span>
+            <span>{isEn ? 'BACK' : 'RETOUR'}</span>
           </button>
           <span className="font-['Space_Grotesk'] text-[11px] bg-[#dee1ff] text-[#001258] px-2 py-1 rounded font-bold uppercase">
-            ENTRAÎNEMENT CITOYEN
+            {isEn ? 'CITIZEN PREPAREDNESS' : 'ENTRAÎNEMENT CITOYEN'}
           </span>
         </div>
 
@@ -154,17 +155,19 @@ export const FormationView: React.FC<FormationViewProps> = ({
         <header className="flex flex-col gap-1">
           <div className="flex items-center gap-1.5">
             <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#12263f] text-white uppercase font-bold tracking-wider">
-              Programme d'entraînement citoyen
+              {isEn ? 'Citizen preparedness program' : "Programme d'entraînement citoyen"}
             </span>
             <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
               Sec. 4.11 Civ. Prot
             </span>
           </div>
           <h1 className="text-[24px] text-[#001126] tracking-tight font-bold">
-            Formation, Quiz & Exercices
+            {isEn ? 'Training, Quizzes & Drills' : 'Formation, Quiz & Exercices'}
           </h1>
           <p className="text-[13px] text-[#44474d] leading-relaxed">
-            Développez des automatismes de survie face aux aléas technologiques majeurs. Entraînez-vous à froid avant l'urgence.
+            {isEn
+              ? 'Develop instinctive survival habits against major technological hazards. Practice ahead of time before real emergencies.'
+              : "Développez des automatismes de survie face aux aléas technologiques majeurs. Entraînez-vous à froid avant l'urgence."}
           </p>
 
           {/* Legal Disclaimer */}
@@ -174,10 +177,13 @@ export const FormationView: React.FC<FormationViewProps> = ({
             </span>
             <div className="flex flex-col gap-0.5">
               <span className="font-['Space_Grotesk'] text-[11px] text-[#ba1a1a] uppercase font-bold tracking-wide">
-                Avertissement Réglementaire (Art. 4.11)
+                {isEn ? 'Regulatory Notice (Art. 4.11)' : 'Avertissement Réglementaire (Art. 4.11)'}
               </span>
               <p className="text-[12px] text-[#0f1c2b] leading-tight">
-                <strong>EXERCICE & FORMATION FICTIFS :</strong> Aucun score ne confère d'habilitation opérationnelle ni de certificat d'intervention en zone d'exclusion NRBC. En situation réelle, appliquez sans délai les consignes de la Préfecture.
+                <strong>{isEn ? 'SIMULATED TRAINING & EXERCISE: ' : 'EXERCICE & FORMATION FICTIFS : '}</strong>
+                {isEn
+                  ? 'No score confers operational qualification or certification for deployment into CBRN hot zones. In real events, immediately obey instructions from the Civil Protection authorities.'
+                  : "Aucun score ne confère d'habilitation opérationnelle ni de certificat d'intervention en zone d'exclusion NRBC. En situation réelle, appliquez sans délai les consignes de la Préfecture."}
               </p>
             </div>
           </section>
@@ -188,10 +194,12 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <span className="material-symbols-outlined text-[20px] text-[#0036ce]">co_present</span>
               <div>
                 <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] block">
-                  Mode Formateur / Animateur d'Exercice
+                  {isEn ? 'Trainer / Drill Instructor Mode' : "Mode Formateur / Animateur d'Exercice"}
                 </span>
                 <span className="text-[10px] text-[#44474d]">
-                  Affiche les notes pédagogiques, objectifs et débriefing pour animer un groupe
+                  {isEn
+                    ? 'Displays teaching notes, objectives and debriefing guides to lead a group'
+                    : 'Affiche les notes pédagogiques, objectifs et débriefing pour animer un groupe'}
                 </span>
               </div>
             </div>
@@ -216,14 +224,16 @@ export const FormationView: React.FC<FormationViewProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white uppercase tracking-wider">
-                      Console d'Exercice Collectif Formateur
+                      {isEn ? 'Trainer Collective Drill Console' : "Console d'Exercice Collectif Formateur"}
                     </span>
                     <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-bold uppercase">
-                      Local / Hors-Serveur
+                      {isEn ? 'Local / Zero-Server' : 'Local / Hors-Serveur'}
                     </span>
                   </div>
                   <span className="text-[11px] text-gray-300">
-                    4 scénarios de simulation • Objectifs pédagogiques • Bilan imprimable pour débriefing
+                    {isEn
+                      ? '4 drill scenarios • Pedagogical objectives • Printable sheet for group debriefing'
+                      : '4 scénarios de simulation • Objectifs pédagogiques • Bilan imprimable pour débriefing'}
                   </span>
                 </div>
               </div>
@@ -234,7 +244,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                 className="w-full sm:w-auto h-9 px-4 bg-white hover:bg-gray-100 text-[#001126] rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shrink-0 flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Animer un Exercice</span>
+                <span>{isEn ? 'Lead a Drill' : 'Animer un Exercice'}</span>
               </button>
             </div>
           )}
@@ -245,9 +255,9 @@ export const FormationView: React.FC<FormationViewProps> = ({
           <div className="flex items-center justify-between">
             <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#0036ce] flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px]">verified</span>
-              Compétences Civiles Validées ({competencies.length}) :
+              {isEn ? `Validated Civil Skills (${competencies.length}):` : `Compétences Civiles Validées (${competencies.length}) :`}
             </span>
-            <span className="text-[10px] text-gray-500 font-medium">Historique local</span>
+            <span className="text-[10px] text-gray-500 font-medium">{isEn ? 'Local history' : 'Historique local'}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {competencies.map((comp, idx) => (
@@ -267,12 +277,14 @@ export const FormationView: React.FC<FormationViewProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col min-w-0">
               <span className="font-['Space_Grotesk'] text-[11px] text-[#0036ce] uppercase font-bold tracking-wider">
-                Indicateur de Réactivité
+                {isEn ? 'Responsiveness Index' : 'Indicateur de Réactivité'}
               </span>
               <h2 className="text-[18px] text-[#001126] font-bold">
-                Préparation du foyer : 72%
+                {isEn ? 'Household preparedness: 72%' : 'Préparation du foyer : 72%'}
               </h2>
-              <span className="text-[12px] text-[#44474d]">3 modules complétés sur 5</span>
+              <span className="text-[12px] text-[#44474d]">
+                {isEn ? '3 modules completed out of 5' : '3 modules complétés sur 5'}
+              </span>
             </div>
             <div className="relative w-14 h-14 flex items-center justify-center flex-shrink-0">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -302,7 +314,9 @@ export const FormationView: React.FC<FormationViewProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-[#eef4ff] rounded-lg p-2.5 flex flex-col border border-[#d6e4f8]">
               <span className="font-['Space_Grotesk'] text-[20px] text-[#001126] font-bold">18</span>
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">Questions traitées</span>
+              <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
+                {isEn ? 'Questions answered' : 'Questions traitées'}
+              </span>
             </div>
             <div className="bg-[#eef4ff] rounded-lg p-2.5 flex flex-col border border-[#d6e4f8]">
               <div className="flex items-center gap-1">
@@ -311,7 +325,9 @@ export const FormationView: React.FC<FormationViewProps> = ({
                   check_circle
                 </span>
               </div>
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">Réflexes validés</span>
+              <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
+                {isEn ? 'Mastered reflexes' : 'Réflexes validés'}
+              </span>
             </div>
           </div>
 
@@ -326,15 +342,17 @@ export const FormationView: React.FC<FormationViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#ba1a1a] text-[22px]">campaign</span>
               <h3 className="text-[16px] font-bold text-[#001126]">
-                Reconnaissance Sonore • Sirène RNA
+                {isEn ? 'Audio Recognition • National Alert Siren' : 'Reconnaissance Sonore • Sirène RNA'}
               </h3>
             </div>
             <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold uppercase">
-              AUDIO LOCAL SYNTHÉTISÉ
+              {isEn ? 'LOCAL SYNTHESIZED AUDIO' : 'AUDIO LOCAL SYNTHÉTISÉ'}
             </span>
           </div>
           <p className="text-[12px] text-[#44474d] leading-relaxed">
-            Testez la sirène d'alerte officielle (signal modulé montant/descendant de 1 min 41s répété 3 fois) et le signal continu de fin d'alerte (30 secondes).
+            {isEn
+              ? 'Test the official national alert siren (rising/falling modulated signal of 1 min 41s repeated 3 times) and the all-clear continuous signal (30 seconds).'
+              : "Testez la sirène d'alerte officielle (signal modulé montant/descendant de 1 min 41s répété 3 fois) et le signal continu de fin d'alerte (30 secondes)."}
           </p>
 
           <div className="grid grid-cols-2 gap-2 pt-1">
@@ -350,7 +368,11 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 {sirenPlaying === 'alerte' ? 'stop' : 'volume_up'}
               </span>
-              <span>{sirenPlaying === 'alerte' ? 'Arrêter sirène' : 'Simuler Alerte (RNA)'}</span>
+              <span>
+                {sirenPlaying === 'alerte'
+                  ? (isEn ? 'Stop siren' : 'Arrêter sirène')
+                  : (isEn ? 'Simulate Alert Siren' : 'Simuler Alerte (RNA)')}
+              </span>
             </button>
 
             <button
@@ -365,7 +387,11 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 {sirenPlaying === 'fin' ? 'stop' : 'check_circle'}
               </span>
-              <span>{sirenPlaying === 'fin' ? 'Arrêter son' : 'Fin d\'alerte (30s)'}</span>
+              <span>
+                {sirenPlaying === 'fin'
+                  ? (isEn ? 'Stop sound' : 'Arrêter son')
+                  : (isEn ? 'All-clear (30s)' : "Fin d'alerte (30s)")}
+              </span>
             </button>
           </div>
         </section>
@@ -373,10 +399,10 @@ export const FormationView: React.FC<FormationViewProps> = ({
         {/* Filter Category Chips */}
         <nav className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           {[
-            { id: 'tous', label: 'Tous les modules (4)' },
-            { id: 'nuc', label: 'Nucléaire & Radio' },
-            { id: 'chem', label: 'Chimique & TMD' },
-            { id: 'gestes', label: 'Gestes Réflexes Foyer' },
+            { id: 'tous', label: isEn ? 'All modules (4)' : 'Tous les modules (4)' },
+            { id: 'nuc', label: isEn ? 'Nuclear & Radiation' : 'Nucléaire & Radio' },
+            { id: 'chem', label: isEn ? 'Chemical & Hazmat' : 'Chimique & TMD' },
+            { id: 'gestes', label: isEn ? 'Household Reflex Habits' : 'Gestes Réflexes Foyer' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -420,7 +446,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
 
           <div className="flex flex-col gap-0.5">
             <span className="font-['Space_Grotesk'] text-[11px] text-[#0036ce] font-bold uppercase tracking-wider">
-              Évaluation Réflexe
+              {isEn ? 'Reflex Assessment' : 'Évaluation Réflexe'}
             </span>
             <p className="text-[14px] text-[#001126] font-bold leading-snug">
               {currentScenario.question}
@@ -432,16 +458,20 @@ export const FormationView: React.FC<FormationViewProps> = ({
             <div className="p-3 bg-[#fff9ea] rounded-xl border border-[#ffe082] text-[11px] text-[#5c3e00] flex flex-col gap-1.5 animate-in fade-in duration-150">
               <div className="flex items-center gap-1.5 font-bold uppercase font-['Space_Grotesk'] text-[#7a5200]">
                 <span className="material-symbols-outlined text-[16px]">school</span>
-                <span>Fiche Formateur • Animation de Groupe</span>
+                <span>{isEn ? 'Trainer Guide • Group Facilitation' : 'Fiche Formateur • Animation de Groupe'}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 leading-snug">
                 <div>
-                  <strong>Objectif pédagogique : </strong>
-                  Déconstruire les fausses croyances (fuite en véhicule, saturation d'appels, prise d'iode non ordonnée) et ancrer le réflexe de confinement immédiat en bâtiment dur.
+                  <strong>{isEn ? 'Pedagogical objective: ' : 'Objectif pédagogique : '}</strong>
+                  {isEn
+                    ? 'Dispel misconceptions (vehicular flight, phone line saturation, uncommanded iodine intake) and anchor immediate shelter-in-place habits.'
+                    : "Déconstruire les fausses croyances (fuite en véhicule, saturation d'appels, prise d'iode non ordonnée) et ancrer le réflexe de confinement immédiat en bâtiment dur."}
                 </div>
                 <div>
-                  <strong>Conseil d'animation : </strong>
-                  Faire émerger les réponses spontanées du groupe avant d'afficher la correction. Rappeler que le PPMS protège les enfants dans les écoles.
+                  <strong>{isEn ? 'Facilitation tip: ' : "Conseil d'animation : "}</strong>
+                  {isEn
+                    ? 'Solicit spontaneous answers from the group before revealing solutions. Remind that schools safeguard children via internal safety plans (PPMS).'
+                    : "Faire émerger les réponses spontanées du groupe avant d'afficher la correction. Rappeler que le PPMS protège les enfants dans les écoles."}
                 </div>
               </div>
             </div>
@@ -473,12 +503,12 @@ export const FormationView: React.FC<FormationViewProps> = ({
                         </span>
                         <div className="flex flex-col min-w-0">
                           <span className="text-[13px] font-bold text-[#002c1b]">
-                            Option {opt.letter} : {opt.text}
+                            {isEn ? `Option ${opt.letter}: ` : `Option ${opt.letter} : `}{opt.text}
                           </span>
                         </div>
                       </div>
                       <span className="font-['Space_Grotesk'] text-[10px] px-1.5 py-0.5 rounded bg-white text-[#005236] uppercase font-bold shrink-0">
-                        {isSelected ? 'SÉLECTIONNÉ' : 'CONSEILLÉ'}
+                        {isSelected ? (isEn ? 'SELECTED' : 'SÉLECTIONNÉ') : (isEn ? 'RECOMMENDED' : 'CONSEILLÉ')}
                       </span>
                     </div>
                     {isSelected && (
@@ -513,7 +543,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                       <span className={`text-[13px] font-bold ${
                         isSelected ? 'text-[#93000a]' : 'text-[#0f1c2b]'
                       }`}>
-                        Option {opt.letter} : {opt.text}
+                        {isEn ? `Option ${opt.letter}: ` : `Option ${opt.letter} : `}{opt.text}
                       </span>
                     </div>
                   </div>
@@ -533,14 +563,18 @@ export const FormationView: React.FC<FormationViewProps> = ({
           <footer className="pt-2 flex items-center justify-between text-[#44474d] text-[12px] font-['Space_Grotesk'] border-t border-[#e4efff]">
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px]">verified</span>
-              Source : {currentScenario.source}
+              {isEn ? 'Source: ' : 'Source : '}{currentScenario.source}
             </span>
             <button
               onClick={handleNextScenario}
               type="button"
               className="font-bold text-[#0036ce] flex items-center gap-1 hover:underline min-h-[44px] px-2 items-center"
             >
-              <span>Simulation suivante ({scenarioIndex + 1}/{IMMERSION_SCENARIOS.length})</span>
+              <span>
+                {isEn
+                  ? `Next simulation (${scenarioIndex + 1}/${immersionScenarios.length})`
+                  : `Simulation suivante (${scenarioIndex + 1}/${immersionScenarios.length})`}
+              </span>
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
           </footer>
@@ -550,19 +584,19 @@ export const FormationView: React.FC<FormationViewProps> = ({
         <div className="flex items-center justify-between pt-1">
           <div className="flex flex-col">
             <h3 className="text-[18px] text-[#001126] font-bold">
-              Scénarios d'Entraînement Foyer
+              {isEn ? 'Household Preparedness Scenarios' : "Scénarios d'Entraînement Foyer"}
             </h3>
             <span className="text-[12px] text-[#44474d]">
-              Modules certifiés conformes aux doctrines civiles
+              {isEn ? 'Modules strictly adhering to civil defense doctrines' : 'Modules certifiés conformes aux doctrines civiles'}
             </span>
           </div>
           <span className="font-['Space_Grotesk'] text-[11px] text-[#0036ce] font-bold uppercase bg-[#e4efff] px-2 py-1 rounded">
-            3 Disponibles
+            {isEn ? `${additionalModules.length} Available` : `${additionalModules.length} Disponibles`}
           </span>
         </div>
 
         <div className="flex flex-col gap-3">
-          {ADDITIONAL_MODULES.map((mod) => (
+          {additionalModules.map((mod) => (
             <article
               key={mod.id}
               className="rounded-xl bg-white p-4 shadow-sm flex flex-col gap-2.5 border border-[#c4c6ce]"
@@ -575,7 +609,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                     </span>
                     {mod.duration && (
                       <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-                        Durée : {mod.duration}
+                        {isEn ? 'Duration: ' : 'Durée : '}{mod.duration}
                       </span>
                     )}
                   </div>
@@ -617,7 +651,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                     info
                   </span>
                   <p className="text-[12px] text-[#0f1c2b] leading-snug">
-                    <strong>Consigne clé :</strong> {mod.keyDirective}
+                    <strong>{isEn ? 'Key directive: ' : 'Consigne clé : '}</strong> {mod.keyDirective}
                   </p>
                 </div>
               )}
@@ -632,9 +666,9 @@ export const FormationView: React.FC<FormationViewProps> = ({
                       setDrillSeconds(900);
                       setDrillFinished(false);
                     } else if (mod.id === 'm-radio-quiz') {
-                      openInteractiveQuiz(QUIZ_IRRADIATION_CONTAMINATION);
+                      openInteractiveQuiz(quizIrradiation);
                     } else if (mod.id === 'm-decontamination-quiz') {
-                      openInteractiveQuiz(QUIZ_DECONTAMINATION);
+                      openInteractiveQuiz(quizDecontamination);
                     }
                   }}
                   className={`w-full min-h-[48px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-sm ${
@@ -658,30 +692,32 @@ export const FormationView: React.FC<FormationViewProps> = ({
           <div className="relative w-full h-44 bg-[#001126]">
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnIiYmI9wvJF_SYUP_MdxrkSbd32EZA49I-5xsgxJwME3bbpvdkvsUSlPYFQ4hFORbdkjO5Q8wNuGKjaHC0JlwOgA6YwA5G367gXWWKYWH-m_17LfhCNI-f2xF9SJTBKGFdsSY3WOXOrJsZjIqWNZGsvUbMmLad-rhMVtWCpJVZvABkJS-ceEz5K_W-Rtwbq4oKOXoYbcoDaf7yP3VyG4HBcTs0h-jBgjjk70vJrjQ0hZaatuB05g"
-              alt="Le Kit 72h Scellé du Foyer"
+              alt={isEn ? 'The Household Sealed 72h Kit' : 'Le Kit 72h Scellé du Foyer'}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#001126]/90 via-transparent to-transparent flex items-end p-4">
               <div className="flex flex-col">
                 <span className="font-['Space_Grotesk'] text-[10px] text-[#98f6c5] uppercase font-bold tracking-wider">
-                  Atelier Matériel
+                  {isEn ? 'Equipment Workshop' : 'Atelier Matériel'}
                 </span>
                 <span className="text-[17px] text-white font-bold">
-                  Le Kit 72h Scellé du Foyer
+                  {isEn ? 'The Household Sealed 72h Kit' : 'Le Kit 72h Scellé du Foyer'}
                 </span>
               </div>
             </div>
           </div>
           <div className="p-3.5 flex items-center justify-between gap-3">
             <p className="text-[12px] text-[#44474d] leading-snug">
-              Vérifiez semestriellement les dates de péremption de vos filtres, réserves d'eau et piles.
+              {isEn
+                ? 'Check expiration dates of your filters, water rations, and batteries twice a year.'
+                : "Vérifiez semestriellement les dates de péremption de vos filtres, réserves d'eau et piles."}
             </p>
             <button
               onClick={() => onOpenSubScreen({ type: 'protocol', id: 'confinement' })}
               type="button"
               className="flex-shrink-0 min-h-[44px] px-3.5 rounded-lg bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 border border-[#c4c6ce]"
             >
-              Inventaire
+              {isEn ? 'Inventory' : 'Inventaire'}
               <span className="material-symbols-outlined text-[16px]">chevron_right</span>
             </button>
           </div>
@@ -695,10 +731,12 @@ export const FormationView: React.FC<FormationViewProps> = ({
             </div>
             <div className="flex flex-col gap-0.5">
               <h4 className="text-[15px] font-bold text-[#001126] leading-tight">
-                Rappel Pédagogique Fondamental
+                {isEn ? 'Fundamental Civil Protection Reminder' : 'Rappel Pédagogique Fondamental'}
               </h4>
               <p className="text-[12px] text-[#44474d] leading-relaxed">
-                Aucune application ni aucun quiz théorique ne remplace l'entraînement pratique délivré par la Sécurité Civile (formations PSC1, gestes qui sauvent) ni l'autorité exclusive du Préfet de département lors d'un accident technologique ou d'une crise NRBC.
+                {isEn
+                  ? 'No app or theoretical quiz replaces certified practical first responder training delivered by Civil Protection (PSC1, basic emergency gestures) nor the exclusive legal authority of government civil protection authorities in technological accidents or CBRN emergencies.'
+                  : "Aucune application ni aucun quiz théorique ne remplace l'entraînement pratique délivré par la Sécurité Civile (formations PSC1, gestes qui sauvent) ni l'autorité exclusive du Préfet de département lors d'un accident technologique ou d'une crise NRBC."}
               </p>
             </div>
           </div>
@@ -710,7 +748,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
               className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:opacity-90 shadow-sm transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">file_download</span>
-              Télécharger le Mémo d'Exercice Foyer (PDF Hors-ligne)
+              {isEn ? 'Download Household Drill Memo (Offline PDF)' : "Télécharger le Mémo d'Exercice Foyer (PDF Hors-ligne)"}
             </button>
             <button
               onClick={onGoToGuides}
@@ -718,7 +756,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
               className="w-full min-h-[48px] bg-white hover:bg-[#e4efff] text-[#001126] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce]"
             >
               <span className="material-symbols-outlined text-[18px]">menu_book</span>
-              Consulter les Fiches Réflexes Officielles
+              {isEn ? 'Consult Official Immediate Reflex Guides' : 'Consulter les Fiches Réflexes Officielles'}
             </button>
           </div>
         </footer>
@@ -730,7 +768,6 @@ export const FormationView: React.FC<FormationViewProps> = ({
         onClose={() => setShowDrillModal(false)}
         onGoToGuides={onGoToGuides}
       />
-
 
       {/* Modal Quiz Interactif Complet */}
       {activeQuiz && (
@@ -751,6 +788,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <button
                 onClick={() => setActiveQuiz(null)}
                 className="text-[#44474d] hover:text-[#001126]"
+                aria-label={isEn ? 'Close quiz' : 'Fermer le quiz'}
               >
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
@@ -760,9 +798,13 @@ export const FormationView: React.FC<FormationViewProps> = ({
               <>
                 <div className="flex items-center justify-between text-[11px] font-['Space_Grotesk'] text-[#44474d]">
                   <span>
-                    Question {quizQuestionIndex + 1} sur {activeQuiz.questions.length}
+                    {isEn
+                      ? `Question ${quizQuestionIndex + 1} of ${activeQuiz.questions.length}`
+                      : `Question ${quizQuestionIndex + 1} sur ${activeQuiz.questions.length}`}
                   </span>
-                  <span>Score actuel : {calculateQuizScore()} pts</span>
+                  <span>
+                    {isEn ? 'Current score: ' : 'Score actuel : '}{calculateQuizScore()} pts
+                  </span>
                 </div>
 
                 <div className="w-full bg-[#e4efff] h-1.5 rounded-full overflow-hidden">
@@ -810,7 +852,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                     onClick={() => setQuizQuestionIndex((i) => i - 1)}
                     className="h-10 px-3 rounded bg-[#eef4ff] disabled:opacity-40 text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase"
                   >
-                    Précédent
+                    {isEn ? 'Previous' : 'Précédent'}
                   </button>
 
                   {quizQuestionIndex < activeQuiz.questions.length - 1 ? (
@@ -820,7 +862,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                       onClick={() => setQuizQuestionIndex((i) => i + 1)}
                       className="h-10 px-4 rounded bg-[#001126] disabled:opacity-40 text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
                     >
-                      Suivant
+                      {isEn ? 'Next' : 'Suivant'}
                     </button>
                   ) : (
                     <button
@@ -829,7 +871,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                       onClick={() => setQuizSubmitted(true)}
                       className="h-10 px-4 rounded bg-[#0036ce] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
                     >
-                      Valider le quiz
+                      {isEn ? 'Submit Quiz' : 'Valider le quiz'}
                     </button>
                   )}
                 </div>
@@ -846,8 +888,12 @@ export const FormationView: React.FC<FormationViewProps> = ({
                   </h4>
                   <p className="text-[12px] font-medium mt-0.5">
                     {calculateQuizScore() === activeQuiz.questions.length
-                      ? 'Félicitations ! Vous maîtrisez les automatismes de sécurité civile.'
-                      : 'Bonne révision. Consultez les fiches réflexes pour consolider vos réflexes.'}
+                      ? (isEn
+                          ? 'Congratulations! You master civil defense emergency instincts.'
+                          : 'Félicitations ! Vous maîtrisez les automatismes de sécurité civile.')
+                      : (isEn
+                          ? 'Good practice! Consult the reflex guides to strengthen your habits.'
+                          : 'Bonne révision. Consultez les fiches réflexes pour consolider vos réflexes.')}
                   </p>
                 </div>
 
@@ -877,7 +923,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                   onClick={() => setActiveQuiz(null)}
                   className="w-full h-11 rounded-lg bg-[#001126] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase"
                 >
-                  Fermer
+                  {isEn ? 'Close' : 'Fermer'}
                 </button>
               </div>
             )}

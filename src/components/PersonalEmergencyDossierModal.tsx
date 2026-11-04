@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FamilyMember, ContactPerson, AssemblyPoint } from '../types';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface PersonalEmergencyDossierModalProps {
   onClose: () => void;
@@ -28,6 +29,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
   localContacts,
   assemblyPoints,
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   // Opt-ins choisis explicitement par l'utilisateur
   const [includeContacts, setIncludeContacts] = useState(true);
   const [includeAssemblyPoints, setIncludeAssemblyPoints] = useState(true);
@@ -77,16 +81,17 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
             <span className="material-symbols-outlined text-[24px]">contact_emergency</span>
             <div>
               <h2 className="font-bold text-[16px] font-['Space_Grotesk']">
-                Dossier de Secours Personnel & Fiche Imprimable
+                {isEn ? 'Personal Emergency File & Printable Sheet' : 'Dossier de Secours Personnel & Fiche Imprimable'}
               </h2>
               <span className="text-[11px] text-gray-300 font-['Space_Grotesk']">
-                Sélection granulaire • Confidentialité absolue • Format poche & A4
+                {isEn ? 'Granular selection • Sovereign privacy • Pocket & A4 format' : 'Sélection granulaire • Confidentialité absolue • Format poche & A4'}
               </span>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
+            aria-label={isEn ? 'Close modal' : 'Fermer'}
             className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
           >
             ✕
@@ -98,7 +103,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
           {/* Section : Choix explicite des rubriques à inclure */}
           <section className="bg-gray-50 border border-gray-300 rounded-xl p-3.5 flex flex-col gap-2.5">
             <span className="font-['Space_Grotesk'] text-[12px] font-black uppercase text-[#001126] tracking-wider">
-              Rubriques à inclure sur la fiche imprimée (au choix de l'utilisateur) :
+              {isEn ? 'Sections to include on printable sheet (user explicit opt-in):' : "Rubriques à inclure sur la fiche imprimée (au choix de l'utilisateur) :"}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -108,7 +113,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                   onChange={(e) => setIncludeContacts(e.target.checked)}
                   className="rounded text-black focus:ring-black w-4 h-4"
                 />
-                <span className="font-medium text-gray-800">Contacts prioritaires & Relais</span>
+                <span className="font-medium text-gray-800">
+                  {isEn ? 'Priority & Out-of-Zone Contacts' : 'Contacts prioritaires & Relais'}
+                </span>
               </label>
 
               <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -118,7 +125,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                   onChange={(e) => setIncludeAssemblyPoints(e.target.checked)}
                   className="rounded text-black focus:ring-black w-4 h-4"
                 />
-                <span className="font-medium text-gray-800">Points de rassemblement</span>
+                <span className="font-medium text-gray-800">
+                  {isEn ? 'Assembly Points' : 'Points de rassemblement'}
+                </span>
               </label>
 
               <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -128,7 +137,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                   onChange={(e) => setIncludeOfflineProtocols(e.target.checked)}
                   className="rounded text-black focus:ring-black w-4 h-4"
                 />
-                <span className="font-medium text-gray-800">Protocoles de crise hors-réseau</span>
+                <span className="font-medium text-gray-800">
+                  {isEn ? 'Offline Emergency Protocols' : 'Protocoles de crise hors-réseau'}
+                </span>
               </label>
 
               <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -138,7 +149,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                   onChange={(e) => setIncludeAssistanceNeeds(e.target.checked)}
                   className="rounded text-black focus:ring-black w-4 h-4"
                 />
-                <span className="font-medium text-gray-800">Besoins d'assistance & PMR/Nourrissons</span>
+                <span className="font-medium text-gray-800">
+                  {isEn ? 'Assistance Needs & Infants/Elderly' : "Besoins d'assistance & PMR/Nourrissons"}
+                </span>
               </label>
 
               <label className="flex items-center gap-2 p-2 bg-red-50 rounded-lg border border-red-200 cursor-pointer hover:bg-red-100 sm:col-span-2">
@@ -150,10 +163,10 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 />
                 <div className="flex flex-col">
                   <span className="font-bold text-red-950">
-                    Informations médicales d'urgence (Optionnel & Explicite)
+                    {isEn ? 'Emergency Medical Info (Optional & Explicit)' : "Informations médicales d'urgence (Optionnel & Explicite)"}
                   </span>
                   <span className="text-[10px] text-red-800">
-                    Groupe sanguin, allergies graves, traitements quotidiens indispensables
+                    {isEn ? 'Blood group, severe allergies, vital ongoing medication' : 'Groupe sanguin, allergies graves, traitements quotidiens indispensables'}
                   </span>
                 </div>
               </label>
@@ -167,7 +180,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-amber-700 text-[20px]">lock</span>
                   <strong className="text-[12px] uppercase font-['Space_Grotesk'] font-bold">
-                    Garantie de stricte confidentialité des données de santé
+                    {isEn ? 'Strict Health Data Privacy Guarantee' : 'Garantie de stricte confidentialité des données de santé'}
                   </strong>
                 </div>
                 <button
@@ -175,12 +188,16 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                   onClick={() => setIsEditingMedical(!isEditingMedical)}
                   className="text-[11px] font-bold text-black underline hover:no-underline"
                 >
-                  {isEditingMedical ? 'Masquer formulaire' : 'Renseigner mes données'}
+                  {isEditingMedical
+                    ? (isEn ? 'Hide form' : 'Masquer formulaire')
+                    : (isEn ? 'Enter my data' : 'Renseigner mes données')}
                 </button>
               </div>
 
               <p className="text-[11px] leading-relaxed text-amber-900">
-                Vos données de santé restent <strong>100% locales sur votre appareil</strong>. Elles ne sont transmises à <strong>aucun serveur</strong>, et ne sont <strong>jamais incluses par défaut dans un QR Code de partage</strong>. Elles ne sont visibles que sur votre tirage papier physique.
+                {isEn
+                  ? 'Your medical information remains 100% stored on your local device. It is never transmitted to any external server and never embedded in shared QR codes. It only appears on your physical paper printout.'
+                  : 'Vos données de santé restent 100% locales sur votre appareil. Elles ne sont transmises à aucun serveur, et ne sont jamais incluses par défaut dans un QR Code de partage. Elles ne sont visibles que sur votre tirage papier physique.'}
               </p>
 
               {/* Formulaire d'édition médicale locale */}
@@ -244,7 +261,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
           {/* APERÇU IMPRIMABLE HAUTE DÉFINITION (NOIR & BLANC OPTIMISÉ POUR IMPRIMANTE) */}
           <div className="flex flex-col gap-1.5">
             <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-gray-500">
-              Aperçu du document imprimable (Économie d'encre & Lisibilité N&B) :
+              {isEn
+                ? 'Printable Document Preview (Ink Saver & B&W High Legibility):'
+                : "Aperçu du document imprimable (Économie d'encre & Lisibilité N&B) :"}
             </span>
 
             <div className="border-2 border-black p-4 rounded-xl bg-white flex flex-col gap-3 font-sans print:border-black print:m-0 print:p-2">
@@ -252,15 +271,22 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               <div className="border-b-2 border-black pb-2 flex items-center justify-between">
                 <div>
                   <h1 className="text-[15px] font-black uppercase font-['Space_Grotesk'] leading-tight">
-                    DOSSIER DE SECOURS CIVILE INDIVIDUEL • NRBCOR
+                    {isEn
+                      ? 'INDIVIDUAL CIVIL EMERGENCY DOSSIER • NRBCOR'
+                      : 'DOSSIER DE SECOURS CIVILE INDIVIDUEL • NRBCOR'}
                   </h1>
                   <span className="text-[10px] uppercase font-bold text-gray-700">
-                    Plan Familial & Consignes d'Urgence Immédiate
+                    {isEn
+                      ? 'Family Plan & Immediate Emergency Guidelines'
+                      : "Plan Familial & Consignes d'Urgence Immédiate"}
                   </span>
                 </div>
                 <div className="text-right text-[10px]">
-                  <span className="font-bold block">FORMAT PAPIER N&B</span>
-                  <span className="text-gray-600">Imprimé le {new Date().toLocaleDateString('fr-FR')}</span>
+                  <span className="font-bold block">{isEn ? 'B&W PAPER FORMAT' : 'FORMAT PAPIER N&B'}</span>
+                  <span className="text-gray-600">
+                    {isEn ? 'Printed on ' : 'Imprimé le '}
+                    {new Intl.DateTimeFormat(isEn ? 'en-US' : 'fr-FR', { dateStyle: 'long' }).format(new Date())}
+                  </span>
                 </div>
               </div>
 
@@ -269,24 +295,26 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 <div className="p-2.5 border-2 border-black bg-gray-50 rounded flex flex-col gap-1">
                   <div className="flex justify-between items-center border-b border-black pb-1">
                     <span className="font-black text-[11px] uppercase font-['Space_Grotesk']">
-                      DONNÉES MÉDICALES D'URGENCE (CONFIDENTIEL SECOURS)
+                      {isEn
+                        ? 'EMERGENCY MEDICAL DATA (FIRST RESPONDERS CONFIDENTIAL)'
+                        : "DONNÉES MÉDICALES D'URGENCE (CONFIDENTIEL SECOURS)"}
                     </span>
                     <span className="font-bold text-[10px] bg-black text-white px-1.5 py-0.2 rounded">
-                      GROUPE : {medicalProfile.bloodGroup || 'NON RENSEIGNÉ'}
+                      {isEn ? 'BLOOD GROUP: ' : 'GROUPE : '}{medicalProfile.bloodGroup || (isEn ? 'NOT SPECIFIED' : 'NON RENSEIGNÉ')}
                     </span>
                   </div>
                   {medicalProfile.fullName && (
-                    <div><strong>Identité :</strong> {medicalProfile.fullName}</div>
+                    <div><strong>{isEn ? 'Full name: ' : 'Identité : '}</strong> {medicalProfile.fullName}</div>
                   )}
                   <div>
-                    <strong>Allergies sévères :</strong> {medicalProfile.allergies || 'Aucune connue signalée'}
+                    <strong>{isEn ? 'Severe allergies: ' : 'Allergies sévères : '}</strong> {medicalProfile.allergies || (isEn ? 'None reported' : 'Aucune connue signalée')}
                   </div>
                   <div>
-                    <strong>Traitements vitaux réguliers :</strong> {medicalProfile.treatments || 'Aucun traitement continu'}
+                    <strong>{isEn ? 'Vital ongoing medications: ' : 'Traitements vitaux réguliers : '}</strong> {medicalProfile.treatments || (isEn ? 'No ongoing treatment' : 'Aucun traitement continu')}
                   </div>
                   {medicalProfile.doctorContact && (
                     <div>
-                      <strong>Médecin de référence :</strong> {medicalProfile.doctorContact}
+                      <strong>{isEn ? 'Reference physician: ' : 'Médecin de référence : '}</strong> {medicalProfile.doctorContact}
                     </div>
                   )}
                 </div>
@@ -296,35 +324,49 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               <div className="border-2 border-dashed border-black p-3 rounded-lg flex flex-col gap-2">
                 <div className="flex items-center justify-between border-b border-black pb-1">
                   <span className="text-[10px] font-black uppercase font-['Space_Grotesk']">
-                    ✂️ CARTE DE POCHE DÉCOUPABLE (Format 8.5 x 5.5 cm)
+                    ✂️ {isEn ? 'CUT-OUT POCKET CARD (Format 8.5 x 5.5 cm)' : 'CARTE DE POCHE DÉCOUPABLE (Format 8.5 x 5.5 cm)'}
                   </span>
-                  <span className="text-[9px] uppercase font-bold">À PLACER DANS CHAQUE CARTABLE / PORTEFEUILLE</span>
+                  <span className="text-[9px] uppercase font-bold">
+                    {isEn ? 'KEEP IN EVERY WALLET / SCHOOLBAG' : 'À PLACER DANS CHAQUE CARTABLE / PORTEFEUILLE'}
+                  </span>
                 </div>
 
                 {includeContacts && (
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     <div>
-                      <strong className="block text-[10px] uppercase">Contact Relais Hors-Zone :</strong>
-                      <span>{outZoneContact ? `${outZoneContact.name} - ${outZoneContact.phone}` : 'À renseigner'}</span>
+                      <strong className="block text-[10px] uppercase">
+                        {isEn ? 'Out-of-Zone Relay Contact:' : 'Contact Relais Hors-Zone :'}
+                      </strong>
+                      <span>{outZoneContact ? `${outZoneContact.name} - ${outZoneContact.phone}` : (isEn ? 'To be set' : 'À renseigner')}</span>
                     </div>
                     <div>
-                      <strong className="block text-[10px] uppercase">Numéros d'Urgence :</strong>
-                      <span>15 (SAMU) • 18 (Pompiers) • 112 • 114 (SMS)</span>
+                      <strong className="block text-[10px] uppercase">
+                        {isEn ? 'Emergency Numbers:' : "Numéros d'Urgence :"}
+                      </strong>
+                      <span>15 (SAMU) • 18 (Firefighters) • 112 • 114 (SMS)</span>
                     </div>
                   </div>
                 )}
 
                 {includeAssemblyPoints && (
                   <div className="text-[11px] pt-1 border-t border-gray-300">
-                    <strong className="block text-[10px] uppercase">Points de Rassemblement :</strong>
-                    <div>• Primaire : {assemblyPoints && assemblyPoints[0] ? `${assemblyPoints[0].name} (${assemblyPoints[0].coords})` : 'Entrée immeuble'}</div>
-                    <div>• Secondaire : {assemblyPoints && assemblyPoints[1] ? `${assemblyPoints[1].name} (${assemblyPoints[1].coords})` : 'Mairie ou gymnase'}</div>
+                    <strong className="block text-[10px] uppercase">
+                      {isEn ? 'Assembly Points:' : 'Points de Rassemblement :'}
+                    </strong>
+                    <div>
+                      • {isEn ? 'Primary: ' : 'Primaire : '}
+                      {assemblyPoints && assemblyPoints[0] ? `${assemblyPoints[0].name} (${assemblyPoints[0].coords})` : (isEn ? 'Building entrance' : 'Entrée immeuble')}
+                    </div>
+                    <div>
+                      • {isEn ? 'Secondary: ' : 'Secondaire : '}
+                      {assemblyPoints && assemblyPoints[1] ? `${assemblyPoints[1].name} (${assemblyPoints[1].coords})` : (isEn ? 'Town hall or gymnasium' : 'Mairie ou gymnase')}
+                    </div>
                   </div>
                 )}
 
                 <div className="text-[10px] font-bold border-t border-black pt-1 flex justify-between">
-                  <span>Radio FM d'urgence : France Bleu (ou radio locale)</span>
-                  <span>Consigne : Confinement immédiat si alerte</span>
+                  <span>{isEn ? 'Emergency FM Radio: France Bleu / Public Radio' : 'Radio FM d\'urgence : France Bleu (ou radio locale)'}</span>
+                  <span>{isEn ? 'Rule: Immediate shelter-in-place upon alert' : 'Consigne : Confinement immédiat si alerte'}</span>
                 </div>
               </div>
 
@@ -332,20 +374,32 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {includeOfflineProtocols && (
                 <div className="border border-black p-2.5 rounded text-[11px] flex flex-col gap-1.5">
                   <strong className="font-['Space_Grotesk'] text-[11px] uppercase">
-                    Protocoles d'Urgence en Cas de Coupure de Réseau Cellulaire :
+                    {isEn ? 'Emergency Protocols in Case of Cellular Blackout:' : 'Protocoles d\'Urgence en Cas de Coupure de Réseau Cellulaire :'}
                   </strong>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-gray-800">
                     <div className="p-1.5 bg-gray-100 rounded">
-                      <strong>1. Séparation :</strong>
-                      <p className="text-[10px] mt-0.5">Rejoindre le point primaire. Envoyer 1 SMS court au contact hors-zone.</p>
+                      <strong>1. {isEn ? 'Separation:' : 'Séparation :'}</strong>
+                      <p className="text-[10px] mt-0.5">
+                        {isEn
+                          ? 'Reach primary assembly point. Send 1 brief SMS to out-of-zone relay.'
+                          : 'Rejoindre le point primaire. Envoyer 1 SMS court au contact hors-zone.'}
+                      </p>
                     </div>
                     <div className="p-1.5 bg-gray-100 rounded">
-                      <strong>2. Rendez-vous fixe :</strong>
-                      <p className="text-[10px] mt-0.5">Si réseau coupé : présence au point primaire à H+2, H+6 puis le lendemain à 09h00.</p>
+                      <strong>2. {isEn ? 'Fixed rendez-vous:' : 'Rendez-vous fixe :'}</strong>
+                      <p className="text-[10px] mt-0.5">
+                        {isEn
+                          ? 'If telecom blackout: rendezvous at primary point at H+2, H+6, then next morning 09:00.'
+                          : 'Si réseau coupé : présence au point primaire à H+2, H+6 puis le lendemain à 09h00.'}
+                      </p>
                     </div>
                     <div className="p-1.5 bg-gray-100 rounded">
-                      <strong>3. Radio FM :</strong>
-                      <p className="text-[10px] mt-0.5">Allumer le poste à piles sur France Bleu. Les ordres du Préfet priment toujours.</p>
+                      <strong>3. {isEn ? 'FM Radio:' : 'Radio FM :'}</strong>
+                      <p className="text-[10px] mt-0.5">
+                        {isEn
+                          ? 'Switch on battery/crank radio to local public service station. Prefectural orders always prevail.'
+                          : 'Allumer le poste à piles sur France Bleu. Les ordres du Préfet priment toujours.'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -355,7 +409,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {includeAssistanceNeeds && members.length > 0 && (
                 <div className="border border-gray-300 p-2.5 rounded text-[11px]">
                   <strong className="font-['Space_Grotesk'] text-[10px] uppercase block mb-1">
-                    Composition du Foyer & Besoins Spécifiques d'Assistance :
+                    {isEn ? 'Household Composition & Specific Assistance Needs:' : 'Composition du Foyer & Besoins Spécifiques d\'Assistance :'}
                   </strong>
                   <div className="divide-y divide-gray-200">
                     {members.map((m) => (
@@ -374,7 +428,9 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
         {/* Pied de page modal avec bouton d'impression */}
         <div className="p-4 bg-gray-100 border-t border-black flex items-center justify-between gap-3 shrink-0">
           <div className="text-[11px] text-gray-600 hidden sm:block">
-            Imprimez 2 exemplaires : 1 pour le classeur familial, 1 découpé en portefeuille.
+            {isEn
+              ? 'Print 2 copies: 1 for the household resilience binder, 1 cut out for your wallet.'
+              : 'Imprimez 2 exemplaires : 1 pour le classeur familial, 1 découpé en portefeuille.'}
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
@@ -383,14 +439,14 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               className="h-10 px-5 bg-black hover:bg-gray-800 active:bg-gray-900 text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">print</span>
-              <span>Imprimer / Exporter PDF</span>
+              <span>{isEn ? 'Print / Export PDF' : 'Imprimer / Exporter PDF'}</span>
             </button>
             <button
               type="button"
               onClick={onClose}
               className="h-10 px-4 bg-white border border-black hover:bg-gray-50 text-black rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
             >
-              Fermer
+              {isEn ? 'Close' : 'Fermer'}
             </button>
           </div>
         </div>

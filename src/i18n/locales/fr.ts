@@ -68,6 +68,10 @@ export const fr = {
   'nav.language': 'Langue',
   'nav.sources': 'Sources & Traçabilité',
   'nav.settings': 'Paramètres',
+  'header.autonomousStorage': 'Stockage Autonome',
+  'header.installTitle': 'Installer l\'application sur votre écran mobile ou ordinateur',
+  'header.profileSimplifiedTooltip': 'Mode actuel : Grand Public Simplifié (Cliquer pour Mode Expert)',
+  'header.profileExpertTooltip': 'Mode actuel : Expert / Formateur (Cliquer pour Mode Grand Public)',
 
   // Menu Hamburger Rubriques
   'menu.catUrgence': '1. Urgence & Réflexes Immédiats',

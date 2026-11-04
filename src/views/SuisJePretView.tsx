@@ -4,6 +4,7 @@ import { InventoryItem, FamilyPlanData, AppSettings } from '../services/storage/
 import { storageService, DEFAULT_SPECIFIC_NEEDS, INITIAL_INVENTORY, INITIAL_FAMILY_PLAN } from '../services/storage/IndexedDbStorage';
 import { calculateReadinessScore, ReadinessDashboardData, RecommendedAction } from '../utils/readinessScore';
 import { Tooltip } from '../components/Tooltip';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface SuisJePretViewProps {
   onBack?: () => void;
@@ -24,6 +25,8 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
   onOpenInventory,
   headerSlot
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
   const [config, setConfig] = useState<SpecificNeedsConfig>(() => {
     try {
       const saved = localStorage.getItem('nrbcor_specific_needs');
@@ -191,10 +194,10 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           </span>
           <div className="flex flex-col min-w-0">
             <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] truncate">
-              Tableau de bord « Suis-je prêt ? »
+              {t('readiness.title')}
             </span>
             <span className="text-[11px] text-[#44474d] truncate">
-              Parcours d'autonomie personnalisé • 100% Hors-ligne en local
+              {t('readiness.subtitle')}
             </span>
           </div>
         </div>
@@ -384,7 +387,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">dashboard</span>
-          <span>Autonomie & Synthèse</span>
+          <span>{isEn ? 'Autonomy & Summary' : 'Autonomie & Synthèse'}</span>
         </button>
 
         <button
@@ -397,7 +400,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">family_restroom</span>
-          <span>Besoins Foyer</span>
+          <span>{isEn ? 'Household Needs' : 'Besoins Foyer'}</span>
         </button>
 
         <button
@@ -410,7 +413,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">troubleshoot</span>
-          <span>Données Estimées ({missingDataAndEstimates.length})</span>
+          <span>{isEn ? `Estimated Data (${missingDataAndEstimates.length})` : `Données Estimées (${missingDataAndEstimates.length})`}</span>
         </button>
 
         <button
@@ -423,7 +426,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">checklist</span>
-          <span>Manquants Kit ({missingItems.length})</span>
+          <span>{isEn ? `Missing in Kit (${missingItems.length})` : `Manquants Kit (${missingItems.length})`}</span>
         </button>
 
         <button
@@ -436,7 +439,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">history</span>
-          <span>Péremptions ({expiries.expired.length + expiries.expiringSoon.length})</span>
+          <span>{isEn ? `Expiries (${expiries.expired.length + expiries.expiringSoon.length})` : `Péremptions (${expiries.expired.length + expiries.expiringSoon.length})`}</span>
         </button>
 
         <button
@@ -449,7 +452,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">rule</span>
-          <span>Critères Explicites</span>
+          <span>{isEn ? 'Explicit Criteria' : 'Critères Explicites'}</span>
         </button>
       </div>
 

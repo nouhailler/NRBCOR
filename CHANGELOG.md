@@ -6,25 +6,28 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
-## [1.6.0] - 2026-11-03
+## [1.6.0] - 2026-11-04
 
-### 🌐 Internationalisation Intégrale Bilingue (Français & Anglais)
+### 🌐 Internationalisation Intégrale Bilingue & Parité 100% (Français & Anglais)
 - **Architecture i18n Décentralisée & Hors-Ligne (`src/i18n/`)** :
-  - `src/i18n/I18nContext.tsx` : Contexte React léger avec persistance double (IndexedDB et miroir `localStorage['nrbcor_language']`), synchronisation automatique de l'attribut `<html lang="...">`, formatage natif `Intl.DateTimeFormat` et `Intl.NumberFormat`.
-  - `src/i18n/locales/fr.ts` & `src/i18n/locales/en.ts` : 248 paires de clés parfaitement symétriques couvrant l'ensemble des modules applicatifs (Accueil, Réagir, Mode Crise, Suis-je prêt ?, Kit 72h, Plan familial, Dossier d'urgence, Mode formateur, Carte hors-ligne des périmètres, Géorisques, Paramètres, Encyclopédie et Glossaire).
-  - `src/i18n/content/protocols.en.ts` & `localizedProtocols.ts` : Traduction intégrale du corpus doctrinal des 5 fiches réflexes (Nucléaire, Radiologique, Biologique, Chimique, Confinement) respectant la terminologie internationale (ALARA, Seveso, Shelter-in-place, Potassium Iodide KI 65mg).
+  - `src/i18n/I18nContext.tsx` : Contexte React léger avec persistance double (IndexedDB et miroir synchrone `localStorage['nrbcor_language']`), synchronisation automatique de l'attribut `<html lang="...">`, formatage natif `Intl.DateTimeFormat` et `Intl.NumberFormat`.
+  - `src/i18n/locales/fr.ts` & `src/i18n/locales/en.ts` : 248 paires de clés parfaitement symétriques couvrant l'ensemble des modules applicatifs.
+  - **Traduction intégrale des jeux de données doctrinaux et pédagogiques** :
+    - `src/i18n/content/protocols.en.ts` & `localizedProtocols.ts` : Les 5 protocoles CBRN complets (Nucléaire, Radiologique, Biologique, Chimique, Confinement).
+    - `src/i18n/content/kit.en.ts` & `localizedKit.ts` : 18 articles du kit 72h et 6 catégories, avec préservation stricte des IDs canoniques (`k1`..`k18`).
+    - `src/i18n/content/encyclopedia.en.ts` & `localizedEncyclopedia.ts` : 25 termes du glossaire NRBC, 4 grandes ères historiques, 5 doctrines géopolitiques et 4 catégories d'arsenal technologique.
+    - `src/i18n/content/quiz.en.ts` & `localizedQuiz.ts` : 4 scénarios d'immersion opérationnelle, 2 quiz complets (Irradiation/Contamination & Décontamination d'urgence), 3 modules complémentaires et 4 scénarios de formation collective.
+    - `src/i18n/content/coherenceMatrix.en.ts` & `localizedCoherenceMatrix.ts` : 6 scénarios de cohérence d'urgence anti-fausse sécurité.
+    - `src/i18n/content/familyPlan.en.ts` & `localizedFamilyPlan.ts` : Tâches canoniques (`t1`..`t5`), membres du foyer et points de rassemblement.
 - **Sélecteur de Langue Ergonomique & Accessible (`src/components/LanguageSwitcher.tsx`)** :
   - Variante compacte intégrée en tête d'application (`Header.tsx`) pour une permutation instantanée 1-tap.
   - Variante complète avec drapeaux et descriptifs dans le menu hamburger (`HamburgerMenu.tsx`) et dans les paramètres (`SettingsView.tsx`).
-  - Accessibilité ARIA conforme (`role="radiogroup"` / `role="radio"`).
-- **Préservation des Doctrines & Numéros Nationaux Transfrontaliers** :
-  - Maintien rigoureux des numéros officiels d'urgence pour la France (15, 18, 17, 112, 114), la Suisse (144, 118, 117, 145, 112), la Belgique (112, 101, 100, 070245245) et le Luxembourg (112, 113) sans fausse conversion anglo-saxonne.
-  - Maintien des périmètres légaux (PPI français de 20 km, rayon d'iode suisse de 50 km).
-- **Synthèse Vocale Adaptative** :
-  - Support multilingue du text-to-speech dans le Mode Réagir et le Mode Crise (`fr-FR` ou `en-US` selon la langue active).
-- **Contrôles Automatisés de Non-Régression & CI (`scripts/run-i18n-tests.ts`)** :
-  - Suite de 46 vérifications automatisées intégrée à `npm test` : validation de la parité 100% des clés, vérification de l'absence de chaînes vides, tests de résolution dynamique des protocoles, intégrité des numéros de crise et validation des formats `Intl`.
-  - Total de 273 tests automatisés réussis (227 tests d'autonomie/cohérence + 46 tests i18n).
+- **Suppression du parasite visuel "NU x _" sur les cartes CNPE (`CartePerimetresView.tsx`)** :
+  - Remplacement de l'artefact par un composant d'icône SVG vectoriel autonome et épuré (`src/components/icons/NuclearPowerIcon.tsx`) représentant fidèlement une tour de réfrigération aéroréfrigérante de centrale nucléaire (CNPE).
+- **Contrôles Automatisés de Non-Régression & CI (`npm test`)** :
+  - **469 vérifications automatisées réussies à 100%** :
+    - `scripts/run-readiness-tests.ts` : 227 tests d'autonomie, fraîcheur Géorisques, calculs de besoins du foyer et matrice anti-fausse sécurité.
+    - `scripts/run-i18n-tests.ts` : 242 tests de parité des dictionnaires, intégrité des IDs canoniques, non-régression des magasins de données et validité des formats régionaux.
 
 ---
 

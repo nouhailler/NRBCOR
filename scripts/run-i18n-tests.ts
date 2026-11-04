@@ -3,6 +3,21 @@ import { en, EN_TRANSLATIONS } from '../src/i18n/locales/en';
 import { PROTOCOLS_DATA } from '../src/data/protocols';
 import { PROTOCOLS_DATA_EN } from '../src/i18n/content/protocols.en';
 import { getLocalizedProtocol, getAllLocalizedProtocols } from '../src/i18n/content/localizedProtocols';
+import { INITIAL_KIT_ITEMS, KIT_CATEGORIES } from '../src/data/kitData';
+import { INITIAL_KIT_ITEMS_EN, KIT_CATEGORIES_EN } from '../src/i18n/content/kit.en';
+import { getLocalizedKitItems, getLocalizedKitCategories } from '../src/i18n/content/localizedKit';
+import { GLOSSARY_TERMS, HISTORICAL_ERAS, COUNTRY_DOCTRINES, NRBC_TOOL_CATEGORIES } from '../src/data/encyclopediaData';
+import { GLOSSARY_TERMS_EN, HISTORICAL_ERAS_EN, COUNTRY_DOCTRINES_EN, NRBC_TOOL_CATEGORIES_EN } from '../src/i18n/content/encyclopedia.en';
+import { getLocalizedEncyclopedia } from '../src/i18n/content/localizedEncyclopedia';
+import { IMMERSION_SCENARIOS, QUIZ_IRRADIATION_CONTAMINATION, QUIZ_DECONTAMINATION } from '../src/data/quizData';
+import { IMMERSION_SCENARIOS_EN, QUIZ_IRRADIATION_CONTAMINATION_EN, QUIZ_DECONTAMINATION_EN, TRAINER_SCENARIOS_EN } from '../src/i18n/content/quiz.en';
+import { getLocalizedQuizData, getLocalizedTrainerScenarios } from '../src/i18n/content/localizedQuiz';
+import { EMERGENCY_SCENARIOS } from '../src/components/EmergencyCoherenceMatrixModal';
+import { EMERGENCY_SCENARIOS_EN } from '../src/i18n/content/coherenceMatrix.en';
+import { getLocalizedEmergencyScenarios } from '../src/i18n/content/localizedCoherenceMatrix';
+import { INITIAL_PLAN_TASKS, INITIAL_MEMBERS } from '../src/data/familyPlanData';
+import { INITIAL_PLAN_TASKS_EN, INITIAL_MEMBERS_EN } from '../src/i18n/content/familyPlan.en';
+import { getLocalizedFamilyPlan, getLocalizedPlanTasks } from '../src/i18n/content/localizedFamilyPlan';
 
 let passed = 0;
 let failed = 0;
@@ -108,6 +123,101 @@ const enNumStr = new Intl.NumberFormat('en-US').format(testNumber);
 
 assert(frNumStr.includes(',') || frNumStr.includes(' '), `Formatage nombre FR (virgule décimale) : ${frNumStr}`);
 assert(enNumStr.includes('.'), `Formatage nombre EN (point décimal) : ${enNumStr}`);
+
+// 5. LOCALISATION DU KIT D'URGENCE 72H
+console.log('\n--- 5. LOCALISATION DU KIT D\'URGENCE 72H ---');
+
+assert(INITIAL_KIT_ITEMS_EN.length === INITIAL_KIT_ITEMS.length, `Parité du nombre d'articles du kit (18 attendus : ${INITIAL_KIT_ITEMS_EN.length})`);
+assert(KIT_CATEGORIES_EN.length === KIT_CATEGORIES.length, `Parité du nombre de catégories du kit (6 attendues : ${KIT_CATEGORIES_EN.length})`);
+
+INITIAL_KIT_ITEMS.forEach((frItem) => {
+  const enItem = INITIAL_KIT_ITEMS_EN.find((it) => it.id === frItem.id);
+  assert(!!enItem, `Article de kit ${frItem.id} présent en EN`);
+  if (enItem) {
+    assert(enItem.title.length > 0 && enItem.title !== frItem.title, `Titre traduit pour ${frItem.id}: "${enItem.title}"`);
+    assert(enItem.subtitle.length > 0 && enItem.subtitle !== frItem.subtitle, `Sous-titre traduit pour ${frItem.id}`);
+  }
+});
+
+const localizedEnKit = getLocalizedKitItems(INITIAL_KIT_ITEMS, 'en');
+assert(localizedEnKit[0].title === INITIAL_KIT_ITEMS_EN[0].title, 'getLocalizedKitItems traduit dynamiquement les titres en EN');
+assert(localizedEnKit[0].id === INITIAL_KIT_ITEMS[0].id, 'getLocalizedKitItems préserve l\'ID canonique k1');
+
+// 6. LOCALISATION DE L'ENCYCLOPÉDIE & GLOSSAIRE NRBC
+console.log('\n--- 6. LOCALISATION DE L\'ENCYCLOPÉDIE & GLOSSAIRE NRBC ---');
+
+assert(GLOSSARY_TERMS_EN.length === GLOSSARY_TERMS.length, `Parité des termes du glossaire (25 attendus : ${GLOSSARY_TERMS_EN.length})`);
+assert(HISTORICAL_ERAS_EN.length === HISTORICAL_ERAS.length, `Parité des ères historiques (4 attendues : ${HISTORICAL_ERAS_EN.length})`);
+assert(COUNTRY_DOCTRINES_EN.length === COUNTRY_DOCTRINES.length, `Parité des doctrines nationales (5 attendues : ${COUNTRY_DOCTRINES_EN.length})`);
+assert(NRBC_TOOL_CATEGORIES_EN.length === NRBC_TOOL_CATEGORIES.length, `Parité de l'arsenal technologique (4 attendus : ${NRBC_TOOL_CATEGORIES_EN.length})`);
+
+GLOSSARY_TERMS.forEach((frTerm) => {
+  const enTerm = GLOSSARY_TERMS_EN.find((t) => t.id === frTerm.id);
+  assert(!!enTerm, `Terme glossaire ${frTerm.id} présent en EN`);
+  if (enTerm) {
+    assert(enTerm.shortDef.length > 10, `Définition courte valide en EN pour ${frTerm.id}`);
+    assert(enTerm.fullDef.length > 30, `Définition complète valide en EN pour ${frTerm.id}`);
+  }
+});
+
+const localizedEncyclo = getLocalizedEncyclopedia('en');
+assert(localizedEncyclo.historicalEras[0].id === 'era-ww1', 'Ère 1 canonique préservée (era-ww1)');
+assert(localizedEncyclo.historicalEras[0].title.includes('World War I') || localizedEncyclo.historicalEras[0].title.includes('Origins') || localizedEncyclo.historicalEras[0].period.includes('1914'), 'Ère 1 traduite en EN');
+assert(localizedEncyclo.countryDoctrines[0].id === 'france', 'Doctrine France canonique préservée');
+assert(localizedEncyclo.countryDoctrines[0].country.includes('France'), 'Doctrine France traduite en EN');
+
+// 7. LOCALISATION DES QUIZ & EXERCICES COLLECTIFS
+console.log('\n--- 7. LOCALISATION DES QUIZ & EXERCICES FORMATEUR ---');
+
+assert(IMMERSION_SCENARIOS_EN.length === IMMERSION_SCENARIOS.length, `Parité scénarios immersion (4 attendus : ${IMMERSION_SCENARIOS_EN.length})`);
+assert(QUIZ_IRRADIATION_CONTAMINATION_EN.questions.length === QUIZ_IRRADIATION_CONTAMINATION.questions.length, 'Parité questions quiz irradiation/contamination');
+assert(QUIZ_DECONTAMINATION_EN.questions.length === QUIZ_DECONTAMINATION.questions.length, 'Parité questions quiz décontamination');
+assert(TRAINER_SCENARIOS_EN.length === 4, '4 scénarios formateur disponibles en EN');
+
+const localizedQuiz = getLocalizedQuizData('en');
+assert(localizedQuiz.immersionScenarios[0].id === 'q-chimique-03', 'Scénario immersion 1 ID canonique préservé');
+assert(localizedQuiz.immersionScenarios[0].title.includes('Chlorine') || localizedQuiz.immersionScenarios[0].title.includes('Toxic'), 'Titre scénario 1 traduit en EN');
+assert(localizedQuiz.quizIrradiation.authority.includes('IRSN') || localizedQuiz.quizIrradiation.authority.includes('ASN'), 'Autorité de sûreté préservée dans quiz EN');
+
+// 8. LOCALISATION DE LA MATRICE DE COHÉRENCE
+console.log('\n--- 8. LOCALISATION DE LA MATRICE DE COHÉRENCE ---');
+
+assert(EMERGENCY_SCENARIOS_EN.length === EMERGENCY_SCENARIOS.length, `Parité des scénarios d'urgence (6 attendus : ${EMERGENCY_SCENARIOS_EN.length})`);
+EMERGENCY_SCENARIOS.forEach((frSc) => {
+  const enSc = EMERGENCY_SCENARIOS_EN.find((s) => s.id === frSc.id);
+  assert(!!enSc, `Scénario de cohérence ${frSc.id} présent en EN`);
+  if (enSc) {
+    assert(enSc.immediateAction.length > 10, `Action immédiate définie pour scénario ${frSc.id}`);
+    assert(enSc.fatalTraps.length === frSc.fatalTraps.length, `Même nombre de pièges mortels pour scénario ${frSc.id}`);
+  }
+});
+
+const localizedScenarios = getLocalizedEmergencyScenarios('en');
+assert(localizedScenarios[0].id === 'confinement', 'Scénario confinement canonique préservé');
+assert(localizedScenarios[0].title.includes('Shelter') || localizedScenarios[0].title.includes('Alert'), 'Scénario 1 traduit en EN');
+
+// 9. LOCALISATION DU PLAN FAMILIAL
+console.log('\n--- 9. LOCALISATION DU PLAN FAMILIAL & TÂCHES ---');
+
+assert(INITIAL_PLAN_TASKS_EN.length === INITIAL_PLAN_TASKS.length, `Parité des tâches du plan (5 attendues : ${INITIAL_PLAN_TASKS_EN.length})`);
+assert(INITIAL_MEMBERS_EN.length === INITIAL_MEMBERS.length, `Parité des membres du plan (3 attendus : ${INITIAL_MEMBERS_EN.length})`);
+
+const mappedPlanTasks = getLocalizedPlanTasks(INITIAL_PLAN_TASKS, 'en');
+assert(mappedPlanTasks[0].id === 't1', 'Tâche t1 canonique préservée');
+assert(mappedPlanTasks[0].label !== INITIAL_PLAN_TASKS[0].label, 'Tâche t1 traduite en EN');
+
+// 10. PRÉSERVATION DE L'INTÉGRITÉ DES CLÉS CANONIQUES DANS LE STOCKAGE LOCAL
+console.log('\n--- 10. CONSERVATION STRICTE DES IDENTIFIANTS CANONIQUES ---');
+
+const canonicalKitIds = ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8', 'k9', 'k10', 'k11', 'k12', 'k13', 'k14', 'k15', 'k16', 'k17', 'k18'];
+canonicalKitIds.forEach((id) => {
+  assert(INITIAL_KIT_ITEMS_EN.some((it) => it.id === id), `ID canonique kit "${id}" intact en EN`);
+});
+
+const canonicalTaskIds = ['t1', 't2', 't3', 't4', 't5'];
+canonicalTaskIds.forEach((id) => {
+  assert(INITIAL_PLAN_TASKS_EN.some((t) => t.id === id), `ID canonique tâche "${id}" intact en EN`);
+});
 
 console.log('========================================================');
 if (failed === 0) {

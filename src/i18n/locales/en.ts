@@ -70,6 +70,10 @@ export const en: TranslationDictionary = {
   'nav.language': 'Language',
   'nav.sources': 'Sources & Traceability',
   'nav.settings': 'Settings',
+  'header.autonomousStorage': 'Autonomous Storage',
+  'header.installTitle': 'Install application on your mobile device or computer',
+  'header.profileSimplifiedTooltip': 'Current mode: General Public (Click for Expert Mode)',
+  'header.profileExpertTooltip': 'Current mode: Expert / Trainer (Click for General Public Mode)',
 
   // Hamburger Menu Categories
   'menu.catUrgence': '1. Emergency & Immediate Reflexes',

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../i18n/I18nContext';
+import { getLocalizedTrainerScenarios } from '../i18n/content/localizedQuiz';
 
 export interface TrainerExerciseScenario {
   id: string;
@@ -121,8 +123,14 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
   onClose,
   onCompetencyMastered
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+  const scenarios = getLocalizedTrainerScenarios(language);
+
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('chimique-seveso');
-  const [groupName, setGroupName] = useState<string>('Groupe Citoyen Résilience - Session 1');
+  const [groupName, setGroupName] = useState<string>(
+    isEn ? 'Citizen Resilience Group - Session 1' : 'Groupe Citoyen Résilience - Session 1'
+  );
   const [participantsCount, setParticipantsCount] = useState<number>(6);
   const [sessionNotes, setSessionNotes] = useState<string>('');
   const [exerciseRunning, setExerciseRunning] = useState<boolean>(false);
@@ -130,7 +138,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
   const [validatedCompetencies, setValidatedCompetencies] = useState<{ [comp: string]: boolean }>({});
   const [showDebriefSheet, setShowDebriefSheet] = useState<boolean>(false);
 
-  const scenario = TRAINER_SCENARIOS.find((s) => s.id === selectedScenarioId) || TRAINER_SCENARIOS[0];
+  const scenario = scenarios.find((s) => s.id === selectedScenarioId) || scenarios[0];
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -176,14 +184,16 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[16px] font-bold font-['Space_Grotesk'] text-white">
-                  Mode Formateur • Animation d'Exercice Collectif
+                  {isEn ? 'Trainer Mode • Collective Drill Facilitation' : "Mode Formateur • Animation d'Exercice Collectif"}
                 </h2>
                 <span className="text-[10px] bg-amber-400 text-black font-['Space_Grotesk'] font-extrabold px-2 py-0.5 rounded uppercase">
-                  Pédagogique
+                  {isEn ? 'Educational' : 'Pédagogique'}
                 </span>
               </div>
               <p className="text-[11px] text-[#c4c6ce]">
-                Animation sans serveur • Stockage local • Bilan d'exercice imprimable
+                {isEn
+                  ? 'Zero-server execution • Local sovereign storage • Printable debrief memo'
+                  : "Animation sans serveur • Stockage local • Bilan d'exercice imprimable"}
               </p>
             </div>
           </div>
@@ -191,6 +201,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label={isEn ? 'Close modal' : 'Fermer'}
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
           >
             ✕
@@ -201,7 +212,10 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
         <div className="bg-amber-100 border-b border-amber-300 p-2.5 px-4 flex items-center gap-2 text-[11px] text-amber-950">
           <span className="material-symbols-outlined text-amber-800 text-[18px] shrink-0">warning</span>
           <span className="leading-snug">
-            <strong>DISTINCTION MAJEURE :</strong> Cet exercice est une simulation pédagogique. En cas d'événement réel, les consignes diffusées par le Préfet et la Sécurité Civile priment immédiatement.
+            <strong>{isEn ? 'MANDATORY ETHICAL NOTICE: ' : 'DISTINCTION MAJEURE : '}</strong>
+            {isEn
+              ? 'This drill is an educational simulation. In real emergency events, directives broadcast by Civil Protection authorities strictly prevail.'
+              : "Cet exercice est une simulation pédagogique. En cas d'événement réel, les consignes diffusées par le Préfet et la Sécurité Civile priment immédiatement."}
           </span>
         </div>
 
@@ -211,7 +225,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div>
               <label className="block text-[10px] font-bold uppercase text-gray-700 mb-0.5">
-                Intitulé de l'Atelier / Groupe :
+                {isEn ? 'Workshop / Group Title:' : "Intitulé de l'Atelier / Groupe :"}
               </label>
               <input
                 type="text"
@@ -222,7 +236,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase text-gray-700 mb-0.5">
-                Effectif Participants :
+                {isEn ? 'Participants Count:' : 'Effectif Participants :'}
               </label>
               <input
                 type="number"
@@ -247,7 +261,11 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                   <span className="material-symbols-outlined text-[16px]">
                     {exerciseRunning ? 'pause' : 'play_arrow'}
                   </span>
-                  <span>{exerciseRunning ? `En cours (${formatTimer(exerciseTimer)})` : 'Lancer chrono'}</span>
+                  <span>
+                    {exerciseRunning
+                      ? (isEn ? `Running (${formatTimer(exerciseTimer)})` : `En cours (${formatTimer(exerciseTimer)})`)
+                      : (isEn ? 'Start timer' : 'Lancer chrono')}
+                  </span>
                 </button>
                 {exerciseTimer > 0 && !exerciseRunning && (
                   <button
@@ -265,10 +283,10 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           {/* Sélecteur de scénario */}
           <div className="flex flex-col gap-1.5">
             <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-gray-600">
-              Choisir le scénario de l'exercice collectif :
+              {isEn ? 'Choose collective exercise scenario:' : "Choisir le scénario de l'exercice collectif :"}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {TRAINER_SCENARIOS.map((sc) => (
+              {scenarios.map((sc) => (
                 <button
                   key={sc.id}
                   type="button"
@@ -284,7 +302,9 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                       {sc.badge}
                     </span>
                     {sc.id === selectedScenarioId && (
-                      <span className="text-[10px] font-bold text-[#0036ce]">Actif</span>
+                      <span className="text-[10px] font-bold text-[#0036ce]">
+                        {isEn ? 'Active' : 'Actif'}
+                      </span>
                     )}
                   </div>
                   <strong className="text-[12px] text-[#001126] leading-snug">
@@ -299,7 +319,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <div className="p-4 bg-white rounded-xl border border-gray-300 flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#0036ce]">
-                Situation posée au groupe :
+                {isEn ? 'Situation presented to the group:' : 'Situation posée au groupe :'}
               </span>
               <p className="text-[13px] text-gray-900 bg-gray-50 p-2.5 rounded-lg border border-gray-200 italic leading-relaxed">
                 « {scenario.situation} »
@@ -310,7 +330,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex flex-col gap-1">
               <div className="flex items-center gap-1.5 text-red-950 font-bold uppercase text-[11px]">
                 <span className="material-symbols-outlined text-[16px] text-red-700">psychology_alt</span>
-                <span>Dilemme à soumettre au débat du groupe :</span>
+                <span>{isEn ? 'Dilemma to submit for group debate:' : 'Dilemme à soumettre au débat du groupe :'}</span>
               </div>
               <p className="text-[12px] text-red-900 leading-snug">
                 {scenario.groupDilemma}
@@ -321,7 +341,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col gap-1.5">
                 <strong className="text-blue-950 uppercase font-['Space_Grotesk']">
-                  Objectifs Pédagogiques Clés :
+                  {isEn ? 'Key Pedagogical Objectives:' : 'Objectifs Pédagogiques Clés :'}
                 </strong>
                 <ul className="flex flex-col gap-1 text-blue-900 leading-relaxed">
                   {scenario.pedagogicalObjectives.map((obj, idx) => (
@@ -335,7 +355,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
 
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-1.5">
                 <strong className="text-amber-950 uppercase font-['Space_Grotesk']">
-                  Pièges mortels à déconstruire :
+                  {isEn ? 'Fatal Traps to Deconstruct:' : 'Pièges mortels à déconstruire :'}
                 </strong>
                 <ul className="flex flex-col gap-1 text-amber-900 leading-relaxed">
                   {scenario.fatalTraps.map((trap, idx) => (
@@ -352,9 +372,11 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <strong className="text-[#001126] uppercase font-['Space_Grotesk'] text-[11px]">
-                  Validation des compétences travaillées par le groupe :
+                  {isEn ? 'Validation of skills practiced by the group:' : 'Validation des compétences travaillées par le groupe :'}
                 </strong>
-                <span className="text-[10px] text-gray-500">Cocher pour valider</span>
+                <span className="text-[10px] text-gray-500">
+                  {isEn ? 'Check to validate' : 'Cocher pour valider'}
+                </span>
               </div>
               <div className="flex flex-col gap-1.5">
                 {scenario.targetedCompetencies.map((comp) => {
@@ -380,7 +402,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                       <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
                         isChecked ? 'bg-emerald-200 text-emerald-900' : 'bg-gray-100 text-gray-600'
                       }`}>
-                        {isChecked ? 'Acquis' : 'À travailler'}
+                        {isChecked ? (isEn ? 'Mastered' : 'Acquis') : (isEn ? 'In progress' : 'À travailler')}
                       </span>
                     </label>
                   );
@@ -391,13 +413,17 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             {/* Remarques & observations formateur */}
             <div>
               <label className="block text-[10px] font-bold uppercase text-gray-700 mb-0.5">
-                Observations & points de débriefing de l'animateur :
+                {isEn ? 'Facilitator debrief observations & notes:' : "Observations & points de débriefing de l'animateur :"}
               </label>
               <textarea
                 rows={2}
                 value={sessionNotes}
                 onChange={(e) => setSessionNotes(e.target.value)}
-                placeholder="Ex: Le groupe a rapidement écarté la fuite en véhicule mais a hésité sur l'usage des comprimés d'iode..."
+                placeholder={
+                  isEn
+                    ? 'E.g.: The group quickly rejected fleeing by car but hesitated on the strict protocol for iodine tablets...'
+                    : "Ex: Le groupe a rapidement écarté la fuite en véhicule mais a hésité sur l'usage des comprimés d'iode..."
+                }
                 className="w-full p-2 border border-gray-300 rounded text-[12px]"
               />
             </div>
@@ -407,14 +433,16 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <div className="border-t border-gray-300 pt-3 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase text-black">
-                Bilan Pédagogique de la Session (Format Imprimable N&B) :
+                {isEn ? 'Session Pedagogical Memo (Printable B&W format):' : 'Bilan Pédagogique de la Session (Format Imprimable N&B) :'}
               </span>
               <button
                 type="button"
                 onClick={() => setShowDebriefSheet(!showDebriefSheet)}
                 className="text-[11px] font-bold text-[#0036ce] underline"
               >
-                {showDebriefSheet ? 'Masquer fiche' : 'Prévisualiser fiche bilan'}
+                {showDebriefSheet
+                  ? (isEn ? 'Hide debrief sheet' : 'Masquer fiche')
+                  : (isEn ? 'Preview debrief sheet' : 'Prévisualiser fiche bilan')}
               </button>
             </div>
 
@@ -423,33 +451,41 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                 <div className="border-b-2 border-black pb-2 flex justify-between items-center">
                   <div>
                     <h3 className="font-black text-[14px] uppercase font-['Space_Grotesk']">
-                      BILAN D'EXERCICE DE SÉCURITÉ CIVILE • NRBCOR
+                      {isEn ? 'CIVIL DEFENSE DRILL SUMMARY • NRBCOR' : "BILAN D'EXERCICE DE SÉCURITÉ CIVILE • NRBCOR"}
                     </h3>
                     <p className="text-[11px] text-gray-600">
-                      Formation à la Résilience Citoyenne • Support Pédagogique
+                      {isEn ? 'Citizen Resilience Preparedness • Educational Support' : 'Formation à la Résilience Citoyenne • Support Pédagogique'}
                     </p>
                   </div>
                   <div className="text-right text-[10px]">
-                    <span className="font-bold block">DATE : {new Date().toLocaleDateString('fr-FR')}</span>
-                    <span>DURÉE : {formatTimer(exerciseTimer)}</span>
+                    <span className="font-bold block">
+                      DATE : {new Intl.DateTimeFormat(isEn ? 'en-US' : 'fr-FR', { dateStyle: 'long' }).format(new Date())}
+                    </span>
+                    <span>{isEn ? 'DURATION: ' : 'DURÉE : '}{formatTimer(exerciseTimer)}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[11px] border-b border-gray-300 pb-2">
-                  <div><strong>Session :</strong> {groupName}</div>
-                  <div><strong>Participants :</strong> {participantsCount} personnes</div>
-                  <div className="col-span-2"><strong>Scénario travaillé :</strong> {scenario.title}</div>
+                  <div><strong>{isEn ? 'Session: ' : 'Session : '}</strong> {groupName}</div>
+                  <div><strong>{isEn ? 'Participants: ' : 'Participants : '}</strong> {participantsCount} {isEn ? 'people' : 'personnes'}</div>
+                  <div className="col-span-2"><strong>{isEn ? 'Practiced scenario: ' : 'Scénario travaillé : '}</strong> {scenario.title}</div>
                 </div>
 
                 <div className="text-[11px] flex flex-col gap-1">
-                  <strong className="uppercase">Compétences Travaillées & Validées :</strong>
+                  <strong className="uppercase">
+                    {isEn ? 'Targeted & Validated Skills:' : 'Compétences Travaillées & Validées :'}
+                  </strong>
                   <div className="space-y-0.5">
                     {scenario.targetedCompetencies.map((comp) => {
                       const isOk = !!validatedCompetencies[comp];
                       return (
                         <div key={comp} className="flex justify-between py-0.5 border-b border-gray-200">
                           <span>{comp}</span>
-                          <span className="font-bold">{isOk ? 'VALIDÉ ✓' : 'NON VALIDÉ ✕'}</span>
+                          <span className="font-bold">
+                            {isOk
+                              ? (isEn ? 'VALIDATED ✓' : 'VALIDÉ ✓')
+                              : (isEn ? 'NOT VALIDATED ✕' : 'NON VALIDÉ ✕')}
+                          </span>
                         </div>
                       );
                     })}
@@ -458,14 +494,14 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
 
                 {sessionNotes && (
                   <div className="text-[11px] border-t border-gray-300 pt-1.5">
-                    <strong>Observations Formateur :</strong>
+                    <strong>{isEn ? 'Facilitator Observations:' : 'Observations Formateur :'}</strong>
                     <p className="text-gray-700 italic mt-0.5">{sessionNotes}</p>
                   </div>
                 )}
 
                 <div className="border-t-2 border-black pt-2 text-[9px] text-gray-600 flex justify-between">
-                  <span>Document pédagogique local généré sans serveur.</span>
-                  <span>Rappel : Les ordres de la Préfecture et de la Sécurité Civile prévalent toujours.</span>
+                  <span>{isEn ? 'Local educational memo generated without server.' : 'Document pédagogique local généré sans serveur.'}</span>
+                  <span>{isEn ? 'Notice: Orders from Civil Protection authorities strictly prevail at all times.' : 'Rappel : Les ordres de la Préfecture et de la Sécurité Civile prévalent toujours.'}</span>
                 </div>
               </div>
             )}
@@ -480,7 +516,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             className="h-10 px-4 bg-black text-white hover:bg-gray-800 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[16px]">print</span>
-            <span>Imprimer Bilan de Session</span>
+            <span>{isEn ? 'Print Session Debrief' : 'Imprimer Bilan de Session'}</span>
           </button>
 
           <button
@@ -488,7 +524,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             onClick={onClose}
             className="h-10 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-800 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
           >
-            Fermer
+            {isEn ? 'Close' : 'Fermer'}
           </button>
         </div>
       </div>

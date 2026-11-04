@@ -33,8 +33,10 @@ import { updateService } from './services/updateService';
 import { PROTOCOLS_DATA } from './data/protocols';
 import { INITIAL_KIT_ITEMS } from './data/kitData';
 import { triggerHaptic } from './utils/haptics';
+import { useTranslation } from './i18n/I18nContext';
 
 export default function App() {
+  const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -280,58 +282,58 @@ export default function App() {
   };
 
   // Titre dynamique de l'en-tête
-  let headerTitle = 'Accueil';
+  let headerTitle = t('nav.home');
   let showHeaderBack = false;
 
   if (subScreen) {
     showHeaderBack = true;
     if (subScreen.type === 'protocol') {
-      headerTitle = 'Protocole Détail';
+      headerTitle = language === 'en' ? 'Protocol Details' : 'Protocole Détail';
     } else if (subScreen.type === 'georisques') {
-      headerTitle = 'Géorisques';
+      headerTitle = t('georisques.title');
     } else if (subScreen.type === 'formation') {
-      headerTitle = 'Formation & Quiz';
+      headerTitle = t('training.title');
     } else if (subScreen.type === 'tracabilite') {
-      headerTitle = 'Sources & Traçabilité';
+      headerTitle = t('drawer.sourcesTracabilite');
     } else if (subScreen.type === 'deshabillage') {
-      headerTitle = 'Déshabillage & Décontamination';
+      headerTitle = language === 'en' ? 'Undressing & Decontamination' : 'Déshabillage & Décontamination';
     } else if (subScreen.type === 'iode') {
-      headerTitle = 'Fiche Iode Stable';
+      headerTitle = language === 'en' ? 'Stable Iodine Sheet' : 'Fiche Iode Stable';
     } else if (subScreen.type === 'confinement-guide') {
-      headerTitle = 'Guide Confinement';
+      headerTitle = language === 'en' ? 'Shelter-in-Place Guide' : 'Guide Confinement';
     } else if (subScreen.type === 'siren-guide') {
-      headerTitle = 'Signaux d\'Alerte RNA';
+      headerTitle = language === 'en' ? 'Warning Sirens' : 'Signaux d\'Alerte RNA';
     } else if (subScreen.type === 'animaux') {
-      headerTitle = 'Animaux en Milieu NRBC';
+      headerTitle = language === 'en' ? 'Pets in CBRN Hazards' : 'Animaux en Milieu NRBC';
     } else if (subScreen.type === 'carte-perimetres') {
-      headerTitle = 'Carte Hors-Ligne des Périmètres';
+      headerTitle = t('perimeters.title');
     } else if (subScreen.type === 'mode-crise') {
-      headerTitle = 'Mode Crise Immédiat';
+      headerTitle = t('crisis.title');
     } else if (subScreen.type === 'inventory') {
-      headerTitle = 'Inventaire Matériel';
+      headerTitle = t('inventory.title');
     } else if (subScreen.type === 'settings') {
-      headerTitle = 'Paramètres & Données';
+      headerTitle = t('settings.title');
     } else if (subScreen.type === 'system-settings') {
-      headerTitle = 'Système & Mises à Jour';
+      headerTitle = t('drawer.systemSettings');
     } else if (subScreen.type === 'encyclopedie') {
-      headerTitle = 'Encyclopédie & Glossaire NRBC';
+      headerTitle = t('encyclo.title');
     }
   } else {
     switch (activeTab) {
       case 'accueil':
-        headerTitle = 'Accueil';
+        headerTitle = t('nav.home');
         break;
       case 'reagir':
-        headerTitle = 'Réagir';
+        headerTitle = t('nav.react');
         break;
       case 'guides':
-        headerTitle = 'Guides';
+        headerTitle = t('nav.guides');
         break;
       case 'preparation':
-        headerTitle = 'Préparation';
+        headerTitle = t('nav.prep');
         break;
       case 'mon-plan':
-        headerTitle = 'Mon Plan';
+        headerTitle = t('nav.myPlan');
         break;
     }
   }

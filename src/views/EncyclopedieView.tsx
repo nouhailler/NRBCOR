@@ -238,33 +238,33 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
 
             {/* Liste des cartes du glossaire */}
             <div className="flex flex-col gap-2.5">
-              {filteredGlossary.map((t) => {
-                const isExpanded = expandedGlossaryId === t.id;
+              {filteredGlossary.map((term) => {
+                const isExpanded = expandedGlossaryId === term.id;
                 const categoryBadge =
-                  t.category === 'chimique'
+                  term.category === 'chimique'
                     ? { bg: 'bg-[#ffdad6]', text: 'text-[#93000a]', label: isEn ? 'Chemical' : 'Chimique' }
-                    : t.category === 'nucleaire'
+                    : term.category === 'nucleaire'
                     ? { bg: 'bg-[#ffd8e4]', text: 'text-[#31111d]', label: isEn ? 'Nuclear' : 'Nucléaire' }
-                    : t.category === 'radiologique'
+                    : term.category === 'radiologique'
                     ? { bg: 'bg-[#ffeedd]', text: 'text-[#7c2d12]', label: isEn ? 'Radiological' : 'Radiologique' }
-                    : t.category === 'biologique'
+                    : term.category === 'biologique'
                     ? { bg: 'bg-[#dcfce7]', text: 'text-[#14532d]', label: isEn ? 'Biological' : 'Biologique' }
-                    : t.category === 'materiel'
+                    : term.category === 'materiel'
                     ? { bg: 'bg-[#e0e7ff]', text: 'text-[#3730a3]', label: isEn ? 'Equipment' : 'Équipements' }
-                    : t.category === 'secours'
+                    : term.category === 'secours'
                     ? { bg: 'bg-[#fef3c7]', text: 'text-[#92400e]', label: isEn ? 'Civil Rescue' : 'Sécurité Civile' }
                     : { bg: 'bg-[#e2e8f0]', text: 'text-[#1e293b]', label: 'Doctrines' };
 
                 return (
                   <div
-                    key={t.id}
+                    key={term.id}
                     className="bg-white rounded-xl border border-[#c4c6ce] shadow-xs p-3.5 flex flex-col gap-2 transition-all hover:border-[#0036ce]"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-[15px] font-bold text-[#001126]">
-                            {t.term}
+                            {term.term}
                           </h3>
                           <span
                             className={`font-['Space_Grotesk'] text-[10px] uppercase font-bold px-2 py-0.5 rounded ${categoryBadge.bg} ${categoryBadge.text}`}
@@ -272,9 +272,9 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                             {categoryBadge.label}
                           </span>
                         </div>
-                        {t.acronym && (
+                        {term.acronym && (
                           <span className="text-[11px] font-['Space_Grotesk'] text-[#74777e] mt-0.5">
-                            {t.acronym}
+                            {term.acronym}
                           </span>
                         )}
                       </div>
@@ -283,7 +283,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                         type="button"
                         onClick={() => {
                           triggerHaptic('light');
-                          setExpandedGlossaryId(isExpanded ? null : t.id);
+                          setExpandedGlossaryId(isExpanded ? null : term.id);
                         }}
                         className="p-1 rounded-lg hover:bg-[#eef4ff] text-[#0036ce] transition-colors"
                         title={isExpanded ? (isEn ? 'Collapse' : 'Réduire') : (isEn ? 'Expand details' : 'Développer la notice')}
@@ -295,14 +295,14 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                     </div>
 
                     <p className="text-[13px] text-[#44474d] leading-relaxed">
-                      {t.shortDef}
+                      {term.shortDef}
                     </p>
 
                     {isExpanded && (
                       <div className="pt-2 border-t border-[#eef4ff] flex flex-col gap-2.5 text-[12px] animate-in fade-in duration-150">
                         <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#e4efff] text-[#001126] leading-relaxed">
                           <strong>{t('encyclo.fullDefinition')} </strong>
-                          {t.fullDef}
+                          {term.fullDef}
                         </div>
 
                         <div className="flex flex-col gap-1">
@@ -310,27 +310,27 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                             {t('encyclo.contextApplication')}
                           </span>
                           <p className="text-[#44474d] leading-relaxed">
-                            {t.contextUsage}
+                            {term.contextUsage}
                           </p>
                         </div>
 
-                        {t.historicalNote && (
+                        {term.historicalNote && (
                           <div className="p-2.5 bg-[#fef3c7] text-[#92400e] rounded-lg text-[11px] leading-relaxed flex items-start gap-1.5">
                             <span className="material-symbols-outlined text-[16px] shrink-0 mt-0.5">
                               history
                             </span>
                             <span>
-                              <strong>{t('encyclo.historicalOrigin')}</strong> {t.historicalNote}
+                              <strong>{t('encyclo.historicalOrigin')}</strong> {term.historicalNote}
                             </span>
                           </div>
                         )}
 
-                        {t.seeAlso && t.seeAlso.length > 0 && (
+                        {term.seeAlso && term.seeAlso.length > 0 && (
                           <div className="flex items-center gap-1.5 flex-wrap pt-1">
                             <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#74777e]">
                               {t('encyclo.seeAlso')}
                             </span>
-                            {t.seeAlso.map((relatedId) => {
+                            {term.seeAlso.map((relatedId) => {
                               const related = glossaryTerms.find((r) => r.id === relatedId);
                               if (!related) return null;
                               return (

@@ -10,6 +10,7 @@ import {
 import { AVAILABLE_COMMUNES, CommuneInfo } from '../data/georisquesData';
 import { triggerHaptic } from '../utils/haptics';
 import { NuclearPowerIcon } from '../components/icons/NuclearPowerIcon';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface CartePerimetresViewProps {
   onBack: () => void;
@@ -20,6 +21,8 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
   onBack,
   onOpenSubScreen
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
   // Coordonnées utilisateur (par défaut Lyon 3e ou position sauvée)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; label: string }>({
     lat: 45.7602,
@@ -133,11 +136,11 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               className="flex items-center gap-1.5 text-[#98f6c5] hover:text-white transition-colors font-['Space_Grotesk'] text-[13px] font-bold"
             >
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-              <span>Retour</span>
+              <span>{t('common.back')}</span>
             </button>
             <div className="flex items-center gap-1.5 bg-[#98f6c5]/20 text-[#98f6c5] border border-[#98f6c5]/30 px-2 py-0.5 rounded-full font-['Space_Grotesk'] text-[10px] uppercase font-bold">
               <span className="material-symbols-outlined text-[14px]">offline_bolt</span>
-              <span>100% Hors-Ligne • Zero-Cloud</span>
+              <span>{isEn ? '100% Offline • Zero-Cloud' : '100% Hors-Ligne • Zero-Cloud'}</span>
             </div>
           </div>
 
@@ -145,11 +148,11 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#98f6c5] text-[24px]">radar</span>
               <h1 className="text-[20px] font-extrabold text-white tracking-tight">
-                Carte Hors-Ligne des Périmètres
+                {t('carte.title')}
               </h1>
             </div>
             <p className="text-[12px] text-[#dce9fd] mt-1 leading-relaxed">
-              Base autonome des 19 CNPE nucléaires et 22 plateformes Seveso Seuil Haut. Calcul géodésique local immédiat sans réseau ni serveur.
+              {t('carte.subtitle')}
             </p>
           </div>
         </div>
@@ -165,7 +168,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-['Space_Grotesk'] text-[10px] text-[#74777e] uppercase font-bold">
-                  Position de référence
+                  {t('carte.refPosition')}
                 </span>
                 <span className="text-[14px] font-bold text-[#001126] truncate">
                   {userLocation.label}

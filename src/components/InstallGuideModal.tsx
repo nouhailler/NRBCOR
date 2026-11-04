@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface InstallGuideModalProps {
   isOpen: boolean;
@@ -13,6 +14,9 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
   onNativeInstall,
   canNativeInstall = false,
 }) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   if (!isOpen) return null;
 
   return (
@@ -31,17 +35,17 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
             </div>
             <div className="flex flex-col">
               <h2 id="install-title" className="font-['Space_Grotesk'] text-[16px] font-bold tracking-tight">
-                Installer l'application NRBCOR
+                {isEn ? 'Install NRBCOR Application' : "Installer l'application NRBCOR"}
               </h2>
               <span className="text-[11px] text-[#98f6c5] font-['Space_Grotesk'] uppercase font-semibold">
-                Accès direct 100% hors-ligne
+                {isEn ? 'Direct 100% Offline Access' : 'Accès direct 100% hors-ligne'}
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            aria-label="Fermer"
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            aria-label={t('common.close')}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -50,7 +54,9 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
         {/* Corps des instructions pas-à-pas pour utilisateurs novices */}
         <div className="p-5 flex flex-col gap-4 overflow-y-auto max-h-[70vh] text-[13px]">
           <p className="text-[#44474d] leading-relaxed">
-            L'installation de l'application permet de l'ajouter sur votre écran d'accueil comme une application native, consultable même en cas de panne de réseau Internet ou de coupure électrique.
+            {isEn
+              ? 'Installing the application adds it to your home screen or desktop as a native app, always accessible even during full cellular network failures or power outages.'
+              : "L'installation de l'application permet de l'ajouter sur votre écran d'accueil comme une application native, consultable même en cas de panne de réseau Internet ou de coupure électrique."}
           </p>
 
           {/* Si installation native en 1-clic possible */}
@@ -61,10 +67,10 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
                 onClose();
               }}
               type="button"
-              className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white rounded-xl font-['Space_Grotesk'] text-[13px] uppercase font-bold tracking-wider flex items-center justify-center gap-2 shadow-md transition-all"
+              className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white rounded-xl font-['Space_Grotesk'] text-[13px] uppercase font-bold tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">download</span>
-              <span>Installer directement en 1 clic</span>
+              <span>{isEn ? 'Install directly in 1 click' : 'Installer directement en 1 clic'}</span>
             </button>
           )}
 
@@ -72,17 +78,29 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
             <div className="flex items-center gap-2 text-[#001126] font-bold">
               <span className="material-symbols-outlined text-[#0036ce] text-[20px]">phone_iphone</span>
-              <span>Sur iPhone ou iPad (Safari) :</span>
+              <span>{isEn ? 'On iPhone or iPad (Safari):' : 'Sur iPhone ou iPad (Safari) :'}</span>
             </div>
             <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-[#44474d] leading-snug pl-1">
               <li>
-                Appuyez sur le bouton <strong>Partager</strong> en bas de Safari (<span className="text-[#0036ce] font-bold">icône rectangle avec flèche vers le haut ⎋</span>).
+                {isEn ? (
+                  <>Tap the <strong>Share</strong> button at the bottom of Safari (<span className="text-[#0036ce] font-bold">rectangle icon with upward arrow ⎋</span>).</>
+                ) : (
+                  <>Appuyez sur le bouton <strong>Partager</strong> en bas de Safari (<span className="text-[#0036ce] font-bold">icône rectangle avec flèche vers le haut ⎋</span>).</>
+                )}
               </li>
               <li>
-                Faites défiler vers le bas et touchez <strong>« Sur l'écran d'accueil »</strong> (<span className="font-bold">icône ⊕</span>).
+                {isEn ? (
+                  <>Scroll down and tap <strong>"Add to Home Screen"</strong> (<span className="font-bold">⊕ icon</span>).</>
+                ) : (
+                  <>Faites défiler vers le bas et touchez <strong>« Sur l'écran d'accueil »</strong> (<span className="font-bold">icône ⊕</span>).</>
+                )}
               </li>
               <li>
-                Touchez <strong>« Ajouter »</strong> en haut à droite. L'icône NRBCOR apparaît sur votre écran !
+                {isEn ? (
+                  <>Tap <strong>"Add"</strong> in the top right. The NRBCOR icon will appear on your device!</>
+                ) : (
+                  <>Touchez <strong>« Ajouter »</strong> en haut à droite. L'icône NRBCOR apparaît sur votre écran !</>
+                )}
               </li>
             </ol>
           </div>
@@ -91,17 +109,29 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
             <div className="flex items-center gap-2 text-[#001126] font-bold">
               <span className="material-symbols-outlined text-[#3f9d73] text-[20px]">phone_android</span>
-              <span>Sur Mobile Android :</span>
+              <span>{isEn ? 'On Android Mobile:' : 'Sur Mobile Android :'}</span>
             </div>
             <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-[#44474d] leading-snug pl-1">
               <li>
-                Appuyez sur le menu du navigateur (<strong className="font-bold">les 3 petits points ⋮</strong> en haut à droite).
+                {isEn ? (
+                  <>Tap the browser menu (<strong className="font-bold">the 3 vertical dots ⋮</strong> in the top right corner).</>
+                ) : (
+                  <>Appuyez sur le menu du navigateur (<strong className="font-bold">les 3 petits points ⋮</strong> en haut à droite).</>
+                )}
               </li>
               <li>
-                Sélectionnez <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.
+                {isEn ? (
+                  <>Select <strong>"Install application"</strong> or <strong>"Add to Home screen"</strong>.</>
+                ) : (
+                  <>Sélectionnez <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.</>
+                )}
               </li>
               <li>
-                Confirmez l'installation. L'application s'installe comme une appli native.
+                {isEn ? (
+                  <>Confirm installation. The app installs seamlessly as a native application.</>
+                ) : (
+                  <>Confirmez l'installation. L'application s'installe comme une appli native.</>
+                )}
               </li>
             </ol>
           </div>
@@ -110,10 +140,14 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
             <div className="flex items-center gap-2 text-[#001126] font-bold">
               <span className="material-symbols-outlined text-[#001126] text-[20px]">laptop</span>
-              <span>Sur Ordinateur (Desktop) :</span>
+              <span>{isEn ? 'On Desktop Computer:' : 'Sur Ordinateur (Desktop) :'}</span>
             </div>
             <p className="text-[12px] text-[#44474d] leading-snug">
-              Cliquez sur l'icône d'installation située tout à droite dans la barre d'adresse de votre navigateur (<span className="font-semibold">icône écran avec flèche ⭳ ou bouton Installer</span>).
+              {isEn ? (
+                <>Click the install icon on the far right of your browser's address bar (<span className="font-semibold">computer screen icon with down arrow ⭳ or Install button</span>).</>
+              ) : (
+                <>Cliquez sur l'icône d'installation située tout à droite dans la barre d'adresse de votre navigateur (<span className="font-semibold">icône écran avec flèche ⭳ ou bouton Installer</span>).</>
+              )}
             </p>
           </div>
         </div>
@@ -123,9 +157,9 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[42px] px-5 rounded-xl bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
+            className="min-h-[42px] px-5 rounded-xl bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors cursor-pointer"
           >
-            Fermer le guide
+            {isEn ? 'Close Guide' : 'Fermer le guide'}
           </button>
         </div>
       </div>
