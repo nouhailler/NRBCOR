@@ -7,6 +7,13 @@
 </p>
 
 <p align="center">
+  <a href="landing.html"><strong>✨ Discover the NRBCOR Landing Page</strong></a> • 
+  <a href="README.md"><strong>🇫🇷 French Documentation (README.md)</strong></a> • 
+  <a href="docs/I18N_IMPLEMENTATION_REPORT.md"><strong>🌐 i18n Implementation Report</strong></a> • 
+  <a href="docs/LANDING_PAGE_DEPLOYMENT.md"><strong>🚀 Cloudflare & Netlify Deployment Guide</strong></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/PWA-100%25%20Offline%20First-98f6c5?style=for-the-badge&logo=pwa&logoColor=001126" alt="PWA Offline" />
   <img src="https://img.shields.io/badge/Language-Bilingual%20FR%20%2F%20EN-0036ce?style=for-the-badge" alt="Bilingual FR / EN" />
   <img src="https://img.shields.io/badge/Version-v1.6.0%20PWA-0036ce?style=for-the-badge" alt="Version 1.6.0" />

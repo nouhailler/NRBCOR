@@ -26,6 +26,7 @@ import { AnimauxGuideView } from './views/AnimauxGuideView';
 import { CartePerimetresView } from './views/CartePerimetresView';
 import { ModeCriseView } from './views/ModeCriseView';
 import { EncyclopedieView } from './views/EncyclopedieView';
+import { LandingPageView } from './views/LandingPageView';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { storageService } from './services/storage/IndexedDbStorage';
@@ -47,7 +48,15 @@ export default function App() {
     }
     return 'accueil';
   });
-  const [subScreen, setSubScreen] = useState<SubScreen>(null);
+  const [subScreen, setSubScreen] = useState<SubScreen>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'landing' || window.location.pathname.startsWith('/landing')) {
+        return { type: 'landing' };
+      }
+    }
+    return null;
+  });
   const [activeCallModal, setActiveCallModal] = useState<EmergencyCall | null>(null);
   const [isWipeModalOpen, setIsWipeModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -347,6 +356,22 @@ export default function App() {
       : textScale === 'extraLarge'
       ? 'text-[116%]'
       : 'text-[100%]';
+
+  if (subScreen?.type === 'landing') {
+    return (
+      <LandingPageView
+        onOpenApp={() => {
+          setSubScreen(null);
+          if (typeof window !== 'undefined' && window.history.replaceState) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('view');
+            window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+          }
+          window.scrollTo({ top: 0, behavior: 'instant' as any });
+        }}
+      />
+    );
+  }
 
   if (subScreen?.type === 'mode-crise') {
     return (

@@ -12,7 +12,15 @@ export default defineConfig(() => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname || '.', '.'),
+      },
+    },
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(import.meta.dirname || '.', 'index.html'),
+          landing: path.resolve(import.meta.dirname || '.', 'landing.html'),
+        },
       },
     },
     server: {

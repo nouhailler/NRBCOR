@@ -333,6 +333,20 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </span>
             <div className="flex flex-col gap-1 bg-white rounded-xl p-1.5 border border-[#c4c6ce] shadow-xs">
               <button
+                onClick={() => handleSelectSub({ type: 'landing' })}
+                className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-[#eef4ff] hover:bg-[#dce9fd] text-[#0036ce] font-bold transition-colors cursor-pointer border border-[#c4c6ce]/30 mb-0.5"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#0036ce]">public</span>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[12px] font-bold">
+                    {language === 'fr' ? 'Site de Présentation / Landing Page' : 'Overview Landing Page'}
+                  </span>
+                  <span className="text-[10px] text-[#44474d] font-normal leading-tight">
+                    {language === 'fr' ? 'Présentation citoyenne et partage' : 'Citizen overview & presentation'}
+                  </span>
+                </div>
+              </button>
+              <button
                 onClick={() => handleSelectSub({ type: 'system-settings' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#eef4ff] text-[#0036ce] font-bold transition-colors cursor-pointer"
               >
