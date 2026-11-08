@@ -51,6 +51,61 @@ Additional documentation:
 
 ---
 
+## 📸 Authentic Application Screenshots
+
+The **NRBCOR** user interface is engineered for instantaneous field clarity, high-contrast legibility under extreme stress, and seamless responsiveness across desktop monitors and mobile touchscreens.
+
+### 🖥️ 1. Main Dashboard & Home Screen (Desktop View)
+> *Header bar with Citizen / Expert mode toggle, PWA install button, local network status detector, doctrinal corpus verification, and 1-tap priority crisis protocols.*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_desktop_home.png" alt="NRBCOR - Desktop Dashboard" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
+</p>
+
+---
+
+### 📱 2. Mobile Smartphone Experience: Home & Emergency Reflex Mode
+> *Built for single-handed operation in the dark or under duress: live network sensing, high-visibility CRISIS trigger, 0-60s reflex triage, and synthesized voice guidance.*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_home.png" alt="NRBCOR - Smartphone Home Screen" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2); margin-right: 4%;" />
+  <img src="public/screenshots/nrbcor_mobile_reagir.png" alt="NRBCOR - Smartphone Emergency Response Screen" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 🗺️ 3. Concentric PPI Radar & Offline Map of 19 Nuclear Plants & Seveso Sites
+> *100% offline geodesic proximity engine. 80 km concentric radar detailing immediate reflex radii (5 km), nuclear PPI zones (20 km), and extended vigilance perimeters (50 km).*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_desktop_perimetres.png" alt="NRBCOR - PPI Radar and Offline Industrial Map" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
+</p>
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_perimetres.png" alt="NRBCOR - Smartphone Perimeters View" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 🎒 4. Household Logistics (72h Survival Kit) & Family Safety Plan
+> *Left: explainable 100-point resilience scoring, breakdown of water reserves (3L/day/person) and calories. Right: Family Safety Plan (PFMS), emergency contacts, and zero-server local storage in IndexedDB.*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_kit72h.png" alt="NRBCOR - 72h Kit and Logistics Score" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2); margin-right: 4%;" />
+  <img src="public/screenshots/nrbcor_mobile_monplan.png" alt="NRBCOR - Family Emergency Safety Plan" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 📚 5. Documented CBRN Encyclopedia & Doctrinal Glossary A-Z
+> *25 in-depth technical definitions (ALARA, Sievert, Gray, MOPP, CMIC, ABEK2P3, etc.), historical lineage from 1914, and comparative analysis of global civil defense doctrines (France, Switzerland, Belgium, USA, Russia, Israel).*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_desktop_encyclopedie.png" alt="NRBCOR - CBRN Encyclopedia and Doctrinal Glossary" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
+</p>
+
+---
+
 ## 🌟 Major Highlights (Version 1.6.0)
 
 ### 🌐 1. Full Bilingual Internationalization (French & English)

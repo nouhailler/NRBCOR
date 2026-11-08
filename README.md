@@ -52,13 +52,58 @@ Pour consulter la documentation détaillée :
 
 ---
 
-## 📸 Aperçu & Capture d'Écran de l'Application
+## 📸 Captures d’Écran Réelles de l’Application
+
+L'interface de **NRBCOR** a été conçue pour être immédiatement opérationnelle, hautement contrastée et lisible sous stress, aussi bien sur écran d'ordinateur que sur smartphone en conditions terrain.
+
+### 🖥️ 1. Tableau de Bord & Écran d'Accueil (Vue Bureau)
+> *Barre de titre avec bascule Grand Public / Expert, raccourci d'installation PWA, détection locale de connectivité, fraîcheur du corpus réglementaire et accès prioritaire 1-clic aux fiches d'alerte vitale.*
 
 <p align="center">
-  <img src="public/nrbcor_screenshot.jpg" alt="Capture d'Écran NRBCOR sur Mobile et Desktop" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.15); max-width: 100%; height: auto;" />
+  <img src="public/screenshots/nrbcor_desktop_home.png" alt="NRBCOR - Tableau de Bord et Accueil sur Ordinateur" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
 </p>
 
-> *Aperçu de l'interface NRBCOR : mode réagir sous stress, fiches doctrinales NRBC, mini-encyclopédie et glossaire complet, tableau de bord d'autonomie explicable, générateur de dossier personnel de secours et simulateur formateur collectif.*
+---
+
+### 📱 2. Expérience Mobile Smartphone : Accueil & Mode Réagir
+> *Conçue pour une manipulation à une main : détection réseau en direct, bouton rouge CRISE, mode lisibilité extrême, triage réflexe 0-60s et synthèse vocale des consignes sous stress.*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_home.png" alt="NRBCOR - Écran d'Accueil Smartphone" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2); margin-right: 4%;" />
+  <img src="public/screenshots/nrbcor_mobile_reagir.png" alt="NRBCOR - Mode Réagir Smartphone" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 🗺️ 3. Radar PPI & Carte Hors-Ligne des 19 Centrales Nucléaires et Sites Seveso
+> *Calculateur géodésique embarqué 100% hors-ligne (zéro cloud). Radar concentrique de 80 km affichant les périmètres réflexes (5 km), PPI nucléaires (20 km) et zones de vigilance (50 km).*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_desktop_perimetres.png" alt="NRBCOR - Radar PPI et Carte des Périmètres Hors-Ligne" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
+</p>
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_perimetres.png" alt="NRBCOR - Carte des Périmètres sur Smartphone" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 🎒 4. Résilience Logistique (Kit 72h) & Plan Familial de Mise en Sûreté
+> *À gauche : score d'autonomie explicable sur 100 points, décomposition des réserves d'eau (3L/jour/personne) et calories. À droite : Plan Familial de Mise en Sûreté (PFMS), contacts d'urgence et stockage 100% confiné dans IndexedDB.*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_mobile_kit72h.png" alt="NRBCOR - Kit 72h et Tableau de Bord Logistique" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2); margin-right: 4%;" />
+  <img src="public/screenshots/nrbcor_mobile_monplan.png" alt="NRBCOR - Plan Familial de Mise en Sûreté" width="45%" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0,17,38,0.2);" />
+</p>
+
+---
+
+### 📚 5. Mini-Encyclopédie Documentée & Glossaire Doctrinal A-Z
+> *25 notices expertes (ALARA, Sievert, Gray, MOPP, CMIC, ABEK2P3, etc.), histoire complète depuis 1914 et panorama comparatif des doctrines mondiales (France, Suisse, Belgique, États-Unis, Russie, Israël).*
+
+<p align="center">
+  <img src="public/screenshots/nrbcor_desktop_encyclopedie.png" alt="NRBCOR - Mini-Encyclopédie et Glossaire NRBC" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,17,38,0.25); max-width: 100%; height: auto;" />
+</p>
 
 ---
 

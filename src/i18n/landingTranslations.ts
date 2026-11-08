@@ -486,32 +486,46 @@ export const LANDING_FR: LandingTranslations = {
     closeLabel: 'Fermer',
     items: [
       {
-        id: 'capture-hero',
-        title: 'Vue d’ensemble Mobile & Desktop',
-        device: 'Multi-plateforme',
-        src: '/nrbcor_screenshot.jpg',
-        description: 'L’application s’adapte naturellement aux smartphones verticaux et aux grands écrans d’ordinateur, avec lisibilité immédiate.'
+        id: 'capture-desktop-home',
+        title: 'Tableau de Bord & Écran d’Accueil',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_home.png',
+        description: 'Interface d’accueil complète avec détection réseau, sélection de profil (Grand Public / Expert), raccourci d’installation PWA et accès 1-clic aux risques NRBC.'
       },
       {
-        id: 'capture-home',
-        title: 'Écran d’Accueil & Détection Réseau',
-        device: 'Vue Smartphone',
-        src: '/assets/aistudio/image_f04dc6c2.png',
-        description: 'Indicateur de statut hors-ligne/en ligne, bouton d’urgence prioritaire et accès immédiat aux protocoles.'
+        id: 'capture-mobile-reagir',
+        title: 'Mode Réagir & Protocoles Réflexes',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_reagir.png',
+        description: 'Mode d’urgence sous stress : triage réflexe 0-60s, mode lisibilité extrême, synthèse vocale des consignes et numéros d’urgence sécurisés.'
       },
       {
-        id: 'capture-perimetres',
-        title: 'Carte Hors-Ligne des Périmètres',
-        device: 'Vue Smartphone',
-        src: '/assets/aistudio/image_5fb083c2.png',
-        description: 'Recensement géographique complet des centrales nucléaires (CNPE) et sites Seveso seuil haut avec calcul des distances géodésiques.'
+        id: 'capture-desktop-perimetres',
+        title: 'Radar PPI & Carte Hors-Ligne des 19 CNPE',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_perimetres.png',
+        description: 'Cartographie vectorielle et radar concentrique de 80 km calculant la distance géodésique vers les 19 centrales nucléaires et 22 plateformes Seveso Seuil Haut.'
       },
       {
-        id: 'capture-privacy',
-        title: 'Stockage Local Zéro-Serveur',
-        device: 'Vue Détail',
-        src: '/assets/aistudio/image_bed71ae5.png',
-        description: 'Interface de confirmation de souveraineté des données garantissant la persistance exclusive dans IndexedDB.'
+        id: 'capture-mobile-kit72h',
+        title: 'Tableau de Bord Logistique & Kit 72h',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_kit72h.png',
+        description: 'Calculateur d’autonomie transparent avec score de résilience sur 100 points, décomposition des réserves d’eau (3L/j), calories et matériel essentiel.'
+      },
+      {
+        id: 'capture-desktop-encyclo',
+        title: 'Mini-Encyclopédie & Glossaire Doctrinal A-Z',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_encyclopedie.png',
+        description: '25 fiches exhaustives, histoire depuis 1914, doctrines géopolitiques (FR, CH, BE, LU, US, RU) et technologies de détection / décontamination.'
+      },
+      {
+        id: 'capture-mobile-plan',
+        title: 'Plan Familial & Souveraineté Zéro-Serveur',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_monplan.png',
+        description: 'Organisation des proches, contacts d’urgence, points de rassemblement alternatif et stockage strictement confiné dans la base locale IndexedDB.'
       }
     ]
   },
@@ -871,32 +885,46 @@ export const LANDING_EN: LandingTranslations = {
     closeLabel: 'Close',
     items: [
       {
-        id: 'capture-hero',
-        title: 'Mobile & Desktop Overview',
-        device: 'Multi-Device Suite',
-        src: '/nrbcor_screenshot.jpg',
-        description: 'The interface adjusts seamlessly to mobile touchscreens and desktop monitors with optimal contrast and typographic clarity.'
+        id: 'capture-desktop-home',
+        title: 'Dashboard & Main Home Screen',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_home.png',
+        description: 'Comprehensive home dashboard featuring network status detection, profile toggle (Citizen / Expert), PWA install trigger, and 1-tap CBRN risk protocols.'
       },
       {
-        id: 'capture-home',
-        title: 'Home Screen & Network Sensor',
-        device: 'Smartphone View',
-        src: '/assets/aistudio/image_f04dc6c2.png',
-        description: 'Real-time offline/online detector, prominent crisis button, and instant 1-tap access to vital CBRN reflex protocols.'
+        id: 'capture-mobile-reagir',
+        title: 'Emergency Response & Reflex Protocols',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_reagir.png',
+        description: 'High-stress crisis interface: 0-60s emergency triage, high-contrast readability mode, text-to-speech audio guidance, and protected emergency speed dials.'
       },
       {
-        id: 'capture-perimetres',
-        title: 'Offline Perimeters Map',
-        device: 'Smartphone View',
-        src: '/assets/aistudio/image_5fb083c2.png',
-        description: 'Geographic listing of all 19 French nuclear plants and top-tier Seveso chemical plants with precise geodesic distance calculation.'
+        id: 'capture-desktop-perimetres',
+        title: 'Concentric PPI Radar & Offline Industrial Map',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_perimetres.png',
+        description: '80km concentric radar and vector map calculating geodesic distances to 19 nuclear power stations and 22 high-threshold Seveso chemical sites without internet.'
       },
       {
-        id: 'capture-privacy',
-        title: 'Zero-Server Local Storage',
-        device: 'Settings View',
-        src: '/assets/aistudio/image_bed71ae5.png',
-        description: 'Data sovereignty confirmation assuring users that all records stay confined strictly to browser IndexedDB.'
+        id: 'capture-mobile-kit72h',
+        title: 'Logistics Dashboard & 72-Hour Emergency Kit',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_kit72h.png',
+        description: 'Transparent self-reliance calculator with 100-point resilience scoring, breakdown of water reserves (3L/day/person), nutrition, and vital equipment tracking.'
+      },
+      {
+        id: 'capture-desktop-encyclo',
+        title: 'CBRN Encyclopedia & Doctrinal Glossary A-Z',
+        device: 'Desktop (1366×860)',
+        src: '/screenshots/nrbcor_desktop_encyclopedie.png',
+        description: '25 detailed entries, historical analysis from 1914, civil protection doctrines (FR, CH, BE, LU, US, RU), and detection/decontamination technology breakdowns.'
+      },
+      {
+        id: 'capture-mobile-plan',
+        title: 'Family Safety Plan & Zero-Server Privacy',
+        device: 'Smartphone (390×844)',
+        src: '/screenshots/nrbcor_mobile_monplan.png',
+        description: 'Household emergency contacts, evacuation meeting points, school emergency protocols (PPMS), and 100% private local storage in IndexedDB.'
       }
     ]
   },

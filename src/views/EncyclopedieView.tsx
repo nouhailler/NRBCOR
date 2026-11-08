@@ -78,7 +78,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
   const isEn = language === 'en';
 
   return (
-    <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pb-28">
+    <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pt-20 pb-28">
       {/* Top Header Editorial */}
       <div className="bg-[#001126] text-white px-4 pt-4 pb-5 border-b border-[#12263f]">
         <div className="max-w-4xl mx-auto flex flex-col gap-3">

@@ -87,12 +87,22 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ t, onLaunchApp }) => {
 
           {/* Colonne Droite : Composition visuelle des captures d'écran réelles */}
           <div className="lg:col-span-5 relative flex justify-center">
-            <div className="relative w-full max-w-md lg:max-w-none rounded-2xl p-2 bg-[#05172e]/80 border border-[#1e3a5f] shadow-2xl backdrop-blur-sm group transition-transform hover:scale-[1.01]">
-              <div className="overflow-hidden rounded-xl bg-[#000a17]">
+            <div className="relative w-full max-w-md lg:max-w-none rounded-2xl p-2 bg-[#05172e]/90 border border-[#1e3a5f] shadow-2xl backdrop-blur-sm group">
+              <div className="overflow-hidden rounded-xl bg-[#000a17] border border-[#12263f]">
                 <img
-                  src="/nrbcor_screenshot.jpg"
+                  src="/screenshots/nrbcor_desktop_home.png"
                   alt={t.hero.imageCaption}
                   className="w-full h-auto object-cover rounded-xl transition-all duration-300"
+                  loading="eager"
+                />
+              </div>
+
+              {/* Incrustation d'un smartphone réel en bas à droite */}
+              <div className="hidden sm:block absolute -bottom-6 -right-4 w-44 rounded-2xl p-1 bg-[#05172e] border-2 border-[#1e3a5f] shadow-2xl overflow-hidden transition-transform hover:scale-105">
+                <img
+                  src="/screenshots/nrbcor_mobile_reagir.png"
+                  alt="Aperçu Smartphone NRBCOR"
+                  className="w-full h-auto rounded-xl object-cover"
                   loading="eager"
                 />
               </div>

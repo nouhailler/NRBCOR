@@ -32,8 +32,8 @@ export const LandingGallery: React.FC<LandingGalleryProps> = ({ t }) => {
           </span>
         </div>
 
-        {/* Grille responsive des 4 captures authentiques */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Grille responsive des 6 captures d'écran authentiques */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {t.gallery.items.map((item) => (
             <div
               key={item.id}

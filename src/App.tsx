@@ -54,6 +54,19 @@ export default function App() {
       if (params.get('view') === 'landing' || window.location.pathname.startsWith('/landing')) {
         return { type: 'landing' };
       }
+      const sub = params.get('sub');
+      if (sub === 'carte-perimetres') return { type: 'carte-perimetres' };
+      if (sub === 'georisques') return { type: 'georisques' };
+      if (sub === 'formation') return { type: 'formation' };
+      if (sub === 'mode-crise') return { type: 'mode-crise' };
+      if (sub === 'inventory') return { type: 'inventory' };
+      if (sub === 'suis-je-pret') return { type: 'suis-je-pret' };
+      if (sub === 'encyclopedie') return { type: 'encyclopedie' };
+      if (sub === 'tracabilite') return { type: 'tracabilite' };
+      if (sub === 'protocol-nucleaire') return { type: 'protocol', id: 'nucleaire' };
+      if (sub === 'protocol-radiologique') return { type: 'protocol', id: 'radiologique' };
+      if (sub === 'protocol-chimique') return { type: 'protocol', id: 'chimique' };
+      if (sub === 'protocol-bio') return { type: 'protocol', id: 'bio' };
     }
     return null;
   });
@@ -212,7 +225,10 @@ export default function App() {
         setTheme(s.preferredTheme);
       }
       if (!s.onboardingCompleted) {
-        setShowOnboarding(true);
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('skip_onboarding') !== '1') {
+          setShowOnboarding(true);
+        }
       }
     });
 

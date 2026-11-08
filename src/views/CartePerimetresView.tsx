@@ -125,7 +125,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
   };
 
   return (
-    <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pb-24">
+    <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pt-20 pb-24">
       {/* Top Header & Actions */}
       <div className="bg-[#001126] text-white px-4 pt-4 pb-5 border-b border-[#12263f]">
         <div className="max-w-4xl mx-auto flex flex-col gap-3">
