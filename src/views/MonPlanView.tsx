@@ -303,7 +303,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </div>
 
       {/* Privacy Statement Card with Discreet Mode Toggle */}
-      <section className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section data-tour="plan-privacy" className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-[#c4c6ce]">
         <div className="flex items-start justify-between gap-2">
           <div className="flex gap-2.5">
             <div className="w-9 h-9 rounded-full bg-[#e4efff] flex items-center justify-center shrink-0 text-[#001126]">

@@ -15,6 +15,7 @@ interface HamburgerMenuProps {
   onChangeTheme?: (theme: 'light' | 'dark' | 'system') => void;
   onTriggerOnboarding?: () => void;
   onOpenWipeModal?: () => void;
+  onStartTour?: () => void;
 }
 
 export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
@@ -28,6 +29,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   onChangeTheme,
   onTriggerOnboarding,
   onOpenWipeModal,
+  onStartTour,
 }) => {
   const { t, language } = useTranslation();
 
@@ -367,6 +369,18 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <span className="material-symbols-outlined text-[18px] text-[#3f9d73]">policy</span>
                 <span>{t('nav.sources')} (v2.4)</span>
               </button>
+              {onStartTour && (
+                <button
+                  onClick={() => {
+                    onStartTour();
+                    onClose();
+                  }}
+                  className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-[#eef4ff] text-[#0036ce] font-bold transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px] text-[#0036ce]">explore</span>
+                  <span>{t('tour.menuButton')}</span>
+                </button>
+              )}
               {onTriggerOnboarding && (
                 <button
                   onClick={() => {

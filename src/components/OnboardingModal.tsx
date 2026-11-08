@@ -5,12 +5,14 @@ interface OnboardingModalProps {
   isOpen: boolean;
   onComplete: (config: { householdSize: number; communeName: string }) => void;
   onGoDirectToGuides: () => void;
+  onStartTour?: () => void;
 }
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   isOpen,
   onComplete,
-  onGoDirectToGuides
+  onGoDirectToGuides,
+  onStartTour
 }) => {
   const [householdSize, setHouseholdSize] = useState(3);
   const [commune, setCommune] = useState('Lyon 3e Arrondissement');
@@ -26,6 +28,17 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       return;
     }
     onComplete({ householdSize, communeName: commune });
+  };
+
+  const handleStartTour = () => {
+    if (!acceptedDisclaimer) {
+      setValidationError(true);
+      return;
+    }
+    onComplete({ householdSize, communeName: commune });
+    if (onStartTour) {
+      onStartTour();
+    }
   };
 
   const handleGuides = () => {
@@ -205,14 +218,24 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           <button
             type="button"
             onClick={handleGuides}
-            className="min-h-[46px] px-4 rounded-xl bg-white hover:bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors border border-[#c4c6ce] flex-1 text-center"
+            className="min-h-[46px] px-3 rounded-xl bg-white hover:bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors border border-[#c4c6ce] flex-1 text-center"
           >
             Consulter les guides
           </button>
+          {onStartTour && (
+            <button
+              type="button"
+              onClick={handleStartTour}
+              className="min-h-[46px] px-3 rounded-xl bg-[#eef4ff] hover:bg-[#dce9fd] text-[#0036ce] font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors border border-[#d6e4f8] flex-1 text-center flex items-center justify-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[17px]">explore</span>
+              <span>Visite Guidée</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={handleStart}
-            className="min-h-[46px] px-5 rounded-xl bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider transition-colors shadow-sm flex-1 text-center flex items-center justify-center gap-1.5"
+            className="min-h-[46px] px-4 rounded-xl bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider transition-colors shadow-sm flex-1 text-center flex items-center justify-center gap-1.5"
           >
             <span>Commencer</span>
             <span className="material-symbols-outlined text-[16px]">arrow_forward</span>

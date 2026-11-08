@@ -193,77 +193,79 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         </div>
       </aside>
 
-      {/* Raccourci d'Urgence Immédiate 1-Tap : Que faire maintenant ? */}
-      <button
-        type="button"
-        onClick={() => {
-          triggerHaptic('warning');
-          setShowReflexModal(true);
-        }}
-        className="w-full min-h-[50px] px-4 bg-[#ba1a1a] hover:bg-[#93000a] text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-black uppercase tracking-wider flex items-center justify-between shadow-lg border-2 border-white/20 active:scale-98 transition-all cursor-pointer"
-      >
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[24px] text-amber-300 animate-pulse">
-            bolt
-          </span>
-          <span className="text-left font-black">
-            QUE FAIRE MAINTENANT ? (Triage 0-60s)
-          </span>
-        </div>
-        <div className="flex items-center gap-1 text-[11px] font-bold text-amber-200">
-          <span>FR • CH • BE • LU</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-        </div>
-      </button>
-
-      {/* Raccourci Proéminent Mode Crise Gros Boutons & Carte Hors-Ligne */}
-      <section className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-3.5 shadow-md border-2 border-[#ba1a1a] flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#ba1a1a] text-white flex items-center justify-center shrink-0 animate-pulse">
-            <span className="material-symbols-outlined text-[24px]">crisis_alert</span>
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-['Space_Grotesk'] text-[13px] font-black uppercase text-[#93000a] leading-tight">
-              Mode Crise Simplifié
+      {/* Raccourci d'Urgence Immédiate 1-Tap : Que faire maintenant ? + Mode Crise */}
+      <div data-tour="reagir-triage" className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic('warning');
+            setShowReflexModal(true);
+          }}
+          className="w-full min-h-[50px] px-4 bg-[#ba1a1a] hover:bg-[#93000a] text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-black uppercase tracking-wider flex items-center justify-between shadow-lg border-2 border-white/20 active:scale-98 transition-all cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[24px] text-amber-300 animate-pulse">
+              bolt
             </span>
-            <span className="text-[11px] text-[#93000a]/90 font-medium">
-              4 actions réflexes grand format (Confiner / Évacuer / Décontaminer / Appeler)
+            <span className="text-left font-black">
+              QUE FAIRE MAINTENANT ? (Triage 0-60s)
             </span>
           </div>
-        </div>
+          <div className="flex items-center gap-1 text-[11px] font-bold text-amber-200">
+            <span>FR • CH • BE • LU</span>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          </div>
+        </button>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 flex-wrap">
-          <button
-            type="button"
-            onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
-            className="flex-1 sm:flex-initial min-h-[44px] px-3.5 bg-[#ba1a1a] hover:bg-[#93000a] text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
-          >
-            <span>Ouvrir l'écran réflexe</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              setShowCoherenceModal(true);
-            }}
-            title="Matrice de Cohérence Opérationnelle (6 Scénarios Critiques)"
-            className="min-h-[44px] px-3 bg-red-800 hover:bg-red-700 text-white rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[16px]">fact_check</span>
-            <span>6 Scénarios P1</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
-            title="Carte & Radar PPI Hors-Ligne"
-            className="min-h-[44px] px-3 bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[16px]">radar</span>
-            <span>Radar PPI</span>
-          </button>
-        </div>
-      </section>
+        {/* Raccourci Proéminent Mode Crise Gros Boutons & Carte Hors-Ligne */}
+        <section className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-3.5 shadow-md border-2 border-[#ba1a1a] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#ba1a1a] text-white flex items-center justify-center shrink-0 animate-pulse">
+              <span className="material-symbols-outlined text-[24px]">crisis_alert</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-['Space_Grotesk'] text-[13px] font-black uppercase text-[#93000a] leading-tight">
+                Mode Crise Simplifié
+              </span>
+              <span className="text-[11px] text-[#93000a]/90 font-medium">
+                4 actions réflexes grand format (Confiner / Évacuer / Décontaminer / Appeler)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 flex-wrap">
+            <button
+              type="button"
+              onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
+              className="flex-1 sm:flex-initial min-h-[44px] px-3.5 bg-[#ba1a1a] hover:bg-[#93000a] text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
+            >
+              <span>Ouvrir l'écran réflexe</span>
+              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowCoherenceModal(true);
+              }}
+              title="Matrice de Cohérence Opérationnelle (6 Scénarios Critiques)"
+              className="min-h-[44px] px-3 bg-red-800 hover:bg-red-700 text-white rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[16px]">fact_check</span>
+              <span>6 Scénarios P1</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
+              title="Carte & Radar PPI Hors-Ligne"
+              className="min-h-[44px] px-3 bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[16px]">radar</span>
+              <span>Radar PPI</span>
+            </button>
+          </div>
+        </section>
+      </div>
 
       {/* 1. Avertissement permanent supérieur encadré haute lisibilité */}
       <section

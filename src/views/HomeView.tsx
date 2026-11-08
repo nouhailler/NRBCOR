@@ -12,6 +12,7 @@ interface HomeViewProps {
   canInstall?: boolean;
   onInstallClick?: () => void;
   onOpenWipeModal?: () => void;
+  onStartTour?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -21,6 +22,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   canInstall = false,
   onInstallClick,
   onOpenWipeModal,
+  onStartTour,
 }) => {
   const { t, language } = useTranslation();
   const [familyPlan, setFamilyPlan] = useState<FamilyPlanData | null>(null);
@@ -51,7 +53,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   return (
     <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
       {/* 1. Bannière de statut réseau & fraîcheur doctrinale proéminente */}
-      <section className="w-full bg-[#eef4ff] rounded-xl p-4 shadow-sm border border-[#d6e4f8] flex flex-col gap-2.5">
+      <section data-tour="home-status" className="w-full bg-[#eef4ff] rounded-xl p-4 shadow-sm border border-[#d6e4f8] flex flex-col gap-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className={`w-3 h-3 rounded-full shrink-0 ${isOnline ? 'bg-[#16a34a] animate-pulse' : 'bg-[#dc2626]'}`}></span>
@@ -117,8 +119,35 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
       )}
 
+      {/* Découverte guidée automatique de l'application */}
+      {onStartTour && (
+        <section className="w-full bg-[#001126] text-white rounded-xl p-3.5 shadow-sm border border-[#1e3a5f] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-lg bg-[#98f6c5]/20 text-[#98f6c5] flex items-center justify-center shrink-0 border border-[#98f6c5]/30">
+              <span className="material-symbols-outlined text-[20px]">explore</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white truncate">
+                {t('tour.startTour')}
+              </span>
+              <span className="text-[11px] text-[#94a3b8] truncate">
+                {t('tour.startTourDesc')}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onStartTour}
+            className="h-9 px-3.5 rounded-lg bg-[#98f6c5] hover:bg-[#b2f8d4] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0 transition-all cursor-pointer flex items-center gap-1 active:scale-95 shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[15px]">play_circle</span>
+            <span>{language === 'fr' ? 'Lancer' : 'Start'}</span>
+          </button>
+        </section>
+      )}
+
       {/* 2. Bloc prioritaire d'urgence 'RÉAGIR MAINTENANT' */}
-      <section className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-md relative overflow-hidden border border-[#ffb4ab]">
+      <section data-tour="urgent-alert" className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-md relative overflow-hidden border border-[#ffb4ab]">
         <div className="relative z-10 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -184,7 +213,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* 3. Grille des 4 risques NRBC */}
-      <section className="flex flex-col gap-2">
+      <section data-tour="cbrn-cards" className="flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[#001126] text-[20px]">shield</span>

@@ -67,7 +67,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
       </header>
 
       {/* Printable Crisis Binder Card */}
-      <div className="bg-gradient-to-r from-[#001126] to-[#12263f] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-3">
+      <div data-tour="guides-pack" className="bg-gradient-to-r from-[#001126] to-[#12263f] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-lg bg-[#0036ce] text-white flex items-center justify-center shrink-0 shadow-sm">

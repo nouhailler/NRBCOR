@@ -314,7 +314,26 @@ export const en: TranslationDictionary = {
   'encyclo.fullDefinition': 'Full definition:',
   'encyclo.contextApplication': 'Operational context & field application:',
   'encyclo.historicalOrigin': 'Historical origin:',
-  'encyclo.seeAlso': 'See also:'
+  'encyclo.seeAlso': 'See also:',
+
+  // -------------------------------------------------------------
+  // AUTOMATIC ONBOARDING TOUR
+  // -------------------------------------------------------------
+  'tour.startTour': 'Automatic Discovery Tour',
+  'tour.startTourDesc': 'Progressively discover all features and tools across the application.',
+  'tour.menuButton': 'Interactive Tour (Auto)',
+  'tour.homePrompt': 'Explore NRBCOR via guided auto-tour',
+  'tour.pause': 'Pause',
+  'tour.resume': 'Continue',
+  'tour.previous': 'Previous',
+  'tour.next': 'Next',
+  'tour.quit': 'Exit',
+  'tour.step': 'Step',
+  'tour.of': 'of',
+  'tour.completedTitle': 'Discovery Tour Completed',
+  'tour.completedDesc': 'You now have all the essential bearings to use NRBCOR with complete offline resilience.',
+  'tour.finishBtn': 'Start Using App',
+  'tour.restartBtn': 'Restart Tour'
 };
 
 export const EN_TRANSLATIONS = en;

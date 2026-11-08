@@ -28,6 +28,7 @@ import { ModeCriseView } from './views/ModeCriseView';
 import { EncyclopedieView } from './views/EncyclopedieView';
 import { LandingPageView } from './views/LandingPageView';
 import { OnboardingModal } from './components/OnboardingModal';
+import { OnboardingTour } from './components/OnboardingTour';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { storageService } from './services/storage/IndexedDbStorage';
 import { updateService } from './services/updateService';
@@ -73,6 +74,19 @@ export default function App() {
   const [activeCallModal, setActiveCallModal] = useState<EmergencyCall | null>(null);
   const [isWipeModalOpen, setIsWipeModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('tour') === '1' || params.get('tour') === 'auto';
+    }
+    return false;
+  });
+
+  const handleStartTour = () => {
+    triggerHaptic('medium');
+    setIsMenuOpen(false);
+    setIsTourOpen(true);
+  };
 
   // Mode de profil : Grand Public Simplifié vs Expert / Formateur Sécurité Civile
   const [profileMode, setProfileMode] = useState<'simplified' | 'expert'>(() => {
@@ -521,6 +535,7 @@ export default function App() {
                 canInstall={canInstall}
                 onInstallClick={handleInstallApp}
                 onOpenWipeModal={() => setIsWipeModalOpen(true)}
+                onStartTour={handleStartTour}
               />
             )}
 
@@ -578,6 +593,7 @@ export default function App() {
         onChangeTheme={setTheme}
         onTriggerOnboarding={() => setShowOnboarding(true)}
         onOpenWipeModal={() => setIsWipeModalOpen(true)}
+        onStartTour={handleStartTour}
       />
 
       {/* Modals */}
@@ -585,6 +601,7 @@ export default function App() {
         isOpen={showOnboarding}
         onComplete={handleCompleteOnboarding}
         onGoDirectToGuides={handleGoDirectToGuides}
+        onStartTour={handleStartTour}
       />
 
       <CallModal
@@ -604,6 +621,14 @@ export default function App() {
         onClose={() => setIsInstallModalOpen(false)}
         onNativeInstall={handleInstallApp}
         canNativeInstall={canInstall}
+      />
+
+      {/* Application Onboarding Discovery Tour */}
+      <OnboardingTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onNavigateTab={handleSelectTab}
+        onOpenSubScreen={handleOpenSubScreen}
       />
     </div>
   );

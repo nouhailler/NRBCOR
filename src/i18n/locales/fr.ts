@@ -312,7 +312,26 @@ export const fr = {
   'encyclo.fullDefinition': 'Définition complète :',
   'encyclo.contextApplication': 'Contexte d\'application & Réalité terrain :',
   'encyclo.historicalOrigin': 'Origine historique :',
-  'encyclo.seeAlso': 'Voir aussi :'
+  'encyclo.seeAlso': 'Voir aussi :',
+
+  // -------------------------------------------------------------
+  // VISITE GUIDÉE & DÉCOUVERTE AUTOMATIQUE
+  // -------------------------------------------------------------
+  'tour.startTour': 'Visite Guidée Automatique',
+  'tour.startTourDesc': 'Découvrir progressivement toutes les fonctionnalités de l\'application.',
+  'tour.menuButton': 'Visite Guidée (Découverte)',
+  'tour.homePrompt': 'Découvrir NRBCOR en visite automatique',
+  'tour.pause': 'Pause',
+  'tour.resume': 'Continuer',
+  'tour.previous': 'Précédent',
+  'tour.next': 'Suivant',
+  'tour.quit': 'Quitter',
+  'tour.step': 'Étape',
+  'tour.of': 'sur',
+  'tour.completedTitle': 'Visite Guidée Terminée',
+  'tour.completedDesc': 'Vous disposez désormais de tous les repères pour utiliser NRBCOR en autonomie.',
+  'tour.finishBtn': 'Accéder à l\'application',
+  'tour.restartBtn': 'Recommencer la visite'
 };
 
 export const FR_TRANSLATIONS = fr;

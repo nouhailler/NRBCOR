@@ -225,7 +225,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
       </div>
 
       {/* CARTE HERO : Score Global de Préparation */}
-      <section className="w-full bg-[#001126] text-white rounded-2xl p-5 shadow-lg border border-[#12263f] flex flex-col gap-4 relative overflow-hidden">
+      <section data-tour="prep-score" className="w-full bg-[#001126] text-white rounded-2xl p-5 shadow-lg border border-[#12263f] flex flex-col gap-4 relative overflow-hidden">
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#0036ce]/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
