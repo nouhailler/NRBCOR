@@ -1,14 +1,43 @@
+# En-têtes HTTP — Cloudflare Pages (aussi compris par Netlify)
+# Doc : https://developers.cloudflare.com/pages/configuration/headers/
+
+# Toutes les pages.
+# Permissions-Policy : géolocalisation (Géorisques, carte des périmètres) et caméra (scan du QR code
+# du plan familial) autorisées pour la même origine uniquement.
+# CSP : API publiques appelées en ligne (geo.api.gouv.fr, Géorisques, annuaire service-public),
+# images distantes des protocoles (lh3.googleusercontent.com), polices Google (page de présentation).
+# Ces hôtes figurent aussi dans connect-src : le Service Worker les récupère via fetch().
 /*
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(self), camera=(), microphone=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: geolocation=(self), camera=(self), microphone=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; connect-src 'self' https://geo.api.gouv.fr https://www.georisques.gouv.fr https://georisques.gouv.fr https://api-lannuaire.service-public.fr https://lh3.googleusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com; media-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
 
+# Fichiers Vite avec empreinte (hash) : cache permanent
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Polices locales (sans empreinte) : 30 jours
+/fonts/*
+  Cache-Control: public, max-age=2592000
+
+# Service Worker et fichiers de version : toujours revalidés pour diffuser les mises à jour
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+/version.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/theme-init.js
+  Cache-Control: no-cache
+
+/sw-register.js
+  Cache-Control: no-cache
 
 /manifest.webmanifest
   Content-Type: application/manifest+json
+  Cache-Control: no-cache

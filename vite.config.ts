@@ -1,13 +1,44 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import {defineConfig, type Plugin} from 'vite';
+
+const APP_VERSION = process.env.npm_package_version || '1.2.0';
+
+/**
+ * Génère dist/version.json à chaque build (lu par updateService pour afficher
+ * la version déployée et sa date de livraison).
+ */
+function versionJson(): Plugin {
+  return {
+    name: 'nrbcor-version-json',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify(
+          {
+            version: APP_VERSION,
+            buildDate: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }),
+            builtAt: new Date().toISOString(),
+            commit: (process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || '').slice(0, 7) || undefined,
+            swScope: '/',
+            integrity: 'verified-offline-corpus',
+          },
+          null,
+          2,
+        ),
+      });
+    },
+  };
+}
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), versionJson()],
     define: {
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.2.0'),
+      __APP_VERSION__: JSON.stringify(APP_VERSION),
       __BUILD_DATE__: JSON.stringify(new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })),
     },
     resolve: {

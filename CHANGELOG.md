@@ -6,6 +6,17 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [Non publié] - Préparation du déploiement Cloudflare Pages
+
+- `wrangler.toml` (projet `nrbcor`, sortie `./dist`), scripts `npm run cf:dev` et `npm run cf:deploy`, `wrangler` en dépendance de développement.
+- `.node-version` (Node 22) ; `.puppeteerrc.cjs` évite le téléchargement de Chromium en CI et sur Cloudflare.
+- `public/_headers` : CSP stricte (`script-src 'self'`), HSTS, COOP, Permissions-Policy corrigée (la caméra était bloquée, ce qui empêchait le scan du QR code du plan familial), règles de cache (assets immuables, polices 30 j, `sw.js`/`version.json`/manifeste toujours revalidés).
+- Scripts inline de `index.html` déplacés dans `public/theme-init.js` et `public/sw-register.js` (pré-cachés par le Service Worker).
+- `public/404.html` : désactive le repli SPA de Pages, qui renvoyait `index.html` avec un cache d'un an pour tout ancien fichier `/assets/…`.
+- `dist/version.json` généré au build (version, date, commit) au lieu d'un fichier figé.
+- `_redirects` simplifié, `sitemap.xml` pointe vers `/landing`.
+- Guide : `docs/DEPLOIEMENT_CLOUDFLARE.md`.
+
 ## [Non publié] - Modernisation UX/UI « Modern Civil Protection Dashboard »
 
 ### 🎨 Design System
