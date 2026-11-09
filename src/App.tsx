@@ -140,7 +140,7 @@ export default function App() {
 
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', isDark ? '#001126' : '#f8f9ff');
+      metaThemeColor.setAttribute('content', isDark ? '#0a1220' : '#ffffff');
     }
 
     // Persister dans les paramètres unifiés
@@ -405,7 +405,7 @@ export default function App() {
 
   if (subScreen?.type === 'mode-crise') {
     return (
-      <div className={`min-h-screen bg-[#050b14] text-white flex flex-col font-['Public_Sans'] selection:bg-red-500/30 ${textScaleClass}`}>
+      <div className={`theme-fixed min-h-screen bg-[#050b14] text-white flex flex-col font-body selection:bg-red-500/30 ${textScaleClass}`}>
         <ModeCriseView
           onBack={handleBack}
           onOpenCallModal={setActiveCallModal}
@@ -420,22 +420,20 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#f8f9ff] text-[#0f1c2b] flex flex-col font-['Public_Sans'] selection:bg-[#d4e3ff] ${textScaleClass}`}>
+    <div className={`min-h-screen bg-canvas text-ink flex flex-col font-body selection:bg-tint ${textScaleClass}`}>
       {/* Top Fixed Header avec bouton Thème et Installer */}
       <Header
         currentTitle={headerTitle}
         showBack={showHeaderBack}
         onBack={handleBack}
         onOpenMenu={() => setIsMenuOpen(true)}
-        onOpenSources={() => handleOpenSubScreen({ type: 'tracabilite' })}
         onOpenSettings={() => handleOpenSubScreen({ type: 'system-settings' })}
-        onInstallClick={handleInstallApp}
-        canInstall={canInstall}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
         profileMode={profileMode}
         onToggleProfileMode={handleToggleProfileMode}
         onOpenModeCrise={() => handleOpenSubScreen({ type: 'mode-crise' })}
+        currentTab={activeTab}
+        isSubScreen={!!subScreen}
+        onSelectTab={handleSelectTab}
       />
 
       {/* Main Content Area */}
@@ -532,6 +530,7 @@ export default function App() {
                 onNavigateTab={handleSelectTab}
                 onOpenSubScreen={handleOpenSubScreen}
                 kitCompletionPercent={kitCompletionPercent}
+                kitItems={kitItems}
                 canInstall={canInstall}
                 onInstallClick={handleInstallApp}
                 onOpenWipeModal={() => setIsWipeModalOpen(true)}
@@ -579,7 +578,7 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <BottomNav currentTab={activeTab} onSelectTab={handleSelectTab} />
+      <BottomNav currentTab={activeTab} onSelectTab={handleSelectTab} isSubScreen={!!subScreen} />
 
       {/* Hamburger Drawer Menu */}
       <HamburgerMenu
@@ -594,6 +593,8 @@ export default function App() {
         onTriggerOnboarding={() => setShowOnboarding(true)}
         onOpenWipeModal={() => setIsWipeModalOpen(true)}
         onStartTour={handleStartTour}
+        profileMode={profileMode}
+        onChangeProfileMode={handleChangeProfileMode}
       />
 
       {/* Modals */}

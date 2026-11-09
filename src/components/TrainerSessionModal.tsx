@@ -174,23 +174,23 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
     >
-      <div className="bg-white text-black w-full max-w-3xl rounded-2xl shadow-2xl border-2 border-[#0036ce] flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="bg-card text-black w-full max-w-3xl rounded-2xl shadow-2xl border-2 border-brand-ink flex flex-col max-h-[92vh] overflow-hidden">
         {/* En-tête */}
-        <div className="p-4 bg-[#001126] text-white flex items-center justify-between shrink-0 border-b border-white/10">
+        <div className="p-4 bg-navy text-white flex items-center justify-between shrink-0 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0036ce] text-white flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[24px]">school</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-[16px] font-bold font-['Space_Grotesk'] text-white">
+                <h2 className="text-[16px] font-bold font-label text-white">
                   {isEn ? 'Trainer Mode • Collective Drill Facilitation' : "Mode Formateur • Animation d'Exercice Collectif"}
                 </h2>
-                <span className="text-[10px] bg-amber-400 text-black font-['Space_Grotesk'] font-extrabold px-2 py-0.5 rounded uppercase">
+                <span className="text-[10px] bg-amber-400 text-black font-label font-extrabold px-2 py-0.5 rounded uppercase">
                   {isEn ? 'Educational' : 'Pédagogique'}
                 </span>
               </div>
-              <p className="text-[11px] text-[#c4c6ce]">
+              <p className="text-[11px] text-on-navy-muted">
                 {isEn
                   ? 'Zero-server execution • Local sovereign storage • Printable debrief memo'
                   : "Animation sans serveur • Stockage local • Bilan d'exercice imprimable"}
@@ -252,10 +252,10 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setExerciseRunning(!exerciseRunning)}
-                  className={`w-full h-8 rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors ${
+                  className={`w-full h-8 rounded-lg font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors ${
                     exerciseRunning
                       ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                      : 'bg-[#0036ce] hover:bg-[#0024a8] text-white'
+                      : 'bg-brand hover:bg-brand-strong text-white'
                   }`}
                 >
                   <span className="material-symbols-outlined text-[16px]">
@@ -282,7 +282,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
 
           {/* Sélecteur de scénario */}
           <div className="flex flex-col gap-1.5">
-            <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-gray-600">
+            <span className="font-label text-[11px] font-bold uppercase text-gray-600">
               {isEn ? 'Choose collective exercise scenario:' : "Choisir le scénario de l'exercice collectif :"}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -293,21 +293,21 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                   onClick={() => setSelectedScenarioId(sc.id)}
                   className={`p-3 rounded-xl text-left border flex flex-col gap-1 transition-all ${
                     sc.id === selectedScenarioId
-                      ? 'bg-[#eef4ff] border-[#0036ce] ring-2 ring-[#0036ce]/30'
-                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                      ? 'bg-subtle border-brand-ink ring-2 ring-brand-ink/30'
+                      : 'bg-card border-gray-200 hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-['Space_Grotesk'] text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-gray-100 text-gray-800">
+                    <span className="font-label text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-gray-100 text-gray-800">
                       {sc.badge}
                     </span>
                     {sc.id === selectedScenarioId && (
-                      <span className="text-[10px] font-bold text-[#0036ce]">
+                      <span className="text-[10px] font-bold text-brand-ink">
                         {isEn ? 'Active' : 'Actif'}
                       </span>
                     )}
                   </div>
-                  <strong className="text-[12px] text-[#001126] leading-snug">
+                  <strong className="text-[12px] text-ink leading-snug">
                     {sc.title}
                   </strong>
                 </button>
@@ -316,9 +316,9 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           </div>
 
           {/* Détail du scénario actif */}
-          <div className="p-4 bg-white rounded-xl border border-gray-300 flex flex-col gap-3">
+          <div className="p-4 bg-card rounded-xl border border-gray-300 flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#0036ce]">
+              <span className="font-label text-[11px] font-bold uppercase text-brand-ink">
                 {isEn ? 'Situation presented to the group:' : 'Situation posée au groupe :'}
               </span>
               <p className="text-[13px] text-gray-900 bg-gray-50 p-2.5 rounded-lg border border-gray-200 italic leading-relaxed">
@@ -340,7 +340,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             {/* Objectifs pédagogiques & Pièges */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col gap-1.5">
-                <strong className="text-blue-950 uppercase font-['Space_Grotesk']">
+                <strong className="text-blue-950 uppercase font-label">
                   {isEn ? 'Key Pedagogical Objectives:' : 'Objectifs Pédagogiques Clés :'}
                 </strong>
                 <ul className="flex flex-col gap-1 text-blue-900 leading-relaxed">
@@ -354,7 +354,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
               </div>
 
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-1.5">
-                <strong className="text-amber-950 uppercase font-['Space_Grotesk']">
+                <strong className="text-amber-950 uppercase font-label">
                   {isEn ? 'Fatal Traps to Deconstruct:' : 'Pièges mortels à déconstruire :'}
                 </strong>
                 <ul className="flex flex-col gap-1 text-amber-900 leading-relaxed">
@@ -371,7 +371,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             {/* Évaluation des compétences travaillées */}
             <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <strong className="text-[#001126] uppercase font-['Space_Grotesk'] text-[11px]">
+                <strong className="text-ink uppercase font-label text-[11px]">
                   {isEn ? 'Validation of skills practiced by the group:' : 'Validation des compétences travaillées par le groupe :'}
                 </strong>
                 <span className="text-[10px] text-gray-500">
@@ -387,7 +387,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
                       className={`p-2 rounded-lg border flex items-center justify-between cursor-pointer transition-colors ${
                         isChecked
                           ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                          : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-800'
+                          : 'bg-card border-gray-200 hover:bg-gray-50 text-gray-800'
                       }`}
                     >
                       <div className="flex items-center gap-2">
@@ -432,13 +432,13 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           {/* BILAN IMPRIMABLE DE SESSION (DÉPLIABLE OU DIRECT) */}
           <div className="border-t border-gray-300 pt-3 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase text-black">
+              <span className="font-label text-[12px] font-bold uppercase text-black">
                 {isEn ? 'Session Pedagogical Memo (Printable B&W format):' : 'Bilan Pédagogique de la Session (Format Imprimable N&B) :'}
               </span>
               <button
                 type="button"
                 onClick={() => setShowDebriefSheet(!showDebriefSheet)}
-                className="text-[11px] font-bold text-[#0036ce] underline"
+                className="text-[11px] font-bold text-brand-ink underline"
               >
                 {showDebriefSheet
                   ? (isEn ? 'Hide debrief sheet' : 'Masquer fiche')
@@ -447,10 +447,10 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
             </div>
 
             {showDebriefSheet && (
-              <div className="p-4 border-2 border-black rounded-xl bg-white flex flex-col gap-3 font-sans print:border-black print:m-0 print:p-2">
+              <div className="p-4 border-2 border-black rounded-xl bg-card flex flex-col gap-3 font-sans print:border-black print:m-0 print:p-2">
                 <div className="border-b-2 border-black pb-2 flex justify-between items-center">
                   <div>
-                    <h3 className="font-black text-[14px] uppercase font-['Space_Grotesk']">
+                    <h3 className="font-black text-[14px] uppercase font-label">
                       {isEn ? 'CIVIL DEFENSE DRILL SUMMARY • NRBCOR' : "BILAN D'EXERCICE DE SÉCURITÉ CIVILE • NRBCOR"}
                     </h3>
                     <p className="text-[11px] text-gray-600">
@@ -513,7 +513,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <button
             type="button"
             onClick={handlePrintDebrief}
-            className="h-10 px-4 bg-black text-white hover:bg-gray-800 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-1.5 transition-colors shadow-sm"
+            className="h-10 px-4 bg-black text-white hover:bg-gray-800 rounded-xl font-label text-[12px] font-bold uppercase flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[16px]">print</span>
             <span>{isEn ? 'Print Session Debrief' : 'Imprimer Bilan de Session'}</span>
@@ -522,7 +522,7 @@ export const TrainerSessionModal: React.FC<TrainerSessionModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="h-10 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-800 rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
+            className="h-10 px-4 bg-card border border-gray-400 hover:bg-gray-50 text-gray-800 rounded-xl font-label text-[12px] font-bold uppercase transition-colors"
           >
             {isEn ? 'Close' : 'Fermer'}
           </button>

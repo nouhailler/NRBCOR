@@ -149,23 +149,23 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
     >
-      <div className="w-full max-w-3xl bg-[#001126] text-white rounded-2xl shadow-2xl border border-red-500/40 flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="w-full max-w-3xl bg-navy text-white rounded-2xl shadow-2xl border border-red-500/40 flex flex-col max-h-[92vh] overflow-hidden">
         {/* En-tête */}
-        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-red-950/80 to-[#001126]">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-red-950/80 to-navy">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[24px]">verified_user</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-[16px] font-bold font-['Space_Grotesk'] text-white">
+                <h2 className="text-[16px] font-bold font-label text-white">
                   {isEn ? 'Operational Coherence Matrix (6 Scenarios)' : 'Matrice de Cohérence Opérationnelle (6 Scénarios)'}
                 </h2>
-                <span className="text-[10px] bg-red-600 text-white font-['Space_Grotesk'] font-bold px-2 py-0.5 rounded uppercase">
+                <span className="text-[10px] bg-red-600 text-white font-label font-bold px-2 py-0.5 rounded uppercase">
                   {isEn ? 'Priority P1' : 'Priorité P1'}
                 </span>
               </div>
-              <p className="text-[11px] text-[#c4c6ce]">
+              <p className="text-[11px] text-on-navy-muted">
                 {isEn
                   ? 'Doctrinal guarantee: Zero false impression of safety • Absolute primacy of official orders'
                   : 'Garantie déontologique : Zéro fausse impression de sécurité • Primauté absolue des ordres officiels'}
@@ -191,10 +191,10 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
                 key={scenario.id}
                 type="button"
                 onClick={() => setSelectedId(scenario.id)}
-                className={`px-3 py-2 rounded-xl text-left font-['Space_Grotesk'] text-[11px] font-bold flex items-center gap-2 shrink-0 transition-all ${
+                className={`px-3 py-2 rounded-xl text-left font-label text-[11px] font-bold flex items-center gap-2 shrink-0 transition-all ${
                   isSelected
                     ? 'bg-red-600 text-white shadow-sm ring-1 ring-red-400'
-                    : 'bg-white/5 text-[#c4c6ce] hover:bg-white/10 hover:text-white'
+                    : 'bg-white/5 text-on-navy-muted hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <span className="material-symbols-outlined text-[16px]">{scenario.icon}</span>
@@ -210,14 +210,14 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
           <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-amber-400 text-[20px]">policy</span>
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-amber-300 uppercase tracking-wider">
+              <span className="font-label text-[12px] font-bold text-amber-300 uppercase tracking-wider">
                 {isEn ? 'Official Civil Protection Directive' : 'Consigne officielle de la Sécurité Civile'}
               </span>
             </div>
             <p className="text-[13px] text-white font-medium leading-snug">
               {currentScenario.officialInstruction}
             </p>
-            <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-[#c4c6ce]">
+            <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-on-navy-muted">
               <span className="font-bold text-white">{isEn ? 'Immediate action:' : 'Réflexe immédiat :'}</span>
               <span>{currentScenario.immediateAction}</span>
             </div>
@@ -228,11 +228,11 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
             <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/30 flex flex-col gap-2.5">
               <div className="flex items-center gap-2 text-red-300">
                 <span className="material-symbols-outlined text-[20px]">block</span>
-                <h3 className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider">
+                <h3 className="font-label text-[12px] font-bold uppercase tracking-wider">
                   {isEn ? 'Fatal Traps & Prohibited Behaviors' : 'Pièges mortels & Comportements à proscrire'}
                 </h3>
               </div>
-              <ul className="flex flex-col gap-2 text-[11px] text-[#ffd599] leading-relaxed">
+              <ul className="flex flex-col gap-2 text-[11px] text-warn-bright leading-relaxed">
                 {currentScenario.fatalTraps.map((trap, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <span className="text-red-400 font-bold shrink-0">✕</span>
@@ -246,7 +246,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
             <div className="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30 flex flex-col gap-2.5">
               <div className="flex items-center gap-2 text-blue-300">
                 <span className="material-symbols-outlined text-[20px]">verified</span>
-                <h3 className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider">
+                <h3 className="font-label text-[12px] font-bold uppercase tracking-wider">
                   {isEn ? 'NRBCOR Application Safeguards' : "Garanties de l'application NRBCOR"}
                 </h3>
               </div>
@@ -262,12 +262,12 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
           </div>
 
           {/* Référence juridique & déontologique */}
-          <div className="p-3 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-[11px] text-[#c4c6ce]">
+          <div className="p-3 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-[11px] text-on-navy-muted">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] text-[#ffd599]">gavel</span>
+              <span className="material-symbols-outlined text-[16px] text-warn-bright">gavel</span>
               <span><strong>{isEn ? 'Legal Reference:' : 'Cadre de référence :'}</strong> {currentScenario.civilSecurityReference}</span>
             </div>
-            <span className="font-['Space_Grotesk'] text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+            <span className="font-label text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
               {isEn ? 'DOCTRINE COMPLIANT' : 'CONFORME DOCTRINE'}
             </span>
           </div>
@@ -283,7 +283,7 @@ export const EmergencyCoherenceMatrixModal: React.FC<EmergencyCoherenceMatrixMod
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors shrink-0 shadow-sm"
+            className="w-full sm:w-auto px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-label text-[12px] font-bold uppercase transition-colors shrink-0 shadow-sm"
           >
             {isEn ? 'Understood & Close' : 'Compris & Fermer'}
           </button>

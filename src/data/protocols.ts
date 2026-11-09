@@ -830,7 +830,7 @@ export const PROTOCOLS_DATA: Record<string, ProtocolData> = {
         {
           title: 'INEFFICACITÉ DE L’IODE STABLE',
           tag: 'Subordonné à l’Iode 131',
-          tagClass: 'bg-[#fef3c7] text-[#92400e]',
+          tagClass: 'bg-warn-soft text-warn-ink',
           specificity: "L'iodure de potassium (KI) ne protège QUE la thyroïde contre l'iode 131 volatil d'un accident de réacteur nucléaire. En cas de source orpheline ou de dispersion radiologique (Cobalt-60, Césium-137, Iridium-192), l'iode est totalement sans effet.",
           icon: 'medication'
         }

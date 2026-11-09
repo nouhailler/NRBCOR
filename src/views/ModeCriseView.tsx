@@ -203,16 +203,16 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           setIsTorchActive(false);
           triggerHaptic('medium');
         }}
-        className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-between p-6 cursor-pointer select-none"
+        className="fixed inset-0 z-50 bg-card flex flex-col items-center justify-between p-6 cursor-pointer select-none"
       >
-        <div className="pt-8 text-center text-black font-['Space_Grotesk'] text-[16px] font-extrabold uppercase">
+        <div className="pt-8 text-center text-black font-label text-[16px] font-extrabold uppercase">
           Éclairage d'urgence blanc actif
         </div>
         <div className="flex flex-col items-center gap-2">
-          <span className="material-symbols-outlined text-[64px] text-black animate-pulse">
+          <span className="material-symbols-outlined text-[64px] text-black">
             light_mode
           </span>
-          <p className="text-black font-['Space_Grotesk'] text-[14px] font-bold text-center">
+          <p className="text-black font-label text-[14px] font-bold text-center">
             Touchez n'importe où pour revenir au Mode Crise
           </p>
           <span className="text-[12px] text-gray-700 bg-gray-200 px-3 py-1 rounded-full font-bold">
@@ -222,7 +222,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         <button
           type="button"
           onClick={() => setIsTorchActive(false)}
-          className="w-full max-w-sm h-14 bg-black text-white rounded-2xl font-['Space_Grotesk'] font-bold text-[16px] uppercase tracking-wider"
+          className="w-full max-w-sm h-14 bg-black text-white rounded-2xl font-label font-bold text-[16px] uppercase tracking-wider"
         >
           Éteindre l'éclairage
         </button>
@@ -231,19 +231,19 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#050b14] text-white flex flex-col pb-28 pt-2 select-none">
-      {/* Bandeau d'Urgence Supérieur */}
-      <div className="max-w-2xl mx-auto w-full px-3 py-2 flex items-center justify-between border-b border-red-900/60 pb-3">
+    <div className="min-h-screen w-full bg-[#050b14] text-white flex flex-col pb-16 select-none">
+      {/* Bandeau d'Urgence Supérieur (collant : « Quitter » et l'éclairage restent toujours accessibles) */}
+      <header className="sticky top-0 z-30 bg-[#050b14]/95 backdrop-blur border-b border-red-900/60 pt-safe">
+      <div className="max-w-2xl mx-auto w-full px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <span className="relative flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-600"></span>
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white" aria-hidden="true">
+            <span className="material-symbols-outlined text-[24px]">emergency</span>
           </span>
           <div>
-            <h1 className="font-['Space_Grotesk'] text-[16px] font-extrabold tracking-wider text-red-400 uppercase">
+            <h1 className="text-[18px] sm:text-[20px] leading-tight font-extrabold tracking-wide text-white uppercase">
               Mode Crise Immédiat
             </h1>
-            <span className="text-[10px] text-gray-400 font-['Space_Grotesk'] uppercase font-bold tracking-widest">
+            <span className="block text-[12px] text-red-300 font-semibold">
               Réflexes vitaux • Sans fioriture
             </span>
           </div>
@@ -258,7 +258,8 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('medium');
             }}
             title="Activer l'écran blanc pour s'éclairer sans bougie"
-            className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-bold active:scale-95 transition-transform"
+            aria-label="Activer l'écran blanc pour s'éclairer sans bougie"
+            className="w-11 h-11 rounded-xl bg-card text-black flex items-center justify-center font-bold active:scale-95 transition-transform"
           >
             <span className="material-symbols-outlined text-[22px]">flashlight_on</span>
           </button>
@@ -270,16 +271,18 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('light');
               onBack();
             }}
-            className="h-10 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 text-[12px] font-['Space_Grotesk'] font-bold uppercase transition-colors"
+            className="h-11 px-3.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 text-[14px] font-bold uppercase transition-colors flex items-center gap-1.5"
           >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
             Quitter
           </button>
         </div>
       </div>
+      </header>
 
       {/* RAPPEL DE PRIMAUTÉ ABSOLUE DES AUTORITÉS (SÉCURITÉ CIVILE) */}
       <div className="max-w-2xl mx-auto w-full px-3 mt-2 flex flex-col gap-2">
-        <div className="p-2.5 bg-red-950/80 border-2 border-red-600 rounded-xl flex items-center justify-between gap-2 text-[11px] text-white">
+        <div className="p-3 bg-red-950/80 border-2 border-red-600 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[13px] text-white">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[20px] text-red-400 shrink-0">emergency</span>
             <span className="leading-snug">
@@ -292,7 +295,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('light');
               setShowCoherenceModal(true);
             }}
-            className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-wider shrink-0 transition-colors flex items-center gap-1 shadow-xs"
+            className="min-h-[40px] px-3 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[12px] font-bold uppercase tracking-wide shrink-0 transition-colors flex items-center justify-center gap-1.5 self-stretch sm:self-auto"
           >
             <span className="material-symbols-outlined text-[14px]">fact_check</span>
             <span>Matrice 6 Scénarios P1</span>
@@ -302,7 +305,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
 
       {/* SÉLECTEUR DE SCÉNARIO AVEC OPTION INCONNU PAR DÉFAUT */}
       <div className="max-w-2xl mx-auto w-full px-3 mt-3 flex flex-col gap-1.5">
-        <span className="text-[10px] font-['Space_Grotesk'] text-gray-400 uppercase font-bold tracking-wider">
+        <span className="text-[12px] font-label text-gray-400 uppercase font-bold tracking-wider">
           Nature de l'événement (Ne jamais retarder la mise à l'abri pour diagnostiquer) :
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
@@ -312,16 +315,17 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               setSelectedScenario('inconnu');
               triggerHaptic('light');
             }}
-            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+            aria-pressed={selectedScenario === 'inconnu'}
+            className={`min-h-[56px] p-2.5 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
               selectedScenario === 'inconnu'
                 ? 'bg-blue-600 text-white border-blue-400 ring-2 ring-blue-300'
                 : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+            <span className="font-label text-[13px] font-black uppercase">
               ❓ Inconnu / Alerte
             </span>
-            <span className="text-[9px] opacity-80 leading-tight">
+            <span className="text-[12px] opacity-80 leading-tight">
               Réflexe universel
             </span>
           </button>
@@ -332,16 +336,17 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               setSelectedScenario('chimique');
               triggerHaptic('light');
             }}
-            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+            aria-pressed={selectedScenario === 'chimique'}
+            className={`min-h-[56px] p-2.5 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
               selectedScenario === 'chimique'
                 ? 'bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300'
                 : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+            <span className="font-label text-[13px] font-black uppercase">
               ☣️ Chimique
             </span>
-            <span className="text-[9px] opacity-80 leading-tight">
+            <span className="text-[12px] opacity-80 leading-tight">
               Gaz / Fuite Seveso
             </span>
           </button>
@@ -352,16 +357,17 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               setSelectedScenario('nucleaire');
               triggerHaptic('light');
             }}
-            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+            aria-pressed={selectedScenario === 'nucleaire'}
+            className={`min-h-[56px] p-2.5 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
               selectedScenario === 'nucleaire'
                 ? 'bg-yellow-600 text-black border-yellow-400 ring-2 ring-yellow-300'
                 : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+            <span className="font-label text-[13px] font-black uppercase">
               ☢️ Nucléaire
             </span>
-            <span className="text-[9px] opacity-80 leading-tight">
+            <span className="text-[12px] opacity-80 leading-tight">
               Rejet CNPE / Retombées
             </span>
           </button>
@@ -372,81 +378,20 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               setSelectedScenario('biologique');
               triggerHaptic('light');
             }}
-            className={`p-2 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
+            aria-pressed={selectedScenario === 'biologique'}
+            className={`min-h-[56px] p-2.5 rounded-xl text-left border flex flex-col gap-0.5 transition-all ${
               selectedScenario === 'biologique'
                 ? 'bg-emerald-600 text-white border-emerald-400 ring-2 ring-emerald-300'
                 : 'bg-gray-900 text-gray-300 border-gray-800 hover:bg-gray-800'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] font-black uppercase">
+            <span className="font-label text-[13px] font-black uppercase">
               🦠 Biologique
             </span>
-            <span className="text-[9px] opacity-80 leading-tight">
+            <span className="text-[12px] opacity-80 leading-tight">
               Bio-aérosol / Épidémie
             </span>
           </button>
-        </div>
-      </div>
-
-      {/* SYNTHÈSE VOCALE CONTRÔLABLE & RADIO OFFICIELLE */}
-      <div className="max-w-2xl mx-auto w-full px-3 mt-3">
-        <div className="p-3 bg-[#0a1526] rounded-xl border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">radio</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-blue-300 truncate">
-                RADIO D'URGENCE : France Bleu FM
-              </span>
-              <span className="text-[10px] text-gray-300 truncate">
-                Seule source officielle opérationnelle en blackout
-              </span>
-            </div>
-          </div>
-
-          {/* Contrôleur Vocal Avancé (Play / Pause / Stop) */}
-          <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
-            {speechState === 'idle' ? (
-              <button
-                type="button"
-                onClick={handlePlaySpeech}
-                className="h-9 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[16px]">volume_up</span>
-                <span>Lire consignes</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-1 bg-gray-900 p-1 rounded-lg border border-gray-700">
-                {speechState === 'playing' ? (
-                  <button
-                    type="button"
-                    onClick={handlePauseSpeech}
-                    className="h-8 px-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">pause</span>
-                    <span>Pause</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handlePlaySpeech}
-                    className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">play_arrow</span>
-                    <span>Reprendre</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={handleStopSpeech}
-                  className="h-8 px-2 bg-red-700 hover:bg-red-600 text-white rounded font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center"
-                >
-                  <span className="material-symbols-outlined text-[15px]">stop</span>
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -460,9 +405,10 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('warning');
               setActiveAction(activeAction === 'confiner' ? 'none' : 'confiner');
             }}
+            aria-expanded={activeAction === 'confiner'}
             className={`w-full min-h-[82px] p-4 rounded-2xl flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] border-2 cursor-pointer shadow-lg ${
               activeAction === 'confiner'
-                ? 'bg-[#0024a8] border-[#98f6c5] text-white'
+                ? 'bg-brand-strong border-ok-bright text-white'
                 : 'bg-[#00135c] hover:bg-[#001d87] border-[#2952d7] text-white'
             }`}
           >
@@ -471,13 +417,13 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 <span className="material-symbols-outlined text-[34px]">meeting_room</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-['Space_Grotesk'] text-[11px] tracking-wider text-blue-300 uppercase font-black">
+                <span className="font-label text-[13px] tracking-wider text-blue-300 uppercase font-black">
                   Action Prioritaire 1
                 </span>
                 <span className="text-[20px] sm:text-[22px] font-black tracking-tight leading-tight">
                   CONFINER EN DUR
                 </span>
-                <span className="text-[12px] text-blue-200 mt-0.5 line-clamp-1">
+                <span className="text-[14px] text-blue-200 mt-0.5">
                   Rentrer, fermer, calfeutrer et couper les VMC
                 </span>
               </div>
@@ -493,8 +439,8 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
             <div className="mt-2 p-4 bg-[#081838] border border-blue-500/40 rounded-2xl flex flex-col gap-3 animate-fadeIn">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="p-3 bg-[#0c224e] rounded-xl border border-blue-400/20">
-                  <div className="flex items-center gap-2 text-blue-300 font-['Space_Grotesk'] font-bold text-[13px]">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[11px] font-black">1</span>
+                  <div className="flex items-center gap-2 text-blue-300 font-label font-bold text-[13px]">
+                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[13px] font-black">1</span>
                     <span>Rentrer en dur</span>
                   </div>
                   <p className="text-[12px] text-gray-200 mt-1">
@@ -503,8 +449,8 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 </div>
 
                 <div className="p-3 bg-[#0c224e] rounded-xl border border-blue-400/20">
-                  <div className="flex items-center gap-2 text-blue-300 font-['Space_Grotesk'] font-bold text-[13px]">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[11px] font-black">2</span>
+                  <div className="flex items-center gap-2 text-blue-300 font-label font-bold text-[13px]">
+                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[13px] font-black">2</span>
                     <span>Couper la VMC</span>
                   </div>
                   <p className="text-[12px] text-gray-200 mt-1">
@@ -513,8 +459,8 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 </div>
 
                 <div className="p-3 bg-[#0c224e] rounded-xl border border-blue-400/20">
-                  <div className="flex items-center gap-2 text-blue-300 font-['Space_Grotesk'] font-bold text-[13px]">
-                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[11px] font-black">3</span>
+                  <div className="flex items-center gap-2 text-blue-300 font-label font-bold text-[13px]">
+                    <span className="w-5 h-5 rounded-full bg-blue-500 text-black flex items-center justify-center text-[13px] font-black">3</span>
                     <span>Calfeutrer</span>
                   </div>
                   <p className="text-[12px] text-gray-200 mt-1">
@@ -539,7 +485,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenSubScreen({ type: 'confinement-guide' })}
-                className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-label text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
               >
                 <span>Consulter le Guide Calfeutrage Complet</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -556,24 +502,25 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('warning');
               setActiveAction(activeAction === 'evacuer' ? 'none' : 'evacuer');
             }}
+            aria-expanded={activeAction === 'evacuer'}
             className={`w-full min-h-[82px] p-4 rounded-2xl flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] border-2 cursor-pointer shadow-lg ${
               activeAction === 'evacuer'
-                ? 'bg-[#9a3412] border-[#fef08a] text-white'
-                : 'bg-[#5c1d04] hover:bg-[#7c2d12] border-[#ea580c] text-white'
+                ? 'bg-[#9a3412] border-warn-line text-white'
+                : 'bg-[#5c1d04] hover:bg-[#7c2d12] border-warn-ink text-white'
             }`}
           >
             <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-[#fed7aa] flex items-center justify-center shrink-0 border border-amber-400/30">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-warn-bright flex items-center justify-center shrink-0 border border-amber-400/30">
                 <span className="material-symbols-outlined text-[34px]">directions_run</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-['Space_Grotesk'] text-[11px] tracking-wider text-amber-300 uppercase font-black">
+                <span className="font-label text-[13px] tracking-wider text-amber-300 uppercase font-black">
                   Action Conditionnelle 2
                 </span>
                 <span className="text-[20px] sm:text-[22px] font-black tracking-tight leading-tight">
                   ÉVACUER (SUR ORDRE)
                 </span>
-                <span className="text-[12px] text-amber-200 mt-0.5 line-clamp-1">
+                <span className="text-[12px] text-amber-200 mt-0.5">
                   Uniquement si le Préfet l'ordonne formellement
                 </span>
               </div>
@@ -588,7 +535,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           {activeAction === 'evacuer' && (
             <div className="mt-2 p-4 bg-[#2e1005] border border-orange-500/40 rounded-2xl flex flex-col gap-3 animate-fadeIn">
               <div className="p-3 bg-red-900/50 border border-red-500/50 rounded-xl">
-                <span className="font-['Space_Grotesk'] text-[13px] font-black uppercase text-amber-300 block mb-1">
+                <span className="font-label text-[13px] font-black uppercase text-amber-300 block mb-1">
                   INTERDICTION DE FUITE SPONTANÉE
                 </span>
                 <p className="text-[12px] text-gray-200 leading-relaxed">
@@ -597,7 +544,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-amber-300">
+                <span className="font-label text-[13px] uppercase font-bold text-amber-300">
                   Emporter strictement :
                 </span>
                 <ul className="text-[12px] text-gray-200 space-y-1.5 list-disc pl-5">
@@ -611,7 +558,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenSubScreen({ type: 'preparation' as any })}
-                className="w-full h-11 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-11 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-label text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
               >
                 <span>Vérifier mon Sac d'Urgence 72h</span>
                 <span className="material-symbols-outlined text-[16px]">backpack</span>
@@ -628,24 +575,25 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('warning');
               setActiveAction(activeAction === 'decontamination' ? 'none' : 'decontamination');
             }}
+            aria-expanded={activeAction === 'decontamination'}
             className={`w-full min-h-[82px] p-4 rounded-2xl flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] border-2 cursor-pointer shadow-lg ${
               activeAction === 'decontamination'
-                ? 'bg-[#005236] border-[#98f6c5] text-white'
-                : 'bg-[#002c1b] hover:bg-[#003d27] border-[#007b53] text-white'
+                ? 'bg-ok border-ok-bright text-white'
+                : 'bg-ok-deep hover:bg-[#003d27] border-[#007b53] text-white'
             }`}
           >
             <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-[#98f6c5] flex items-center justify-center shrink-0 border border-emerald-400/30">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-ok-bright flex items-center justify-center shrink-0 border border-emerald-400/30">
                 <span className="material-symbols-outlined text-[34px]">sanitizer</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-['Space_Grotesk'] text-[11px] tracking-wider text-emerald-300 uppercase font-black">
+                <span className="font-label text-[13px] tracking-wider text-emerald-300 uppercase font-black">
                   Action Réflexe 3
                 </span>
                 <span className="text-[20px] sm:text-[22px] font-black tracking-tight leading-tight">
                   DÉCONTAMINATION
                 </span>
-                <span className="text-[12px] text-emerald-200 mt-0.5 line-clamp-1">
+                <span className="text-[12px] text-emerald-200 mt-0.5">
                   Retrait vêtements sans secouer et rinçage 15 min
                 </span>
               </div>
@@ -661,28 +609,28 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
             <div className="mt-2 p-4 bg-[#001f13] border border-emerald-500/40 rounded-2xl flex flex-col gap-3 animate-fadeIn">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="p-3 bg-[#003822] rounded-xl border border-emerald-400/20">
-                  <span className="text-emerald-300 font-['Space_Grotesk'] font-bold text-[12px] block">
+                  <span className="text-emerald-300 font-label font-bold text-[12px] block">
                     1. Déshabillage
                   </span>
-                  <p className="text-[11px] text-gray-200 mt-1">
+                  <p className="text-[13px] text-gray-200 mt-1">
                     Enlever les vêtements par le haut sans secouer (élimine 80 à 90% des toxiques ou retombées).
                   </p>
                 </div>
 
                 <div className="p-3 bg-[#003822] rounded-xl border border-emerald-400/20">
-                  <span className="text-emerald-300 font-['Space_Grotesk'] font-bold text-[12px] block">
+                  <span className="text-emerald-300 font-label font-bold text-[12px] block">
                     2. Double Sac
                   </span>
-                  <p className="text-[11px] text-gray-200 mt-1">
+                  <p className="text-[13px] text-gray-200 mt-1">
                     Enfermer les vêtements dans deux sacs poubelle superposés et scotcher hermétiquement.
                   </p>
                 </div>
 
                 <div className="p-3 bg-[#003822] rounded-xl border border-emerald-400/20">
-                  <span className="text-emerald-300 font-['Space_Grotesk'] font-bold text-[12px] block">
+                  <span className="text-emerald-300 font-label font-bold text-[12px] block">
                     3. Douche Tiède
                   </span>
-                  <p className="text-[11px] text-gray-200 mt-1">
+                  <p className="text-[13px] text-gray-200 mt-1">
                     Eau tiède + savon doux. NE PAS FROTTER pour ne pas ouvrir les pores cutanés.
                   </p>
                 </div>
@@ -693,10 +641,10 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[24px] text-emerald-400">timer</span>
                   <div>
-                    <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white block">
+                    <span className="font-label text-[12px] font-bold text-white block">
                       Minuteur de rinçage recommandé (15 min)
                     </span>
-                    <span className="text-[18px] font-['Space_Grotesk'] font-black text-emerald-300">
+                    <span className="text-[18px] font-label font-black text-emerald-300">
                       {deconTimer !== null ? formatTimer(deconTimer) : '15:00'}
                     </span>
                   </div>
@@ -706,7 +654,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                   <button
                     type="button"
                     onClick={handleStartDeconTimer}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-label text-[12px] font-bold uppercase transition-colors"
                   >
                     Démarrer
                   </button>
@@ -714,7 +662,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                   <button
                     type="button"
                     onClick={handleStopDeconTimer}
-                    className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
+                    className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg font-label text-[12px] font-bold uppercase transition-colors"
                   >
                     Arrêter
                   </button>
@@ -724,7 +672,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenSubScreen({ type: 'deshabillage' })}
-                className="w-full h-11 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl font-['Space_Grotesk'] text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+                className="w-full h-11 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl font-label text-[13px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
               >
                 <span>Guide Déshabillage Pas-à-Pas (8 étapes)</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -741,10 +689,11 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               triggerHaptic('warning');
               setActiveAction(activeAction === 'appeler' ? 'none' : 'appeler');
             }}
+            aria-expanded={activeAction === 'appeler'}
             className={`w-full min-h-[82px] p-4 rounded-2xl flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] border-2 cursor-pointer shadow-lg ${
               activeAction === 'appeler'
-                ? 'bg-[#ba1a1a] border-white text-white'
-                : 'bg-[#7a0b0b] hover:bg-[#8f1212] border-[#ff897d] text-white'
+                ? 'bg-danger border-white text-white'
+                : 'bg-[#7a0b0b] hover:bg-[#8f1212] border-danger-bright text-white'
             }`}
           >
             <div className="flex items-center gap-3.5 min-w-0">
@@ -752,13 +701,13 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 <span className="material-symbols-outlined text-[34px]">call</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-['Space_Grotesk'] text-[11px] tracking-wider text-red-200 uppercase font-black">
+                <span className="font-label text-[13px] tracking-wider text-red-200 uppercase font-black">
                   Liaisons d'Urgence ({countryData.flag} {countryData.name})
                 </span>
                 <span className="text-[20px] sm:text-[22px] font-black tracking-tight leading-tight">
                   APPELER LES SECOURS
                 </span>
-                <span className="text-[12px] text-red-200 mt-0.5 line-clamp-1">
+                <span className="text-[12px] text-red-200 mt-0.5">
                   {countryData.numbers.map((n) => n.number).join(' • ')}
                 </span>
               </div>
@@ -774,7 +723,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
             <div className="mt-2 p-4 bg-[#380606] border border-red-500/50 rounded-2xl flex flex-col gap-3 animate-fadeIn">
               {/* Sélecteur de pays */}
               <div className="flex items-center justify-between gap-2 border-b border-red-800 pb-2">
-                <span className="text-[11px] font-['Space_Grotesk'] uppercase text-red-200 font-bold">
+                <span className="text-[13px] font-label uppercase text-red-200 font-bold">
                   Pays d'intervention :
                 </span>
                 <div className="flex gap-1">
@@ -783,7 +732,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                       key={c.code}
                       type="button"
                       onClick={() => handleSelectCountry(c.code)}
-                      className={`px-2 py-1 rounded text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                      className={`px-2 py-1 rounded text-[13px] font-label font-bold transition-all ${
                         selectedCountry === c.code
                           ? 'bg-red-600 text-white shadow'
                           : 'bg-red-950/80 text-gray-300 hover:bg-red-900'
@@ -795,7 +744,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                 </div>
               </div>
 
-              <span className="text-[11px] text-red-200 italic">
+              <span className="text-[13px] text-red-200 italic">
                 Ne pas encombrer les lignes sauf urgence vitale avérée :
               </span>
 
@@ -814,14 +763,14 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                     }
                     className="p-3 bg-red-900/60 hover:bg-red-800 rounded-xl border border-red-400/40 flex items-center gap-3 text-left active:scale-95 transition-all"
                   >
-                    <span className="font-['Space_Grotesk'] text-[24px] font-black text-white shrink-0">
+                    <span className="font-label text-[24px] font-black text-white shrink-0">
                       {num.number}
                     </span>
                     <div className="flex flex-col min-w-0">
-                      <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white truncate">
+                      <span className="font-label text-[12px] font-bold text-white truncate">
                         {num.label}
                       </span>
-                      <span className="text-[10px] text-red-200 line-clamp-1">
+                      <span className="text-[12px] text-red-200">
                         {num.desc}
                       </span>
                     </div>
@@ -830,6 +779,66 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               </div>
             </div>
           )}
+        </div>
+
+      {/* SYNTHÈSE VOCALE CONTRÔLABLE & RADIO OFFICIELLE (après les 4 actions prioritaires) */}
+        <div className="p-3 bg-[#0a1526] rounded-xl border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[18px]">radio</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-label text-[12px] font-bold text-blue-300 truncate">
+                RADIO D'URGENCE : France Bleu FM
+              </span>
+              <span className="text-[12px] text-gray-300 truncate">
+                Seule source officielle opérationnelle en blackout
+              </span>
+            </div>
+          </div>
+
+          {/* Contrôleur Vocal Avancé (Play / Pause / Stop) */}
+          <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+            {speechState === 'idle' ? (
+              <button
+                type="button"
+                onClick={handlePlaySpeech}
+                className="h-9 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-label text-[13px] font-bold uppercase flex items-center gap-1 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px]">volume_up</span>
+                <span>Lire consignes</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1 bg-gray-900 p-1 rounded-lg border border-gray-700">
+                {speechState === 'playing' ? (
+                  <button
+                    type="button"
+                    onClick={handlePauseSpeech}
+                    className="h-8 px-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded font-label text-[12px] font-bold uppercase flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">pause</span>
+                    <span>Pause</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handlePlaySpeech}
+                    className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-label text-[12px] font-bold uppercase flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">play_arrow</span>
+                    <span>Reprendre</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleStopSpeech}
+                  className="h-8 px-2 bg-red-700 hover:bg-red-600 text-white rounded font-label text-[12px] font-bold uppercase flex items-center"
+                >
+                  <span className="material-symbols-outlined text-[15px]">stop</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Accès Rapide Carte Hors-Ligne des Périmètres */}
@@ -843,10 +852,10 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
               <span className="material-symbols-outlined text-[22px]">radar</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[13px] font-bold text-white">
+              <span className="font-label text-[13px] font-bold text-white">
                 Carte Hors-Ligne des Périmètres (Radar PPI)
               </span>
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[13px] text-gray-400">
                 Vérifier si vous êtes dans un rayon de 5 km, 20 km ou 50 km d'un CNPE ou Seveso
               </span>
             </div>
@@ -862,7 +871,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         >
           <div className="flex items-center gap-2.5">
             <span className="material-symbols-outlined text-[20px] text-blue-300">menu_book</span>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-blue-200">
+            <span className="font-label text-[12px] font-bold text-blue-200">
               Consulter la Fiche de Doctrine Officielle Complète
             </span>
           </div>

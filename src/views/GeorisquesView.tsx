@@ -50,9 +50,9 @@ export function computeDataFreshness(
       timestamp: report.retrievedAt,
       formattedDisplay: `En direct • ${timeStr}`,
       badgeText: 'EN DIRECT (FLUX API)',
-      badgeBg: 'bg-[#ecfdf5]',
-      badgeTextCol: 'text-[#065f46]',
-      badgeBorder: 'border-[#a7f3d0]',
+      badgeBg: 'bg-ok-soft',
+      badgeTextCol: 'text-ok-ink',
+      badgeBorder: 'border-ok-line',
       relativeAge: 'Très récent (instantané en cours de session)',
       provenanceLabel: 'Interrogation directe de l’API Géorisques',
       provenanceDesc: 'Données transmises en temps réel par les serveurs officiels de l’État (data.gouv.fr / BRGM).',
@@ -83,28 +83,28 @@ export function computeDataFreshness(
     if (elapsedDays === 0) {
       relativeAge = elapsedHours <= 1 ? 'Moins d’1 heure' : `Il y a ${elapsedHours} heures (< 24h)`;
       badgeText = 'CACHE RÉCENT (< 24H)';
-      badgeBg = 'bg-[#f0fdf4]';
-      badgeTextCol = 'text-[#166534]';
-      badgeBorder = 'border-[#bbf7d0]';
+      badgeBg = 'bg-ok-soft';
+      badgeTextCol = 'text-ok-ink';
+      badgeBorder = 'border-ok-line';
     } else if (elapsedDays <= 7) {
       relativeAge = `Il y a ${elapsedDays} jour${elapsedDays > 1 ? 's' : ''}`;
       badgeText = `CACHE (${elapsedDays}J)`;
-      badgeBg = 'bg-[#eff6ff]';
-      badgeTextCol = 'text-[#1e40af]';
-      badgeBorder = 'border-[#bfdbfe]';
+      badgeBg = 'bg-subtle';
+      badgeTextCol = 'text-brand-ink';
+      badgeBorder = 'border-brand-bright';
     } else if (elapsedDays <= 30) {
       relativeAge = `Il y a ${elapsedDays} jours (consultable hors-ligne)`;
       badgeText = `CACHE (${elapsedDays}J)`;
-      badgeBg = 'bg-[#fefce8]';
-      badgeTextCol = 'text-[#854d0e]';
-      badgeBorder = 'border-[#fef08a]';
+      badgeBg = 'bg-warn-soft';
+      badgeTextCol = 'text-warn-ink';
+      badgeBorder = 'border-warn-line';
     } else {
       isStale = true;
       relativeAge = `Il y a ${elapsedDays} jours — actualisation conseillée`;
       badgeText = 'CACHE ANCIEN (> 30J)';
-      badgeBg = 'bg-[#fff7ed]';
-      badgeTextCol = 'text-[#c2410c]';
-      badgeBorder = 'border-[#fed7aa]';
+      badgeBg = 'bg-warn-soft';
+      badgeTextCol = 'text-warn-ink';
+      badgeBorder = 'border-warn-line';
     }
 
     return {
@@ -129,9 +129,9 @@ export function computeDataFreshness(
       timestamp: PRELOADED_DATASET_DATE,
       formattedDisplay: 'Pré-embarqué • 23 oct. 2026',
       badgeText: 'JEU DIDACTIQUE PRÉCHARGÉ',
-      badgeBg: 'bg-[#f5f3ff]',
-      badgeTextCol: 'text-[#5b21b6]',
-      badgeBorder: 'border-[#ddd6fe]',
+      badgeBg: 'bg-tint',
+      badgeTextCol: 'text-brand-ink',
+      badgeBorder: 'border-line',
       relativeAge: 'Référence d’entraînement (non issue de l’API en direct)',
       provenanceLabel: 'Jeu de données pré-embarqué (Référence 23 oct. 2026)',
       provenanceDesc: 'Jeu de démonstration constitué le 23 octobre 2026 pour permettre l’apprentissage sans dépendre d’une connexion réseau immédiate. Les arrêtés réels doivent être synchronisés.',
@@ -145,9 +145,9 @@ export function computeDataFreshness(
     timestamp: null,
     formattedDisplay: 'Non synchronisé',
     badgeText: 'NON SYNCHRONISÉ',
-    badgeBg: 'bg-[#f1f3f9]',
-    badgeTextCol: 'text-[#44474d]',
-    badgeBorder: 'border-[#c4c6ce]',
+    badgeBg: 'bg-subtle',
+    badgeTextCol: 'text-ink-muted',
+    badgeBorder: 'border-line-strong',
     relativeAge: 'Aucune donnée en cache',
     provenanceLabel: 'Aucune donnée officielle enregistrée',
     provenanceDesc: 'Ce territoire n’a pas encore été synchronisé avec l’API Géorisques. Aucune date artificielle ni donnée fictive n’est insérée par défaut.',
@@ -671,26 +671,26 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full pt-20 pb-28 min-h-screen max-w-xl mx-auto">
+    <div className="flex flex-col w-full pt-20 pb-28 lg:pb-12 min-h-screen max-w-xl lg:max-w-5xl mx-auto">
       {/* Persistent Sync Sentinel Bar */}
-      <div className="w-full bg-[#e4efff] px-4 py-2.5 flex items-center justify-between gap-2 border-b border-[#d6e4f8]">
+      <div className="w-full bg-tint px-4 py-2.5 flex items-center justify-between gap-2 border-b border-line">
         <div className="flex items-center gap-2 min-w-0">
-          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOnline ? 'bg-[#3f9d73] animate-pulse' : 'bg-[#ba1a1a]'}`}></span>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] tracking-wide uppercase truncate font-bold">
+          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOnline ? 'bg-ok animate-pulse' : 'bg-danger'}`}></span>
+          <span className="font-label text-[11px] text-ink tracking-wide uppercase truncate font-bold">
             {isOnline ? 'Connectivité Réseau Détectée' : 'Mode 100% Hors-Ligne Actif'}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0 font-['Space_Grotesk'] text-[11px]">
+        <div className="flex items-center gap-1.5 shrink-0 font-label text-[11px]">
           <span className={`w-2 h-2 rounded-full shrink-0 ${
             freshness.origin === 'live'
-              ? 'bg-[#16a34a] animate-pulse'
+              ? 'bg-ok animate-pulse'
               : freshness.origin === 'cache'
-              ? (freshness.isStale ? 'bg-[#ea580c]' : 'bg-[#2563eb]')
+              ? (freshness.isStale ? 'bg-warn' : 'bg-brand')
               : freshness.origin === 'preload'
               ? 'bg-[#7c3aed]'
               : 'bg-[#71717a]'
           }`}></span>
-          <span className="text-[#001126] font-semibold truncate max-w-[170px] sm:max-w-none">
+          <span className="text-ink font-semibold truncate max-w-[170px] sm:max-w-none">
             {freshness.formattedDisplay}
           </span>
         </div>
@@ -702,14 +702,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             onClick={onBack}
             type="button"
-            className="h-12 px-3 bg-[#dce9fd] hover:bg-[#d6e4f8] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
+            className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
             <span>RETOUR ACCUEIL</span>
           </button>
           <div className="flex items-center gap-1.5">
-            <span className={`font-['Space_Grotesk'] text-[11px] px-2 py-1 rounded font-bold uppercase ${
-              isOnline ? 'bg-[#98f6c5] text-[#005236]' : 'bg-[#fff0ed] text-[#ba1a1a] border border-[#ffdad6]'
+            <span className={`font-label text-[11px] px-2 py-1 rounded font-bold uppercase ${
+              isOnline ? 'bg-ok-soft text-ok-ink' : 'bg-danger-soft text-danger-ink border border-danger-bright'
             }`}>
               {isOnline ? 'EN LIGNE' : 'HORS-LIGNE'}
             </span>
@@ -719,47 +719,47 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         {/* Section Categorization Header */}
         <header className="flex flex-col gap-1">
           <div className="flex items-center flex-wrap gap-1.5">
-            <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#12263f] text-white font-bold uppercase tracking-wider">
+            <span className="font-label text-[11px] px-2 py-0.5 rounded bg-navy-2 text-white font-bold uppercase tracking-wider">
               Section 4.10 • Sécurité Civile & Géorisques
             </span>
           </div>
-          <h1 className="text-[24px] text-[#001126] font-bold tracking-tight">
+          <h1 className="text-[24px] text-ink font-bold tracking-tight">
             Risques Locaux & Géorisques
           </h1>
-          <p className="text-[13px] text-[#44474d] leading-relaxed">
+          <p className="text-[13px] text-ink-muted leading-relaxed">
             Inventaire officiel des installations industrielles Seveso, plans de prévention technologique (PPRT), axes TMD et documents communaux de sauvegarde.
           </p>
         </header>
 
         {/* AUDIT TECHNIQUE & TRANSPARENCE DES FONCTIONS (EXIGENCE EXPLICITE UTILISATEUR) */}
-        <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-2.5">
+        <section className="bg-card p-4 rounded-xl shadow-sm border border-line-strong flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#0036ce] text-[20px]">fact_check</span>
-              <h2 className="text-[14px] font-bold text-[#001126]">Audit des Fonctions du Module</h2>
+              <span className="material-symbols-outlined text-brand-ink text-[20px]">fact_check</span>
+              <h2 className="text-[14px] font-bold text-ink">Audit des Fonctions du Module</h2>
             </div>
             <button
               onClick={() => setShowAuditPanel(!showAuditPanel)}
-              className="text-[#0036ce] font-['Space_Grotesk'] text-[11px] font-bold underline"
+              className="text-brand-ink font-label text-[11px] font-bold underline"
               type="button"
             >
               {showAuditPanel ? 'Masquer' : 'Afficher détails'}
             </button>
           </div>
 
-          <p className="text-[12px] text-[#44474d]">
+          <p className="text-[12px] text-ink-muted">
             Ce module distingue rigoureusement les fonctions opérationnelles, les représentations schématiques et les dépendances réseau :
           </p>
 
           {showAuditPanel && (
             <div className="flex flex-col gap-2 pt-1 text-[12px]">
               {/* 🟢 1. Fonctions réellement opérationnelles */}
-              <div className="p-2.5 bg-[#f0fdf4] rounded-lg border border-[#bbf7d0] flex flex-col gap-1">
-                <span className="font-bold text-[#166534] flex items-center gap-1.5 font-['Space_Grotesk'] text-[11px] uppercase">
-                  <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+              <div className="p-2.5 bg-ok-soft rounded-lg border border-ok-line flex flex-col gap-1">
+                <span className="font-bold text-ok-ink flex items-center gap-1.5 font-label text-[11px] uppercase">
+                  <span className="w-2 h-2 rounded-full bg-ok"></span>
                   🟢 Fonctions Réellement Opérationnelles
                 </span>
-                <ul className="list-disc list-inside text-[#14532d] space-y-0.5 text-[11px]">
+                <ul className="list-disc list-inside text-ok-ink space-y-0.5 text-[11px]">
                   <li><strong>Géolocalisation GPS réelle (W3C)</strong> : capture des coordonnées physiques de l'appareil (latitude, longitude, précision).</li>
                   <li><strong>Résolution de commune</strong> : géocodage inverse en direct via <code>geo.api.gouv.fr</code> ou projection géodésique hors-ligne (Haversine).</li>
                   <li><strong>Export d'instantané réel</strong> : génération et téléchargement immédiat d'un fichier JSON normé sur votre terminal.</li>
@@ -768,23 +768,23 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               </div>
 
               {/* 🟡 2. Démonstrations & schémas */}
-              <div className="p-2.5 bg-[#fefce8] rounded-lg border border-[#fef08a] flex flex-col gap-1">
-                <span className="font-bold text-[#854d0e] flex items-center gap-1.5 font-['Space_Grotesk'] text-[11px] uppercase">
+              <div className="p-2.5 bg-warn-soft rounded-lg border border-warn-line flex flex-col gap-1">
+                <span className="font-bold text-warn-ink flex items-center gap-1.5 font-label text-[11px] uppercase">
                   <span className="w-2 h-2 rounded-full bg-[#ca8a04]"></span>
                   🟡 Démonstration & Schéma Pédagogique
                 </span>
-                <p className="text-[11px] text-[#713f12] leading-snug">
+                <p className="text-[11px] text-warn-ink leading-snug">
                   <strong>Périmètres & Rayons vectoriels SVG</strong> : Représentation schématique locale des périmètres PPI/TMD conçue pour fonctionner sans dépendance à un Système d'Information Géographique (SIG) distant lourd.
                 </p>
               </div>
 
               {/* 🔵 3. Fonctionnalités nécessitant une connexion */}
-              <div className="p-2.5 bg-[#eff6ff] rounded-lg border border-[#bfdbfe] flex flex-col gap-1">
-                <span className="font-bold text-[#1e40af] flex items-center gap-1.5 font-['Space_Grotesk'] text-[11px] uppercase">
-                  <span className="w-2 h-2 rounded-full bg-[#2563eb]"></span>
+              <div className="p-2.5 bg-subtle rounded-lg border border-brand-bright flex flex-col gap-1">
+                <span className="font-bold text-brand-ink flex items-center gap-1.5 font-label text-[11px] uppercase">
+                  <span className="w-2 h-2 rounded-full bg-brand"></span>
                   🔵 Fonctionnalités Indisponibles Hors-Connexion
                 </span>
-                <p className="text-[11px] text-[#1e3a8a] leading-snug">
+                <p className="text-[11px] text-brand-ink leading-snug">
                   <strong>Actualisation en direct</strong> de l'API Géorisques (data.gouv.fr) et <strong>liens sortants</strong> vers les fiches web de l'État : nécessitent obligatoirement un accès Internet actif.
                 </p>
               </div>
@@ -793,25 +793,25 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* Passerelle Hors-Ligne : Carte des Périmètres 100% Autonome */}
-        <section className="bg-[#001126] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-2.5">
+        <section className="bg-navy text-white p-4 rounded-xl shadow-md border border-ink flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#98f6c5] text-[20px]">radar</span>
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider text-white">
+              <span className="material-symbols-outlined text-ok-bright text-[20px]">radar</span>
+              <span className="font-label text-[12px] font-bold uppercase tracking-wider text-white">
                 Carte Hors-Ligne des Périmètres (100% Autonome)
               </span>
             </div>
-            <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5]/20 text-[#98f6c5] px-2 py-0.5 rounded font-bold uppercase">
+            <span className="font-label text-[10px] bg-ok-soft/20 text-ok-bright px-2 py-0.5 rounded font-bold uppercase">
               Zéro Réseau
             </span>
           </div>
-          <p className="text-[12px] text-[#dce9fd] leading-relaxed">
+          <p className="text-[12px] text-on-navy-soft leading-relaxed">
             Le chaînon manquant en cas de blackout : base statique pré-embarquée des 19 CNPE nucléaires et 22 plateformes Seveso Seuil Haut. Calcul géodésique local immédiat « suis-je dans un rayon de X km » sans aucun transit serveur.
           </p>
           <button
             type="button"
             onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
-            className="w-full min-h-[42px] bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+            className="w-full min-h-[42px] bg-ok-soft hover:bg-ok-soft text-ok-ink font-label text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px]">map</span>
             <span>Ouvrir la Carte & Radar Hors-Ligne (41 sites)</span>
@@ -819,26 +819,26 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* Territorial Selector & Privacy Guarantee */}
-        <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
+        <section className="bg-card p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-line-strong">
           <div className="flex items-center justify-between">
-            <label className="font-['Space_Grotesk'] text-[12px] uppercase tracking-wider text-[#001126] flex items-center gap-1.5 font-bold">
-              <span className="material-symbols-outlined text-[18px] text-[#0036ce]">share_location</span>
+            <label className="font-label text-[12px] uppercase tracking-wider text-ink flex items-center gap-1.5 font-bold">
+              <span className="material-symbols-outlined text-[18px] text-brand-ink">share_location</span>
               Commune d'Analyse Locale
             </label>
-            <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#98f6c5] text-[#005236] font-bold uppercase">
+            <span className="font-label text-[10px] px-2 py-0.5 rounded bg-ok-soft text-ok-ink font-bold uppercase">
               DONNÉES OFFICIELLES API
             </span>
           </div>
 
           {/* Input Display Bar */}
-          <div className="bg-[#eef4ff] rounded-lg p-3 flex items-center justify-between gap-3 border border-[#d6e4f8]">
+          <div className="bg-subtle rounded-lg p-3 flex items-center justify-between gap-3 border border-line">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="material-symbols-outlined text-[#001126] text-[20px] shrink-0">pin_drop</span>
+              <span className="material-symbols-outlined text-ink text-[20px] shrink-0">pin_drop</span>
               <div className="flex flex-col min-w-0">
-                <span className="text-[15px] font-bold text-[#001126] truncate">
+                <span className="text-[15px] font-bold text-ink truncate">
                   {activeCommune.name}
                 </span>
-                <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] truncate">
+                <span className="font-label text-[11px] text-ink-muted truncate">
                   {activeCommune.postalCode} • INSEE {activeCommune.insee} {activeCommune.departement ? `• Dép. ${activeCommune.departement}` : ''}
                 </span>
               </div>
@@ -846,7 +846,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             <button
               onClick={() => setIsEditingCommune(!isEditingCommune)}
               type="button"
-              className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1 shrink-0 transition-colors border border-[#c4c6ce]"
+              className="h-11 px-3 rounded bg-card hover:bg-tint text-ink font-label text-[12px] font-bold flex items-center gap-1 shrink-0 transition-colors border border-line-strong"
             >
               <span className="material-symbols-outlined text-[16px]">edit</span>
               Modifier
@@ -855,8 +855,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
           {/* Saisie Commune Modal Dropdown avec API geo.api.gouv.fr */}
           {isEditingCommune && (
-            <div className="bg-[#f8f9ff] p-3 rounded-lg flex flex-col gap-2.5 border border-[#c4c6ce]">
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#001126]">
+            <div className="bg-canvas p-3 rounded-lg flex flex-col gap-2.5 border border-line-strong">
+              <span className="font-label text-[11px] uppercase font-bold text-ink">
                 Rechercher une commune en France (API Officielle) :
               </span>
               <div className="relative">
@@ -864,11 +864,11 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                   type="text"
                   value={searchQuery}
                   placeholder="Tapez un nom ou code postal (ex: Feyzin, 76000, Rouen, Dunkerque)..."
-                  className="w-full h-11 px-3 pr-9 bg-white border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 pr-9 bg-card border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                   onChange={(e) => handleSearchChange(e.target.value)}
                 />
                 {searchLoading && (
-                  <span className="absolute right-3 top-3 material-symbols-outlined text-[#0036ce] text-[18px] animate-spin">
+                  <span className="absolute right-3 top-3 material-symbols-outlined text-brand-ink text-[18px] animate-spin">
                     sync
                   </span>
                 )}
@@ -876,8 +876,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
               {/* Résultats de recherche dynamique */}
               {searchResults.length > 0 && (
-                <div className="flex flex-col gap-1 bg-white p-2 rounded-lg border border-[#0036ce]">
-                  <span className="text-[11px] font-bold text-[#0036ce] font-['Space_Grotesk']">
+                <div className="flex flex-col gap-1 bg-card p-2 rounded-lg border border-brand-ink">
+                  <span className="text-[11px] font-bold text-brand-ink font-label">
                     Résultats trouvés via geo.api.gouv.fr :
                   </span>
                   {searchResults.map((c) => (
@@ -885,10 +885,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                       key={c.code}
                       type="button"
                       onClick={() => handleSelectSearchedCommune(c)}
-                      className="p-2 text-left text-[13px] hover:bg-[#eef4ff] rounded flex items-center justify-between"
+                      className="p-2 text-left text-[13px] hover:bg-subtle rounded flex items-center justify-between"
                     >
-                      <span className="font-semibold text-[#001126]">{c.nom}</span>
-                      <span className="text-[11px] text-[#44474d] font-['Space_Grotesk']">
+                      <span className="font-semibold text-ink">{c.nom}</span>
+                      <span className="text-[11px] text-ink-muted font-label">
                         {c.codesPostaux?.[0] || c.code} (Dép. {c.codeDepartement})
                       </span>
                     </button>
@@ -898,13 +898,13 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
               {/* Historique des consultations locales (Disponibles hors-ligne) */}
               {communeHistory.length > 0 && (
-                <div className="flex flex-col gap-1 pt-1 border-t border-[#d6e4f8]">
+                <div className="flex flex-col gap-1 pt-1 border-t border-line">
                   <div className="flex items-center justify-between">
-                    <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase flex items-center gap-1">
+                    <span className="font-label text-[11px] font-bold text-brand-ink uppercase flex items-center gap-1">
                       <span className="material-symbols-outlined text-[14px]">history</span>
                       Historique local ({communeHistory.length}) :
                     </span>
-                    <span className="text-[10px] text-[#44474d] italic">Accès hors-ligne</span>
+                    <span className="text-[10px] text-ink-muted italic">Accès hors-ligne</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {communeHistory.map((hist) => (
@@ -927,9 +927,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           });
                           setIsEditingCommune(false);
                         }}
-                        className="px-2.5 py-1 bg-white hover:bg-[#eef4ff] text-[#001126] border border-[#c4c6ce] rounded text-[11px] font-semibold flex items-center gap-1"
+                        className="px-2.5 py-1 bg-card hover:bg-subtle text-ink border border-line-strong rounded text-[11px] font-semibold flex items-center gap-1"
                       >
-                        <span className="material-symbols-outlined text-[13px] text-[#0036ce]">schedule</span>
+                        <span className="material-symbols-outlined text-[13px] text-brand-ink">schedule</span>
                         <span>{hist.name}</span>
                       </button>
                     ))}
@@ -937,7 +937,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </div>
               )}
 
-              <span className="text-[10px] text-[#44474d] italic">
+              <span className="text-[10px] text-ink-muted italic">
                 Ou sélectionnez parmi nos bassins industriels & nucléaires de référence :
               </span>
               <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto">
@@ -958,12 +958,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     }}
                     className={`p-2 rounded text-left text-[13px] flex items-center justify-between transition-colors ${
                       activeCommune.insee === com.insee
-                        ? 'bg-[#001126] text-white font-bold'
-                        : 'bg-white hover:bg-[#e4efff] text-[#001126] border border-[#c4c6ce]'
+                        ? 'bg-navy text-white font-bold'
+                        : 'bg-card hover:bg-tint text-ink border border-line-strong'
                     }`}
                   >
                     <span>{com.name}</span>
-                    <span className="font-['Space_Grotesk'] text-[11px] opacity-80">
+                    <span className="font-label text-[11px] opacity-80">
                       {com.postalCode} • {com.departement}
                     </span>
                   </button>
@@ -978,7 +978,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={handleSimulateGPS}
               disabled={gpsLoading}
               type="button"
-              className="w-full h-12 rounded bg-[#eef4ff] hover:bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-[#d6e4f8] disabled:opacity-60"
+              className="w-full h-12 rounded bg-subtle hover:bg-tint text-ink font-label text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-line disabled:opacity-60"
             >
               <span className={`material-symbols-outlined text-[18px] ${gpsLoading ? 'animate-spin' : ''}`}>
                 {gpsLoading ? 'satellite_alt' : 'my_location'}
@@ -993,10 +993,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             {gpsStatusMessage && (
               <div className={`p-2.5 rounded-lg text-[12px] flex items-start gap-2 border ${
                 gpsStatusMessage.type === 'success'
-                  ? 'bg-[#f0fdf4] text-[#166534] border-[#bbf7d0]'
+                  ? 'bg-ok-soft text-ok-ink border-ok-line'
                   : gpsStatusMessage.type === 'warning'
-                  ? 'bg-[#fefce8] text-[#854d0e] border-[#fef08a]'
-                  : 'bg-[#fff0ed] text-[#93000a] border-[#ffdad6]'
+                  ? 'bg-warn-soft text-warn-ink border-warn-line'
+                  : 'bg-danger-soft text-danger-ink-strong border-danger-bright'
               }`}>
                 <span className="material-symbols-outlined text-[16px] shrink-0 mt-0.5">
                   {gpsStatusMessage.type === 'success' ? 'check_circle' : 'info'}
@@ -1006,10 +1006,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             )}
 
             <div className="flex items-start gap-1.5 px-1 pt-0.5">
-              <span className="material-symbols-outlined text-[#3f9d73] text-[16px] shrink-0 mt-0.5">
+              <span className="material-symbols-outlined text-ok-ink text-[16px] shrink-0 mt-0.5">
                 verified_user
               </span>
-              <p className="text-[12px] text-[#44474d] leading-snug">
+              <p className="text-[12px] text-ink-muted leading-snug">
                 <strong>Garantie de souveraineté :</strong> Aucune télémétrie ni pistage. Les coordonnées GPS restent strictement confinées dans la mémoire vive locale de votre terminal.
               </p>
             </div>
@@ -1017,19 +1017,19 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* LIAISON DIRECTE MAIRIE & DICRIM COMMUNAL (DILA / PREMIER MINISTRE) */}
-        <section className="bg-gradient-to-br from-[#001126] to-[#12263f] text-white p-4 rounded-xl shadow-md border border-[#12263f] flex flex-col gap-3">
+        <section className="bg-gradient-to-br from-navy to-navy-2 text-white p-4 rounded-xl shadow-md border border-ink flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-[#0036ce] text-white flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shrink-0 shadow-xs">
                 <span className="material-symbols-outlined text-[22px]">account_balance</span>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-['Space_Grotesk'] text-[10px] uppercase font-bold text-[#98f6c5] tracking-wider">
+                  <span className="font-label text-[10px] uppercase font-bold text-ok-bright tracking-wider">
                     Poste de Commandement Municipal
                   </span>
                   {mairieContact?.isAuthentifie && (
-                    <span className="bg-[#98f6c5] text-[#002c1b] text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
+                    <span className="bg-ok-soft text-ok-ink text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
                       Vérifié DILA
                     </span>
                   )}
@@ -1039,14 +1039,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </h2>
               </div>
             </div>
-            <span className="font-['Space_Grotesk'] text-[10px] bg-white/10 text-[#dce9fd] px-2 py-0.5 rounded font-bold uppercase shrink-0">
+            <span className="font-label text-[10px] bg-white/10 text-on-navy-soft px-2 py-0.5 rounded font-bold uppercase shrink-0">
               C.S.I. L731-3
             </span>
           </div>
 
           {mairieContact?.adressePostale?.ligne && (
-            <div className="text-[12px] text-[#dce9fd] flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[16px] text-[#98f6c5]">location_on</span>
+            <div className="text-[12px] text-on-navy-soft flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[16px] text-ok-bright">location_on</span>
               <span>{mairieContact.adressePostale.ligne}, {mairieContact.adressePostale.codePostal} {mairieContact.adressePostale.nomCommune}</span>
             </div>
           )}
@@ -1065,13 +1065,13 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     desc: `Poste de commandement / Standard communal pour la commune de ${activeCommune.name}. Source : Annuaire de l'Administration (DILA / Premier ministre).`,
                   })
                 }
-                className="min-h-[44px] px-3 bg-[#98f6c5] hover:bg-[#80e5b3] text-[#002c1b] font-['Space_Grotesk'] text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer"
+                className="min-h-[44px] px-3 bg-ok-soft hover:bg-ok-soft text-ok-ink font-label text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">call</span>
                 <span>Appeler la Mairie ({mairieContact.telephone})</span>
               </button>
             ) : (
-              <div className="min-h-[44px] px-3 bg-white/10 text-white/80 font-['Space_Grotesk'] text-[11px] font-semibold rounded-lg flex items-center justify-center gap-1.5">
+              <div className="min-h-[44px] px-3 bg-white/10 text-white/80 font-label text-[11px] font-semibold rounded-lg flex items-center justify-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px]">phone_disabled</span>
                 <span>Standard : non synchronisé hors-ligne</span>
               </div>
@@ -1081,19 +1081,19 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             <button
               type="button"
               onClick={() => setActiveModalDoc('dicrim')}
-              className="min-h-[44px] px-3 bg-white/10 hover:bg-white/20 text-white font-['Space_Grotesk'] text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/20 cursor-pointer"
+              className="min-h-[44px] px-3 bg-white/10 hover:bg-white/20 text-white font-label text-[12px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/20 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">menu_book</span>
               <span>Consulter le DICRIM Communal</span>
             </button>
           </div>
 
-          <div className="pt-1 border-t border-white/10 flex items-center justify-between text-[11px] text-[#dce9fd]">
+          <div className="pt-1 border-t border-white/10 flex items-center justify-between text-[11px] text-on-navy-soft">
             <span className="truncate">Plan Communal de Sauvegarde (PCS) sous l'autorité du Maire</span>
             <button
               type="button"
               onClick={() => setActiveModalDoc('pcs')}
-              className="text-[#98f6c5] hover:underline font-bold font-['Space_Grotesk'] shrink-0 ml-2 cursor-pointer"
+              className="text-ok-bright hover:underline font-bold font-label shrink-0 ml-2 cursor-pointer"
             >
               Fiche PCS &rarr;
             </button>
@@ -1101,13 +1101,13 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* Cache Snapshot & Freshness Status */}
-        <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
+        <section className="bg-card p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-line-strong">
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase tracking-wide text-[#44474d] font-semibold">
+              <span className="font-label text-[11px] uppercase tracking-wide text-ink-muted font-semibold">
                 Dossier Territorial Communal
               </span>
-              <span className="text-[17px] font-bold text-[#001126]">
+              <span className="text-[17px] font-bold text-ink">
                 {freshness.origin === 'cache'
                   ? 'Base Locale Hors-Ligne Scellée'
                   : freshness.origin === 'live'
@@ -1118,10 +1118,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               </span>
             </div>
             {/* Freshness Badge with dynamic colors */}
-            <span className={`font-['Space_Grotesk'] text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5 shrink-0 border ${freshness.badgeBg} ${freshness.badgeTextCol} ${freshness.badgeBorder}`}>
+            <span className={`font-label text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5 shrink-0 border ${freshness.badgeBg} ${freshness.badgeTextCol} ${freshness.badgeBorder}`}>
               <span className={`w-2 h-2 rounded-full shrink-0 ${
-                freshness.origin === 'live' ? 'bg-[#16a34a] animate-pulse' :
-                freshness.origin === 'cache' ? (freshness.isStale ? 'bg-[#ea580c]' : 'bg-[#2563eb]') :
+                freshness.origin === 'live' ? 'bg-ok animate-pulse' :
+                freshness.origin === 'cache' ? (freshness.isStale ? 'bg-warn' : 'bg-brand') :
                 freshness.origin === 'preload' ? 'bg-[#7c3aed]' : 'bg-[#71717a]'
               }`}></span>
               <span>{freshness.badgeText}</span>
@@ -1131,23 +1131,23 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           {/* Indicateur de Fraîcheur & Traçabilité */}
           <div className="grid grid-cols-1 gap-2 pt-0.5">
             {/* Fraîcheur des données calculée dynamiquement */}
-            <div className="flex items-center justify-between text-[13px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
-              <span className="text-[#44474d] flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[16px] text-[#0036ce]">schedule</span>
+            <div className="flex items-center justify-between text-[13px] bg-subtle px-3 py-2.5 rounded-lg border border-line">
+              <span className="text-ink-muted flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-brand-ink">schedule</span>
                 <span>Fraîcheur des données :</span>
               </span>
-              <span className="font-['Space_Grotesk'] font-bold text-[#001126]">
+              <span className="font-label font-bold text-ink">
                 {freshness.relativeAge}
               </span>
             </div>
 
             {/* Date réelle de capture / requête / constitution */}
-            <div className="flex items-center justify-between text-[13px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
-              <span className="text-[#44474d] flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[16px] text-[#0036ce]">calendar_today</span>
+            <div className="flex items-center justify-between text-[13px] bg-subtle px-3 py-2.5 rounded-lg border border-line">
+              <span className="text-ink-muted flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-brand-ink">calendar_today</span>
                 <span>Date de capture réelle :</span>
               </span>
-              <span className="font-['Space_Grotesk'] font-bold text-[#001126] text-right">
+              <span className="font-label font-bold text-ink text-right">
                 {freshness.origin === 'live' && freshness.timestamp ? (
                   `${new Date(freshness.timestamp).toLocaleDateString('fr-FR')} à ${new Date(freshness.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
                 ) : freshness.origin === 'cache' && freshness.timestamp ? (
@@ -1155,27 +1155,27 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 ) : freshness.origin === 'preload' ? (
                   '23 oct. 2026 à 18:00 (constitution)'
                 ) : (
-                  <span className="italic text-[#71717a]">Aucune date artificielle</span>
+                  <span className="italic text-ink-faint">Aucune date artificielle</span>
                 )}
               </span>
             </div>
 
             {/* Provenance & Source */}
-            <div className="flex flex-col gap-0.5 text-[12px] bg-[#eef4ff] px-3 py-2.5 rounded-lg border border-[#d6e4f8]">
+            <div className="flex flex-col gap-0.5 text-[12px] bg-subtle px-3 py-2.5 rounded-lg border border-line">
               <div className="flex items-center justify-between">
-                <span className="text-[#44474d] font-['Space_Grotesk'] text-[10px] uppercase font-bold">
+                <span className="text-ink-muted font-label text-[10px] uppercase font-bold">
                   Origine & Méthode de Synchronisation :
                 </span>
-                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#0036ce] uppercase">
+                <span className="font-label text-[10px] font-bold text-brand-ink uppercase">
                   {freshness.origin === 'live' ? 'FLUX OFFICIEL DIRECT' :
                    freshness.origin === 'cache' ? 'STOCKAGE TERMINAL' :
                    freshness.origin === 'preload' ? 'DIDACTIQUE HORS-LIGNE' : 'NON SYNCHRONISÉ'}
                 </span>
               </div>
-              <span className="text-[#001126] font-medium leading-snug">
+              <span className="text-ink font-medium leading-snug">
                 {freshness.provenanceLabel}
               </span>
-              <p className="text-[11px] text-[#555962] leading-snug mt-0.5">
+              <p className="text-[11px] text-ink-muted leading-snug mt-0.5">
                 {freshness.provenanceDesc}
               </p>
             </div>
@@ -1183,7 +1183,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
           {/* Avertissement explicite si cache ancien (> 30 jours) */}
           {freshness.isStale && (
-            <div className="p-2.5 rounded-lg bg-[#fff7ed] border border-[#fed7aa] text-[#c2410c] text-[11px] flex items-start gap-2">
+            <div className="p-2.5 rounded-lg bg-warn-soft border border-warn-line text-warn-ink text-[11px] flex items-start gap-2">
               <span className="material-symbols-outlined text-[16px] shrink-0 mt-0.5">update</span>
               <div className="leading-snug">
                 <strong>Données conservées depuis plus de 30 jours :</strong> Les arrêtés PPRT et zonages Seveso restent valables pour votre préparation (évolutions administratives pluriannuelles), mais une actualisation en ligne est conseillée pour vérifier les révisions administratives récentes.
@@ -1195,7 +1195,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             type="button"
             onClick={() => setShowSourcesModal(true)}
-            className="w-full py-2.5 px-3 rounded-lg bg-white hover:bg-[#f1f3f9] text-[#0036ce] font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-[#c4c6ce] transition-colors cursor-pointer"
+            className="w-full py-2.5 px-3 rounded-lg bg-card hover:bg-subtle text-brand-ink font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border border-line-strong transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">policy</span>
             <span>Consulter les sources des données territoriales</span>
@@ -1204,10 +1204,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           {refreshMessage && (
             <div className={`p-2.5 rounded-lg text-[12px] flex items-start gap-2 border ${
               refreshMessage.type === 'success'
-                ? 'bg-[#f0fdf4] text-[#166534] border-[#bbf7d0]'
+                ? 'bg-ok-soft text-ok-ink border-ok-line'
                 : refreshMessage.type === 'warning'
-                ? 'bg-[#fff0ed] text-[#93000a] border-[#ffdad6]'
-                : 'bg-[#eef4ff] text-[#0036ce] border-[#d6e4f8]'
+                ? 'bg-danger-soft text-danger-ink-strong border-danger-bright'
+                : 'bg-subtle text-brand-ink border-line'
             }`}>
               <span className="material-symbols-outlined text-[16px] shrink-0 mt-0.5">
                 {refreshMessage.type === 'success' ? 'check_circle' : 'info'}
@@ -1221,7 +1221,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={handleRefreshData}
               disabled={refreshing}
               type="button"
-              className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce] disabled:opacity-60 cursor-pointer"
+              className="w-full h-12 rounded bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold flex items-center justify-center gap-2 transition-colors border border-line-strong disabled:opacity-60 cursor-pointer"
             >
               <span
                 className={`material-symbols-outlined text-[18px] ${
@@ -1238,7 +1238,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                   : 'Actualiser (Indisponible hors-connexion)'}
               </span>
             </button>
-            <div className="flex items-center justify-center gap-1 text-center font-['Space_Grotesk'] text-[11px] text-[#44474d]">
+            <div className="flex items-center justify-center gap-1 text-center font-label text-[11px] text-ink-muted">
               <span className="material-symbols-outlined text-[14px]">offline_bolt</span>
               <span>Consultation 100% autonome garantie même sans réseau</span>
             </div>
@@ -1246,41 +1246,41 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         </section>
 
         {/* MANDATORY CIVIL SAFETY NOTICE */}
-        <div className="bg-[#eef4ff] p-4 rounded-xl flex items-start gap-3 shadow-sm border border-[#d6e4f8]" role="alert">
-          <div className="w-8 h-8 rounded-full bg-[#001126] flex items-center justify-center shrink-0 text-white">
+        <div className="bg-subtle p-4 rounded-xl flex items-start gap-3 shadow-sm border border-line" role="alert">
+          <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center shrink-0 text-white">
             <span className="material-symbols-outlined text-[18px]">verified_user</span>
           </div>
           <div className="flex flex-col gap-1 min-w-0">
-            <span className="font-['Space_Grotesk'] text-[12px] text-[#001126] font-bold uppercase tracking-wider">
+            <span className="font-label text-[12px] text-ink font-bold uppercase tracking-wider">
               Avertissement de Sécurité Civile
             </span>
-            <p className="text-[12px] text-[#0f1c2b] leading-relaxed">
+            <p className="text-[12px] text-ink leading-relaxed">
               L'absence de risque répertorié ou un inventaire vide ne garantit en aucun cas qu'une zone est exempte de danger. Aucun indice anxiogène arbitraire n'est calculé. En cas d'alerte réelle, <strong>seules les directives émises par le Préfet de département font foi</strong>.
             </p>
           </div>
         </div>
 
         {/* Schematized Vector Map with Clickable Nodes & Zoom */}
-        <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
+        <section className="bg-card p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-line-strong">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[12px] uppercase tracking-wider text-[#001126] font-bold">
+              <span className="font-label text-[12px] uppercase tracking-wider text-ink font-bold">
                 Périmètres & Rayons d'Incidence
               </span>
-              <span className="text-[12px] text-[#44474d]">
+              <span className="text-[12px] text-ink-muted">
                 Représentation vectorielle interactive (Zoomable, repères cliquables)
               </span>
             </div>
 
             {/* Mode Switcher: Officiel vs Pédagogique */}
-            <div className="inline-flex rounded-lg p-0.5 bg-[#f0f4f9] border border-[#c4c6ce] shrink-0 self-start sm:self-auto">
+            <div className="inline-flex rounded-lg p-0.5 bg-subtle border border-line-strong shrink-0 self-start sm:self-auto">
               <button
                 type="button"
                 onClick={() => setMapMode('officiel')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-label font-bold transition-all ${
                   mapMode === 'officiel'
-                    ? 'bg-[#001126] text-white shadow-xs'
-                    : 'text-[#44474d] hover:text-[#001126]'
+                    ? 'bg-navy text-white shadow-xs'
+                    : 'text-ink-muted hover:text-ink'
                 }`}
               >
                 Données Officielles
@@ -1288,10 +1288,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               <button
                 type="button"
                 onClick={() => setMapMode('pedagogique')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-['Space_Grotesk'] font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-label font-bold transition-all ${
                   mapMode === 'pedagogique'
-                    ? 'bg-[#854d0e] text-white shadow-xs'
-                    : 'text-[#44474d] hover:text-[#001126]'
+                    ? 'bg-warn text-white shadow-xs'
+                    : 'text-ink-muted hover:text-ink'
                 }`}
               >
                 Mode Pédagogique
@@ -1301,33 +1301,33 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
           {/* Mode Banner */}
           {mapMode === 'officiel' ? (
-            <div className="px-3 py-2 rounded-lg bg-[#eef4ff] border border-[#0036ce]/30 flex items-center justify-between text-[11px]">
-              <div className="flex items-center gap-1.5 text-[#0036ce]">
+            <div className="px-3 py-2 rounded-lg bg-subtle border border-brand-ink/30 flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-brand-ink">
                 <span className="material-symbols-outlined text-[16px]">verified</span>
                 <span className="font-bold">Territoire Réel : {activeCommune.name} ({activeCommune.insee})</span>
               </div>
-              <span className="text-[#44474d] text-[10px]">Base API Géorisques</span>
+              <span className="text-ink-muted text-[10px]">Base API Géorisques</span>
             </div>
           ) : (
-            <div className="px-3 py-2 rounded-lg bg-[#fefce8] border border-[#fef08a] flex items-center justify-between text-[11px]">
-              <div className="flex items-center gap-1.5 text-[#854d0e]">
+            <div className="px-3 py-2 rounded-lg bg-warn-soft border border-warn-line flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-warn-ink">
                 <span className="material-symbols-outlined text-[16px]">school</span>
                 <span className="font-bold">Simulation d'Exercice Non-Contractuelle</span>
               </div>
-              <span className="text-[#854d0e] text-[10px]">Didactique uniquement</span>
+              <span className="text-warn-ink text-[10px]">Didactique uniquement</span>
             </div>
           )}
 
           {/* Zoom Toolbar & Map Canvas */}
           <div className="relative">
             {/* Zoom Controls */}
-            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 bg-white/90 backdrop-blur-xs p-1 rounded-lg border border-[#c4c6ce] shadow-xs">
+            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 bg-white/90 backdrop-blur-xs p-1 rounded-lg border border-line-strong shadow-xs">
               <button
                 type="button"
                 onClick={() => setMapZoom((z) => Math.min(2.4, +(z + 0.35).toFixed(2)))}
                 disabled={mapZoom >= 2.4}
                 title="Zoom avant (+)"
-                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126] disabled:opacity-30 disabled:pointer-events-none"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-subtle text-ink disabled:opacity-30 disabled:pointer-events-none"
               >
                 <span className="material-symbols-outlined text-[18px]">zoom_in</span>
               </button>
@@ -1336,7 +1336,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 onClick={() => setMapZoom((z) => Math.max(1, +(z - 0.35).toFixed(2)))}
                 disabled={mapZoom <= 1}
                 title="Zoom arrière (-)"
-                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126] disabled:opacity-30 disabled:pointer-events-none"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-subtle text-ink disabled:opacity-30 disabled:pointer-events-none"
               >
                 <span className="material-symbols-outlined text-[18px]">zoom_out</span>
               </button>
@@ -1344,14 +1344,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 type="button"
                 onClick={() => { setMapZoom(1); setSelectedMapNode(null); }}
                 title="Réinitialiser zoom (100%)"
-                className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#eef4ff] text-[#001126]"
+                className="w-7 h-7 rounded flex items-center justify-center hover:bg-subtle text-ink"
               >
                 <span className="material-symbols-outlined text-[16px]">restart_alt</span>
               </button>
             </div>
 
             {/* Clean Vector SVG Canvas */}
-            <div className="w-full bg-[#eef4ff] rounded-lg p-2 flex items-center justify-center relative overflow-hidden border border-[#d6e4f8]">
+            <div className="w-full bg-subtle rounded-lg p-2 flex items-center justify-center relative overflow-hidden border border-line">
               {(() => {
                 const baseW = 340;
                 const baseH = 220;
@@ -1501,10 +1501,10 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
           {/* Interactive node indicator alert with operational advice */}
           {selectedMapNode && (
-            <div className="p-3 rounded-lg bg-[#dce9fd] text-[12px] border border-[#0036ce]/30 flex flex-col gap-1.5">
+            <div className="p-3 rounded-lg bg-tint text-[12px] border border-brand-ink/30 flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#001126] flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[18px] text-[#0036ce]">near_me</span>
+                <span className="font-bold text-ink flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px] text-brand-ink">near_me</span>
                   {selectedMapNode === 'ppi' && "Zone SEVESO Seuil Haut (Périmètre PPI)"}
                   {selectedMapNode === 'tmd' && "Corridor TMD (Transport Matières Dangereuses Rail/Route)"}
                   {selectedMapNode === 'nucleaire' && "Rayon de Prévention CNPE / Nucléaire (PPI 10-20 km)"}
@@ -1513,12 +1513,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedMapNode(null)}
-                  className="text-[#001126] font-bold text-[11px] underline cursor-pointer"
+                  className="text-ink font-bold text-[11px] underline cursor-pointer"
                 >
                   Effacer
                 </button>
               </div>
-              <p className="text-[11px] text-[#0f1c2b] leading-relaxed">
+              <p className="text-[11px] text-ink leading-relaxed">
                 {selectedMapNode === 'ppi' && "En cas d'accident industriel majeur : sirène POI/PPI spécifique (ou RNA), confinement immédiat dans le local étanche préparé, écoute de la radio locale conventionnée (France Bleu)."}
                 {selectedMapNode === 'tmd' && "Accident de convoi chimique : s'éloigner perpendiculairement au sens du vent à plus de 800 mètres. Ne jamais s'approcher ni utiliser de flamme nue."}
                 {selectedMapNode === 'nucleaire' && "Alerte radiologique : prise d'iode stable (KI) EXCLUSIVEMENT sur ordre formel du Préfet (FR-Alert / radio). Rester calfeutré en attendant les consignes d'évacuation éventuelle."}
@@ -1534,12 +1534,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={() => setSelectedMapNode(selectedMapNode === 'ref' ? null : 'ref')}
               className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
                 selectedMapNode === 'ref'
-                  ? 'bg-[#001126] text-white border-[#001126] shadow-xs'
-                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+                  ? 'bg-navy text-white border-ink shadow-xs'
+                  : 'bg-card hover:bg-subtle text-ink-muted border-line-strong'
               }`}
             >
-              <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${selectedMapNode === 'ref' ? 'bg-[#98f6c5]' : 'bg-[#0036ce]'}`}></span>
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Point de référence</span>
+              <span className={`w-3.5 h-3.5 rounded-full shrink-0 ${selectedMapNode === 'ref' ? 'bg-ok-soft' : 'bg-brand'}`}></span>
+              <span className="font-label text-[11px] font-bold truncate">Point de référence</span>
             </button>
 
             <button
@@ -1547,12 +1547,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={() => setSelectedMapNode(selectedMapNode === 'tmd' ? null : 'tmd')}
               className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
                 selectedMapNode === 'tmd'
-                  ? 'bg-[#ba1a1a] text-white border-[#ba1a1a] shadow-xs'
-                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+                  ? 'bg-danger text-white border-danger-ink shadow-xs'
+                  : 'bg-card hover:bg-subtle text-ink-muted border-line-strong'
               }`}
             >
-              <span className={`w-3.5 h-1.5 shrink-0 ${selectedMapNode === 'tmd' ? 'bg-white' : 'bg-[#ba1a1a]'}`}></span>
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Transit TMD (&lt; 800 m)</span>
+              <span className={`w-3.5 h-1.5 shrink-0 ${selectedMapNode === 'tmd' ? 'bg-card' : 'bg-danger'}`}></span>
+              <span className="font-label text-[11px] font-bold truncate">Transit TMD (&lt; 800 m)</span>
             </button>
 
             <button
@@ -1560,12 +1560,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={() => setSelectedMapNode(selectedMapNode === 'ppi' ? null : 'ppi')}
               className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
                 selectedMapNode === 'ppi'
-                  ? 'bg-[#0036ce] text-white border-[#0036ce] shadow-xs'
-                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+                  ? 'bg-brand text-white border-brand-ink shadow-xs'
+                  : 'bg-card hover:bg-subtle text-ink-muted border-line-strong'
               }`}
             >
-              <span className={`w-3.5 h-3.5 rounded shrink-0 ${selectedMapNode === 'ppi' ? 'bg-[#98f6c5]' : 'bg-[#12263f]'}`}></span>
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Périmètre PPI (4.2 km)</span>
+              <span className={`w-3.5 h-3.5 rounded shrink-0 ${selectedMapNode === 'ppi' ? 'bg-ok-soft' : 'bg-navy-2'}`}></span>
+              <span className="font-label text-[11px] font-bold truncate">Périmètre PPI (4.2 km)</span>
             </button>
 
             <button
@@ -1573,20 +1573,20 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               onClick={() => setSelectedMapNode(selectedMapNode === 'nucleaire' ? null : 'nucleaire')}
               className={`flex items-center gap-2 text-left p-2 rounded-lg border transition-all cursor-pointer ${
                 selectedMapNode === 'nucleaire'
-                  ? 'bg-[#12263f] text-[#98f6c5] border-[#12263f] shadow-xs'
-                  : 'bg-white hover:bg-[#eef4ff] text-[#44474d] border-[#c4c6ce]'
+                  ? 'bg-navy-2 text-ok-bright border-ink shadow-xs'
+                  : 'bg-card hover:bg-subtle text-ink-muted border-line-strong'
               }`}
             >
-              <span className={`w-3.5 h-0.5 shrink-0 ${selectedMapNode === 'nucleaire' ? 'bg-[#98f6c5]' : 'bg-[#74777e]'}`}></span>
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold truncate">Vigilance nucléaire</span>
+              <span className={`w-3.5 h-0.5 shrink-0 ${selectedMapNode === 'nucleaire' ? 'bg-ok-soft' : 'bg-ink-muted'}`}></span>
+              <span className="font-label text-[11px] font-bold truncate">Vigilance nucléaire</span>
             </button>
           </div>
 
           {/* Avertissement de non-confusion cartographique formel */}
-          <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] text-[11px] text-[#001126] flex items-start gap-2">
-            <span className="material-symbols-outlined text-[16px] text-[#0036ce] shrink-0 mt-0.5">info</span>
+          <div className="p-3 bg-canvas rounded-lg border border-line text-[11px] text-ink flex items-start gap-2">
+            <span className="material-symbols-outlined text-[16px] text-brand-ink shrink-0 mt-0.5">info</span>
             <div className="leading-snug">
-              <strong className="text-[#0036ce]">Illustration vectorielle didactique :</strong> Ce schéma local simplifié permet d'appréhender les distances réflexes d'entraînement. Il <strong>ne constitue pas une cartographie officielle de zonage</strong> ni un Système d'Information Géographique (SIG) certifié des périmètres réels de danger. Seuls les documents graphiques opposables annexés aux arrêtés préfectoraux (consultables sur georisques.gouv.fr) font foi.
+              <strong className="text-brand-ink">Illustration vectorielle didactique :</strong> Ce schéma local simplifié permet d'appréhender les distances réflexes d'entraînement. Il <strong>ne constitue pas une cartographie officielle de zonage</strong> ni un Système d'Information Géographique (SIG) certifié des périmètres réels de danger. Seuls les documents graphiques opposables annexés aux arrêtés préfectoraux (consultables sur georisques.gouv.fr) font foi.
             </div>
           </div>
         </section>
@@ -1617,38 +1617,38 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           return (
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-[18px] text-[#001126] font-bold">
+                <h2 className="text-[18px] text-ink font-bold">
                   Inventaire des Risques Notifiés
                 </h2>
-                <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
+                <span className="font-label text-[11px] text-ink-muted">
                   {displayedRisks.length} RISQUE{displayedRisks.length > 1 ? 'S' : ''} RÉPERTORIÉ{displayedRisks.length > 1 ? 'S' : ''}
                 </span>
               </div>
 
               {/* Badge de statut documentaire officiel / cache / pédagogique / non synchronisé */}
               {hasOfficialRisks && (
-                <div className="p-2.5 rounded-lg bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] text-[12px] flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-ok-soft border border-ok-line text-ok-ink text-[12px] flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
+                    <span className="w-2 h-2 rounded-full bg-ok animate-pulse"></span>
                     <span>{liveReport?.dataSourceType === 'live_api' ? 'Données officielles en direct (API Géorisques / BRGM)' : `Dernière réponse enregistrée de l’API officielle (${liveReport?.retrievedAt ? new Date(liveReport.retrievedAt).toLocaleDateString('fr-FR') : 'archive locale'})`}</span>
                   </span>
-                  <span className="text-[10px] text-[#15803d] font-['Space_Grotesk'] uppercase font-bold">{liveReport?.dataSourceType === 'live_api' ? 'Arrêtés en direct' : 'Archive locale'}</span>
+                  <span className="text-[10px] text-ok-ink font-label uppercase font-bold">{liveReport?.dataSourceType === 'live_api' ? 'Arrêtés en direct' : 'Archive locale'}</span>
                 </div>
               )}
 
               {/* Réponse officielle valide : 0 risque recensé dans la base d'État */}
               {isLiveZeroRisk && (
-                <div className="bg-[#f0fdf4] p-4 rounded-xl border border-[#bbf7d0] flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 text-[#166534]">
-                    <span className="material-symbols-outlined text-[20px] text-[#16a34a]">info</span>
-                    <strong className="font-['Space_Grotesk'] text-[13px] font-bold">
+                <div className="bg-ok-soft p-4 rounded-xl border border-ok-line flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 text-ok-ink">
+                    <span className="material-symbols-outlined text-[20px] text-ok-ink">info</span>
+                    <strong className="font-label text-[13px] font-bold">
                       Réponse API Géorisques : Aucun dossier renvoyé par cette requête
                     </strong>
                   </div>
-                  <p className="text-[12px] text-[#15803d] leading-relaxed">
+                  <p className="text-[12px] text-ok-ink leading-relaxed">
                     La base nationale consultée (GASPAR via data.gouv.fr / BRGM) ne renvoie actuellement aucun dossier de risque technologique ou PPRT pour la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}) lors de cette requête.
                   </p>
-                  <p className="text-[11px] text-[#166534] bg-white/80 p-2.5 rounded border border-[#bbf7d0] leading-relaxed">
+                  <p className="text-[11px] text-ok-ink bg-white/80 p-2.5 rounded border border-ok-line leading-relaxed">
                     ⚠️ <strong>Portée de cette information :</strong> Cette réponse signifie qu'aucun dossier n'est répertorié dans la base GASPAR pour ce code INSEE. Cela <strong>ne prouve pas l'absence de tout risque sur la commune</strong> (aléas météorologiques, inondations, transports non classés) et <strong>ne remplace pas l'ensemble des informations de prévention des risques</strong> (DICRIM consultable en mairie, arrêtés préfectoraux opposables, bulletins de vigilance de la Sécurité Civile).
                   </p>
                   <div className="flex flex-wrap gap-2 pt-1">
@@ -1667,7 +1667,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           risks: pedago
                         });
                       }}
-                      className="h-9 px-3 rounded-lg bg-white hover:bg-[#dcfce7] text-[#15803d] font-['Space_Grotesk'] text-[11px] font-bold flex items-center gap-1 border border-[#bbf7d0] cursor-pointer"
+                      className="h-9 px-3 rounded-lg bg-card hover:bg-ok-soft text-ok-ink font-label text-[11px] font-bold flex items-center gap-1 border border-ok-line cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[15px]">school</span>
                       <span>Charger l'échantillon didactique d'entraînement</span>
@@ -1678,14 +1678,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
               {/* Échec de connexion réseau ou erreur API sans cache */}
               {isNetworkError && (
-                <div className="p-3.5 rounded-lg bg-[#fffbeb] border border-[#fef3c7] text-[#92400e] text-[12px] flex items-start gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-[#d97706] shrink-0 mt-0.5">cloud_off</span>
+                <div className="p-3.5 rounded-lg bg-warn-soft border border-warn-line text-warn-ink text-[12px] flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-[20px] text-warn-ink shrink-0 mt-0.5">cloud_off</span>
                   <div className="flex flex-col gap-1 leading-snug">
                     <strong className="font-bold">
                       {liveReport?.dataSourceType === 'network_error' ? 'Connexion réseau impossible avec l’API Géorisques' : 'Erreur de transmission API Géorisques'}
                     </strong>
                     <span>{liveReport?.source}</span>
-                    <span className="text-[11px] text-[#b45309]">
+                    <span className="text-[11px] text-warn-ink">
                       Aucun risque fictif n'a été inséré. Vous pouvez vous entraîner avec l'échantillon pédagogique ci-dessous ou réessayer dès le rétablissement de la connexion.
                     </span>
                   </div>
@@ -1697,7 +1697,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 <div className="p-4 rounded-xl bg-amber-50 border-2 border-dashed border-amber-600 text-amber-950 flex flex-col gap-2 relative overflow-hidden shadow-sm">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[24px] text-amber-700 shrink-0">school</span>
-                    <strong className="font-['Space_Grotesk'] text-[13px] font-black uppercase text-amber-900 tracking-wider">
+                    <strong className="font-label text-[13px] font-black uppercase text-amber-900 tracking-wider">
                       EXERCICE PÉDAGOGIQUE — SIMULATION DIDACTIQUE
                     </strong>
                   </div>
@@ -1712,9 +1712,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
               {/* Jeu didactique pré-embarqué (Lyon 3e) */}
               {isLyonInitial && (
-                <div className="p-3 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] text-[#1e40af] text-[12px] flex items-start justify-between gap-2">
+                <div className="p-3 rounded-lg bg-subtle border border-brand-bright text-brand-ink text-[12px] flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-[#2563eb] shrink-0 mt-0.5">info</span>
+                    <span className="material-symbols-outlined text-[18px] text-brand-ink shrink-0 mt-0.5">info</span>
                     <div>
                       <strong className="font-bold">Base didactique pré-embarquée (Lyon 3e) :</strong> Ce jeu de données illustratif permet de découvrir l'application hors connexion. Pour actualiser les arrêtés préfectoraux officiels en direct, cliquez sur « Actualiser ».
                     </div>
@@ -1723,7 +1723,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     type="button"
                     onClick={handleRealRefreshData}
                     disabled={refreshing}
-                    className="shrink-0 h-8 px-2.5 rounded bg-[#2563eb] text-white font-['Space_Grotesk'] text-[10px] font-bold uppercase flex items-center gap-1 hover:bg-[#1d4ed8] cursor-pointer"
+                    className="shrink-0 h-8 px-2.5 rounded bg-brand text-white font-label text-[10px] font-bold uppercase flex items-center gap-1 hover:bg-[#1d4ed8] cursor-pointer"
                   >
                     <span className={`material-symbols-outlined text-[14px] ${refreshing ? 'animate-spin' : ''}`}>sync</span>
                     Actualiser
@@ -1732,15 +1732,15 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               )}
 
               {isUnverifiedEmpty && (
-                <div className="bg-white p-5 rounded-xl border-2 border-dashed border-[#c4c6ce] flex flex-col items-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#f1f3f9] text-[#555962] flex items-center justify-center">
+                <div className="bg-card p-5 rounded-xl border-2 border-dashed border-line-strong flex flex-col items-center text-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-subtle text-ink-muted flex items-center justify-center">
                     <span className="material-symbols-outlined text-[26px]">travel_explore</span>
                   </div>
                   <div className="flex flex-col gap-1 max-w-md">
-                    <h3 className="font-['Space_Grotesk'] text-[15px] font-bold text-[#001126]">
+                    <h3 className="font-label text-[15px] font-bold text-ink">
                       Aucun risque officiel synchronisé pour {activeCommune.name}
                     </h3>
-                    <p className="text-[12px] text-[#44474d] leading-relaxed">
+                    <p className="text-[12px] text-ink-muted leading-relaxed">
                       Pour garantir l'intégrité de vos protocoles, NRBCOR n'injecte aucun risque fictif par défaut. Connectez-vous à Internet pour interroger les arrêtés préfectoraux de votre commune via l'API d'État, ou chargez l'échantillon didactique d'entraînement.
                     </p>
                   </div>
@@ -1749,7 +1749,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                       type="button"
                       onClick={handleRealRefreshData}
                       disabled={refreshing}
-                      className="h-10 px-4 rounded-lg bg-[#0036ce] text-white font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 hover:bg-[#002ba8] transition-colors disabled:opacity-60 cursor-pointer"
+                      className="h-10 px-4 rounded-lg bg-brand text-white font-label text-[12px] font-bold flex items-center gap-1.5 hover:bg-brand-strong transition-colors disabled:opacity-60 cursor-pointer"
                     >
                       <span className={`material-symbols-outlined text-[16px] ${refreshing ? 'animate-spin' : ''}`}>sync</span>
                       <span>Interroger l'API Géorisques</span>
@@ -1769,7 +1769,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           risks: pedago
                         });
                       }}
-                      className="h-10 px-3.5 rounded-lg bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors border border-[#c4c6ce] cursor-pointer"
+                      className="h-10 px-3.5 rounded-lg bg-subtle hover:bg-tint text-ink font-label text-[12px] font-bold flex items-center gap-1.5 transition-colors border border-line-strong cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">school</span>
                       <span>Charger l'échantillon pédagogique</span>
@@ -1783,48 +1783,48 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             return (
               <article
                 key={item.id || idx}
-                className="bg-white rounded-xl p-4 shadow-sm flex flex-col gap-2.5 border border-[#c4c6ce] transition-all"
+                className="bg-card rounded-xl p-4 shadow-sm flex flex-col gap-2.5 border border-line-strong transition-all"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col">
-                    <span className="font-['Space_Grotesk'] text-[11px] text-[#0036ce] font-bold uppercase tracking-wider">
+                    <span className="font-label text-[11px] text-brand-ink font-bold uppercase tracking-wider">
                       {item.category}
                     </span>
-                    <h3 className="text-[17px] text-[#001126] font-bold mt-0.5">
+                    <h3 className="text-[17px] text-ink font-bold mt-0.5">
                       {item.title}
                     </h3>
                   </div>
-                  <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded font-bold uppercase shrink-0 bg-[#eef4ff] text-[#0036ce]">
+                  <span className="font-label text-[10px] px-2 py-0.5 rounded font-bold uppercase shrink-0 bg-subtle text-brand-ink">
                     {item.tag || 'ARRÊTÉ PRÉFECTORAL'}
                   </span>
                 </div>
 
                 {item.distance && (
-                  <div className="flex items-center gap-2 bg-[#eef4ff] px-2.5 py-1.5 rounded-lg text-[13px] border border-[#d6e4f8]">
-                    <span className="material-symbols-outlined text-[18px] text-[#0036ce]">near_me</span>
-                    <span className="font-semibold text-[#001126]">{item.distance}</span>
+                  <div className="flex items-center gap-2 bg-subtle px-2.5 py-1.5 rounded-lg text-[13px] border border-line">
+                    <span className="material-symbols-outlined text-[18px] text-brand-ink">near_me</span>
+                    <span className="font-semibold text-ink">{item.distance}</span>
                   </div>
                 )}
 
-                <p className="text-[13px] text-[#0f1c2b] leading-relaxed">
+                <p className="text-[13px] text-ink leading-relaxed">
                   {item.description || item.desc}
                 </p>
 
                 {item.measureTitle && (
-                  <div className="bg-[#e4efff] p-3 rounded-lg flex flex-col gap-1 border border-[#d6e4f8]">
-                    <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold">
-                      <span className="material-symbols-outlined text-[18px] text-[#0036ce]">
+                  <div className="bg-tint p-3 rounded-lg flex flex-col gap-1 border border-line">
+                    <div className="flex items-center gap-1.5 text-ink font-label text-[12px] font-bold">
+                      <span className="material-symbols-outlined text-[18px] text-brand-ink">
                         notifications_active
                       </span>
                       {item.measureTitle}
                     </div>
-                    <p className="text-[12px] text-[#44474d] leading-relaxed">{item.measureDesc}</p>
+                    <p className="text-[12px] text-ink-muted leading-relaxed">{item.measureDesc}</p>
                   </div>
                 )}
 
                 {/* Linked Protocol */}
                 <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-1.5 text-[#005236] font-['Space_Grotesk'] text-[11px] font-bold">
+                  <div className="flex items-center gap-1.5 text-ok-ink font-label text-[11px] font-bold">
                     <span className="material-symbols-outlined text-[16px]">check_circle</span>
                     <span>Fiche réflexe prête</span>
                   </div>
@@ -1834,7 +1834,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                         onOpenSubScreen({ type: 'protocol', id: item.protocolKey! })
                       }
                       type="button"
-                      className="h-11 px-4 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center gap-1.5 transition-colors shadow-sm"
+                      className="h-11 px-4 rounded bg-navy hover:bg-navy-2 text-white font-label text-[12px] font-bold uppercase flex items-center gap-1.5 transition-colors shadow-sm"
                     >
                       <span>Consulter Guide Réflexe</span>
                       <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -1849,29 +1849,29 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
       })()}
 
         {/* Cadre Réglementaire Communal & Synthèse des Risques (DICRIM & PCS) */}
-        <section className="bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
+        <section className="bg-card p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-line-strong">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] text-[#001126] font-bold">Cadre Réglementaire & Documents Communaux</h2>
-            <span className="font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded bg-[#eef4ff] text-[#0036ce] font-bold uppercase border border-[#d6e4f8]">
+            <h2 className="text-[18px] text-ink font-bold">Cadre Réglementaire & Documents Communaux</h2>
+            <span className="font-label text-[10px] px-2 py-0.5 rounded bg-subtle text-brand-ink font-bold uppercase border border-line">
               SYNTHÈSE GÉORISQUES
             </span>
           </div>
-          <p className="text-[12px] text-[#44474d] -mt-1">
+          <p className="text-[12px] text-ink-muted -mt-1">
             Synthèse opérationnelle des aléas majeurs et accès aux démarches officielles de la commune de {activeCommune.name}.
           </p>
 
           <div className="flex flex-col gap-2.5">
             {/* DICRIM */}
-            <div className="bg-[#eef4ff] p-3 rounded-lg flex items-center justify-between gap-3 border border-[#d6e4f8]">
+            <div className="bg-subtle p-3 rounded-lg flex items-center justify-between gap-3 border border-line">
               <div className="flex items-start gap-2.5 min-w-0">
-                <span className="material-symbols-outlined text-[#001126] text-[22px] shrink-0 mt-0.5">
+                <span className="material-symbols-outlined text-ink text-[22px] shrink-0 mt-0.5">
                   menu_book
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[14px] font-bold text-[#001126] truncate">
+                  <span className="text-[14px] font-bold text-ink truncate">
                     Fiche de repérage DICRIM ({activeCommune.name})
                   </span>
-                  <span className="text-[12px] text-[#44474d] truncate">
+                  <span className="text-[12px] text-ink-muted truncate">
                     Synthèse des risques • Document complet et paraphé consultable en mairie
                   </span>
                 </div>
@@ -1879,7 +1879,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveModalDoc('dicrim')}
-                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce] cursor-pointer"
+                className="h-11 px-3 rounded bg-card hover:bg-tint text-ink font-label text-[12px] font-bold shrink-0 flex items-center gap-1 border border-line-strong cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 Consulter
@@ -1887,16 +1887,16 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             </div>
 
             {/* PCS */}
-            <div className="bg-[#eef4ff] p-3 rounded-lg flex items-center justify-between gap-3 border border-[#d6e4f8]">
+            <div className="bg-subtle p-3 rounded-lg flex items-center justify-between gap-3 border border-line">
               <div className="flex items-start gap-2.5 min-w-0">
-                <span className="material-symbols-outlined text-[#001126] text-[22px] shrink-0 mt-0.5">
+                <span className="material-symbols-outlined text-ink text-[22px] shrink-0 mt-0.5">
                   corporate_fare
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[14px] font-bold text-[#001126] truncate">
+                  <span className="text-[14px] font-bold text-ink truncate">
                     Fiche de repérage PCS ({activeCommune.name})
                   </span>
-                  <span className="text-[12px] text-[#44474d] truncate">
+                  <span className="text-[12px] text-ink-muted truncate">
                     Organisation des secours • Dossier communal officiel consultable en mairie
                   </span>
                 </div>
@@ -1904,7 +1904,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveModalDoc('pcs')}
-                className="h-11 px-3 rounded bg-white hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold shrink-0 flex items-center gap-1 border border-[#c4c6ce] cursor-pointer"
+                className="h-11 px-3 rounded bg-card hover:bg-tint text-ink font-label text-[12px] font-bold shrink-0 flex items-center gap-1 border border-line-strong cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 Consulter
@@ -1912,38 +1912,38 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
             </div>
 
             {/* PC Communal & Mairie Dynamique */}
-            <div className="bg-[#e4efff] p-3.5 rounded-lg flex flex-col gap-1.5 border border-[#d6e4f8]">
+            <div className="bg-tint p-3.5 rounded-lg flex flex-col gap-1.5 border border-line">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold">
+                <div className="flex items-center gap-1.5 text-ink font-label text-[12px] font-bold">
                   <span className="material-symbols-outlined text-[18px]">emergency_home</span>
                   <span>Poste de Commandement & Mairie</span>
                 </div>
                 {mairieContact?.isAuthentifie && (
-                  <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-1.5 py-0.5 rounded font-bold uppercase">
+                  <span className="font-label text-[10px] bg-ok-soft text-ok-ink px-1.5 py-0.5 rounded font-bold uppercase">
                     Vérifié DILA
                   </span>
                 )}
               </div>
 
-              <span className="text-[13px] font-bold text-[#001126]">
+              <span className="text-[13px] font-bold text-ink">
                 {mairieContact?.nomOfficiel || `Mairie de ${activeCommune.name}`}
               </span>
 
               {mairieContact?.adressePostale?.ligne && (
-                <span className="text-[11px] text-[#44474d]">
+                <span className="text-[11px] text-ink-muted">
                   📍 {mairieContact.adressePostale.ligne}, {mairieContact.adressePostale.codePostal} {mairieContact.adressePostale.nomCommune}
                 </span>
               )}
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-[#d6e4f8]/70 mt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-line/70 mt-1">
                 {mairieContact?.telephone ? (
                   <>
                     <div className="flex flex-col">
-                      <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-semibold">
+                      <span className="font-label text-[11px] text-ink font-semibold">
                         Standard officiel : <strong>{mairieContact.telephone}</strong>
                       </span>
                       {mairieContact.telephoneDescription && (
-                        <span className="text-[10px] text-[#555962]">{mairieContact.telephoneDescription}</span>
+                        <span className="text-[10px] text-ink-muted">{mairieContact.telephoneDescription}</span>
                       )}
                     </div>
                     <button
@@ -1956,7 +1956,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           desc: `Poste de commandement / Mairie pour la commune de ${activeCommune.name}. Source : Annuaire de l'Administration (DILA / Premier ministre).`,
                         })
                       }
-                      className="h-10 px-3.5 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                      className="h-10 px-3.5 rounded bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
                     >
                       <span className="material-symbols-outlined text-[16px]">call</span>
                       Appeler la Mairie
@@ -1964,9 +1964,9 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                   </>
                 ) : (
                   <>
-                    <div className="flex flex-col text-[11px] text-[#555962]">
+                    <div className="flex flex-col text-[11px] text-ink-muted">
                       <span>Numéro direct non synchronisé pour {activeCommune.name}.</span>
-                      <span className="text-[#ba1a1a] font-semibold">En cas de détresse vitale : composer le 18 ou le 112.</span>
+                      <span className="text-danger-ink font-semibold">En cas de détresse vitale : composer le 18 ou le 112.</span>
                     </div>
                     <button
                       type="button"
@@ -1978,7 +1978,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                           desc: `Numéro d'urgence prioritaire accessible gratuitement sur tout terminal en cas d'accident sur la commune de ${activeCommune.name}.`,
                         })
                       }
-                      className="h-10 px-3.5 rounded bg-[#ba1a1a] hover:bg-[#93000a] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                      className="h-10 px-3.5 rounded bg-danger hover:bg-danger-strong text-white font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
                     >
                       <span className="material-symbols-outlined text-[16px]">emergency</span>
                       Appeler 112
@@ -1995,7 +1995,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             onClick={handleExportSnapshot}
             type="button"
-            className="w-full h-12 rounded bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+            className="w-full h-12 rounded bg-navy hover:bg-navy-2 text-white font-label text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             <span>Exporter l'Instantané Territorial (Fichier JSON Réel)</span>
@@ -2004,14 +2004,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
           <button
             onClick={handleExportPDF}
             type="button"
-            className="w-full h-12 rounded bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 transition-colors border border-[#c4c6ce] cursor-pointer"
+            className="w-full h-12 rounded bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold uppercase flex items-center justify-center gap-2 transition-colors border border-line-strong cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
             <span>Imprimer la Fiche de Préparation Communale (PDF / Papier)</span>
           </button>
 
           {exportedFile && (
-            <div className="p-3 rounded-lg bg-[#f0fdf4] text-[#166534] border border-[#bbf7d0] text-[12px] flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-ok-soft text-ok-ink border border-ok-line text-[12px] flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">file_download_done</span>
               <span>Instantané exporté avec succès ! Fichier « <strong>{exportedFile}</strong> » téléchargé sur votre terminal.</span>
             </div>
@@ -2019,14 +2019,14 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
           {/* Lien externe vers l'API géorisques officielle (Nécessite connexion) */}
           <a
-            className="w-full h-12 rounded bg-white hover:bg-[#e4efff] text-[#0036ce] font-['Space_Grotesk'] text-[12px] font-bold flex items-center justify-center gap-2 shadow-sm transition-colors border border-[#c4c6ce]"
+            className="w-full h-12 rounded bg-card hover:bg-tint text-brand-ink font-label text-[12px] font-bold flex items-center justify-center gap-2 shadow-sm transition-colors border border-line-strong"
             href={`https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`}
             rel="noopener noreferrer"
             target="_blank"
           >
             <span className="material-symbols-outlined text-[18px]">open_in_new</span>
             <span>Consulter la fiche complète sur georisques.gouv.fr</span>
-            <span className="text-[11px] text-[#44474d] font-normal">(🔵 Nécessite Internet)</span>
+            <span className="text-[11px] text-ink-muted font-normal">(🔵 Nécessite Internet)</span>
           </a>
         </section>
       </div>
@@ -2036,15 +2036,15 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-[#e0e2eb]">
+          <div className="bg-card max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-line">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#0036ce] text-[22px]">
+                <span className="material-symbols-outlined text-brand-ink text-[22px]">
                   {activeModalDoc === 'dicrim' ? 'menu_book' : 'corporate_fare'}
                 </span>
-                <h3 className="text-[17px] font-bold text-[#001126]">
+                <h3 className="text-[17px] font-bold text-ink">
                   {activeModalDoc === 'dicrim' ? `Synthèse DICRIM • ${activeCommune.name}` : `Dispositif PCS • ${activeCommune.name}`}
                 </h3>
               </div>
@@ -2052,15 +2052,15 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 type="button"
                 onClick={() => setActiveModalDoc(null)}
                 aria-label="Fermer"
-                className="w-8 h-8 rounded-full bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] flex items-center justify-center cursor-pointer"
+                className="w-8 h-8 rounded-full bg-subtle hover:bg-tint text-ink flex items-center justify-center cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Avertissement d'authenticité documentaire formel */}
-            <div className="p-3 bg-[#fff0ed] rounded-xl border border-[#ffdad6] text-[#93000a] text-[11px] flex items-start gap-2">
-              <span className="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0 mt-0.5">verified_user</span>
+            <div className="p-3 bg-danger-soft rounded-xl border border-danger-bright text-danger-ink-strong text-[11px] flex items-start gap-2">
+              <span className="material-symbols-outlined text-[18px] text-danger-ink shrink-0 mt-0.5">verified_user</span>
               <div className="flex flex-col gap-0.5 leading-snug">
                 <span className="font-bold uppercase tracking-wide">
                   Statut Documentaire & Authenticité
@@ -2073,13 +2073,13 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
 
             {/* Contenu spécifique DICRIM ou PCS */}
             {activeModalDoc === 'dicrim' ? (
-              <div className="flex flex-col gap-2.5 text-[12px] text-[#0f1c2b]">
+              <div className="flex flex-col gap-2.5 text-[12px] text-ink">
                 <p className="leading-relaxed">
                   Le <strong>DICRIM (Document d'Information Communal sur les Risques Majeurs)</strong> recense les risques naturels et technologiques prévisibles sur la commune de <strong>{activeCommune.name}</strong> ({activeCommune.insee}).
                 </p>
 
-                <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1.5">
-                  <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase">
+                <div className="bg-canvas p-3 rounded-lg border border-line flex flex-col gap-1.5">
+                  <span className="font-label text-[11px] font-bold text-brand-ink uppercase">
                     Aléas répertoriés pour {activeCommune.name} :
                   </span>
                     {(() => {
@@ -2092,7 +2092,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                       
                       if (list.length === 0) {
                         return (
-                          <div className="col-span-2 p-3 bg-white rounded border border-[#e0e2eb] text-[#555962] text-[11px] text-center">
+                          <div className="col-span-2 p-3 bg-card rounded border border-line text-ink-muted text-[11px] text-center">
                             Aucun aléa majeur officiellement synchronisé en local pour {activeCommune.name}. Consultez le dossier communal officiel ci-dessous.
                           </div>
                         );
@@ -2102,8 +2102,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                         const isHigh = ('severity' in r && r.severity === 'high') || r.category?.toLowerCase().includes('seveso') || r.category?.toLowerCase().includes('nucleaire');
                         const isMed = ('severity' in r && r.severity === 'medium') || r.category?.toLowerCase().includes('tmd') || r.category?.toLowerCase().includes('inondation');
                         return (
-                          <div key={r.id} className="flex items-center gap-1.5 text-[11px] text-[#001126] bg-white p-2 rounded border border-[#e0e2eb]">
-                            <span className={`w-2 h-2 rounded-full shrink-0 ${isHigh ? 'bg-[#ba1a1a]' : isMed ? 'bg-[#0036ce]' : 'bg-[#3f9d73]'}`}></span>
+                          <div key={r.id} className="flex items-center gap-1.5 text-[11px] text-ink bg-card p-2 rounded border border-line">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${isHigh ? 'bg-danger' : isMed ? 'bg-brand' : 'bg-ok'}`}></span>
                             <span className="font-medium truncate">{r.title}</span>
                           </div>
                         );
@@ -2111,8 +2111,8 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                     })()}
                 </div>
 
-                <div className="bg-[#eef4ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1 text-[11px] text-[#44474d]">
-                  <span className="font-bold text-[#001126]">Moyens d'alerte communaux :</span>
+                <div className="bg-subtle p-3 rounded-lg border border-line flex flex-col gap-1 text-[11px] text-ink-muted">
+                  <span className="font-bold text-ink">Moyens d'alerte communaux :</span>
                   <span>Sirène d'alerte aux populations SAIP (3 séquences d'1 min 41 s), système FR-Alert (diffusion cellulaire sans application), relais sonores municipaux.</span>
                 </div>
 
@@ -2120,23 +2120,23 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                   href={`https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 rounded-lg bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 hover:bg-[#12263f] transition-colors"
+                  className="w-full py-2.5 px-3 rounded-lg bg-navy text-white font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 hover:bg-navy-2 transition-colors"
                 >
                   <span className="material-symbols-outlined text-[16px]">open_in_new</span>
                   <span>Ouvrir le dossier Géorisques officiel de {activeCommune.name}</span>
                 </a>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5 text-[12px] text-[#0f1c2b]">
+              <div className="flex flex-col gap-2.5 text-[12px] text-ink">
                 <p className="leading-relaxed">
                   Le <strong>PCS (Plan Communal de Sauvegarde)</strong> organise les moyens d'alerte, de protection et de soutien des populations sous l'autorité du Maire de <strong>{activeCommune.name}</strong> (Art. L731-3 du Code de la Sécurité Intérieure).
                 </p>
 
-                <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1.5">
-                  <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#0036ce] uppercase">
+                <div className="bg-canvas p-3 rounded-lg border border-line flex flex-col gap-1.5">
+                  <span className="font-label text-[11px] font-bold text-brand-ink uppercase">
                     Dispositions d'organisation opérationnelle :
                   </span>
-                  <ul className="list-disc list-inside space-y-1.5 text-[11px] text-[#44474d]">
+                  <ul className="list-disc list-inside space-y-1.5 text-[11px] text-ink-muted">
                     <li><strong>Poste de Commandement Communal (PCC) :</strong> activé à l'Hôtel de Ville ou en salle de crise municipale dès réception de l'alerte préfectorale.</li>
                     <li><strong>Missions municipales :</strong> relayer les consignes préfectorales, interdire les accès aux zones dangereuses, organiser le ravitaillement d'urgence.</li>
                     <li><strong>Centres d'Accueil et de Regroupement :</strong> gymnases ou bâtiments publics communaux réquisitionnés si une évacuation est ordonnée.</li>
@@ -2144,18 +2144,18 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 </div>
 
                 {mairieContact && (
-                  <div className="bg-[#eef4ff] p-3 rounded-lg border border-[#d6e4f8] flex flex-col gap-1 text-[11px]">
-                    <span className="font-bold text-[#001126]">Coordonnées officielles de la Mairie :</span>
-                    <span className="font-medium text-[#0f1c2b]">{mairieContact.nomOfficiel}</span>
+                  <div className="bg-subtle p-3 rounded-lg border border-line flex flex-col gap-1 text-[11px]">
+                    <span className="font-bold text-ink">Coordonnées officielles de la Mairie :</span>
+                    <span className="font-medium text-ink">{mairieContact.nomOfficiel}</span>
                     {mairieContact.telephone && (
-                      <span className="text-[#001126]">Standard : <strong>{mairieContact.telephone}</strong></span>
+                      <span className="text-ink">Standard : <strong>{mairieContact.telephone}</strong></span>
                     )}
                     {mairieContact.siteInternet && (
                       <a
                         href={mairieContact.siteInternet}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#0036ce] underline flex items-center gap-1 mt-0.5"
+                        className="text-brand-ink underline flex items-center gap-1 mt-0.5"
                       >
                         Site officiel de la mairie ({mairieContact.siteInternet})
                         <span className="material-symbols-outlined text-[13px]">open_in_new</span>
@@ -2166,11 +2166,11 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               </div>
             )}
 
-            <div className="flex justify-end pt-2 border-t border-[#e0e2eb]">
+            <div className="flex justify-end pt-2 border-t border-line">
               <button
                 type="button"
                 onClick={() => setActiveModalDoc(null)}
-                className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase cursor-pointer"
+                className="h-10 px-4 rounded bg-navy text-white font-label text-[11px] font-bold uppercase cursor-pointer"
               >
                 Fermer
               </button>
@@ -2183,13 +2183,13 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-xs"
         >
-          <div className="bg-white max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3.5 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-[#e0e2eb]">
+          <div className="bg-card max-w-lg w-full rounded-2xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3.5 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-line">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#0036ce] text-[22px]">policy</span>
-                <h3 className="text-[17px] font-bold text-[#001126]">
+                <span className="material-symbols-outlined text-brand-ink text-[22px]">policy</span>
+                <h3 className="text-[17px] font-bold text-ink">
                   Sources des Données Territoriales
                 </h3>
               </div>
@@ -2197,41 +2197,41 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
                 type="button"
                 onClick={() => setShowSourcesModal(false)}
                 aria-label="Fermer"
-                className="w-8 h-8 rounded-full bg-[#f1f3f9] hover:bg-[#e0e2eb] text-[#001126] flex items-center justify-center cursor-pointer font-bold text-[14px]"
+                className="w-8 h-8 rounded-full bg-subtle hover:bg-tint text-ink flex items-center justify-center cursor-pointer font-bold text-[14px]"
               >
                 ✕
               </button>
             </div>
 
             {/* Note sur la fraîcheur et l'anti-mascarade */}
-            <div className="p-3 bg-[#eef4ff] rounded-xl border border-[#d6e4f8] text-[#001126] text-[12px] flex flex-col gap-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-[#0036ce] font-['Space_Grotesk'] text-[11px] uppercase">
+            <div className="p-3 bg-subtle rounded-xl border border-line text-ink text-[12px] flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-brand-ink font-label text-[11px] uppercase">
                 <span className="material-symbols-outlined text-[16px]">verified</span>
                 Transparence & Règle Anti-Mascarade
               </div>
-              <p className="text-[11px] text-[#44474d] leading-relaxed">
+              <p className="text-[11px] text-ink-muted leading-relaxed">
                 NRBCOR applique un principe de rigueur stricte : <strong>aucune date artificielle n'est insérée</strong>. L'âge réel des données est calculé dynamiquement à partir de la date de capture sur les serveurs de l'État. Une archive locale ancienne conserve toute son utilité pour les zonages réglementaires stables (PPRT/PPI), mais elle ne doit jamais être présentée comme un flux en direct.
               </p>
             </div>
 
             {/* Liste détaillée des bases officielles */}
             <div className="flex flex-col gap-2.5 text-[12px]">
-              <h4 className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#001126] tracking-wider">
+              <h4 className="font-label text-[11px] font-bold uppercase text-ink tracking-wider">
                 Bases de données officielles de l'État :
               </h4>
 
               {/* 1. API Géorisques / BRGM */}
-              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+              <div className="p-3 bg-canvas rounded-lg border border-line flex flex-col gap-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#001126] text-[13px]">API Géorisques (data.gouv.fr)</span>
-                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#dce9fd] text-[#0036ce] px-2 py-0.5 rounded">
+                  <span className="font-bold text-ink text-[13px]">API Géorisques (data.gouv.fr)</span>
+                  <span className="text-[10px] font-bold font-label bg-tint text-brand-ink px-2 py-0.5 rounded">
                     BRGM / MTES
                   </span>
                 </div>
-                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                <p className="text-[11px] text-ink-muted leading-relaxed">
                   Portail national d'information sur les risques naturels et technologiques majeurs. Fournit l'inventaire des dossiers communaux, installations classées Seveso et axes de transport de matières dangereuses (TMD).
                 </p>
-                <div className="pt-1 flex items-center justify-between text-[10px] font-['Space_Grotesk'] text-[#0036ce]">
+                <div className="pt-1 flex items-center justify-between text-[10px] font-label text-brand-ink">
                   <span>Endpoint : /api/v1/gaspar/risques</span>
                   <a
                     href="https://www.georisques.gouv.fr"
@@ -2245,48 +2245,48 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               </div>
 
               {/* 2. Base GASPAR */}
-              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+              <div className="p-3 bg-canvas rounded-lg border border-line flex flex-col gap-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#001126] text-[13px]">Base Nationale GASPAR</span>
-                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#eef4ff] text-[#002c1b] px-2 py-0.5 rounded">
+                  <span className="font-bold text-ink text-[13px]">Base Nationale GASPAR</span>
+                  <span className="text-[10px] font-bold font-label bg-subtle text-ok-ink px-2 py-0.5 rounded">
                     Préfectures / DDTM
                   </span>
                 </div>
-                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                <p className="text-[11px] text-ink-muted leading-relaxed">
                   <strong>Gestion Assistée des Procédures Administratives relatives aux Risques :</strong> Référentiel administratif consolidant les arrêtés préfectoraux opposables, plans de prévention des risques (PPR) et formalités DICRIM.
                 </p>
               </div>
 
               {/* 3. Annuaire Service Public DILA */}
-              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+              <div className="p-3 bg-canvas rounded-lg border border-line flex flex-col gap-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#001126] text-[13px]">Annuaire de l'Administration (DILA)</span>
-                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded">
+                  <span className="font-bold text-ink text-[13px]">Annuaire de l'Administration (DILA)</span>
+                  <span className="text-[10px] font-bold font-label bg-ok-soft text-ok-ink px-2 py-0.5 rounded">
                     Premier Ministre
                   </span>
                 </div>
-                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                <p className="text-[11px] text-ink-muted leading-relaxed">
                   Fournit les coordonnées certifiées du standard officiel de la Mairie et du Poste de Commandement Communal (PCC) pour l'activation des secours locaux.
                 </p>
               </div>
 
               {/* 4. geo.api.gouv.fr */}
-              <div className="p-3 bg-[#f8f9ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
+              <div className="p-3 bg-canvas rounded-lg border border-line flex flex-col gap-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#001126] text-[13px]">Découpage Administratif (Etalab)</span>
-                  <span className="text-[10px] font-bold font-['Space_Grotesk'] bg-[#f1f3f9] text-[#44474d] px-2 py-0.5 rounded">
+                  <span className="font-bold text-ink text-[13px]">Découpage Administratif (Etalab)</span>
+                  <span className="text-[10px] font-bold font-label bg-subtle text-ink-muted px-2 py-0.5 rounded">
                     DINUM
                   </span>
                 </div>
-                <p className="text-[11px] text-[#44474d] leading-relaxed">
+                <p className="text-[11px] text-ink-muted leading-relaxed">
                   Résolution des centroïdes communaux réels [longitude, latitude], codes postaux et numéros INSEE sans transit serveur externe.
                 </p>
               </div>
             </div>
 
             {/* Distinction Réponse Vide vs Risque Zéro */}
-            <div className="p-3 bg-[#fff0ed] rounded-xl border border-[#ffdad6] text-[#93000a] text-[11px] flex flex-col gap-1">
-              <span className="font-bold uppercase tracking-wider flex items-center gap-1 font-['Space_Grotesk']">
+            <div className="p-3 bg-danger-soft rounded-xl border border-danger-bright text-danger-ink-strong text-[11px] flex flex-col gap-1">
+              <span className="font-bold uppercase tracking-wider flex items-center gap-1 font-label">
                 <span className="material-symbols-outlined text-[16px]">warning</span>
                 Limites & Portée Réglementaire
               </span>
@@ -2295,12 +2295,12 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-[#e0e2eb]">
+            <div className="flex items-center justify-between pt-2 border-t border-line">
               <a
                 href={`https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi?code_insee=${activeCommune.insee}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#0036ce] text-[12px] font-bold underline flex items-center gap-1"
+                className="text-brand-ink text-[12px] font-bold underline flex items-center gap-1"
               >
                 Fiche officielle de {activeCommune.name}
                 <span className="material-symbols-outlined text-[14px]">open_in_new</span>
@@ -2308,7 +2308,7 @@ export const GeorisquesView: React.FC<GeorisquesViewProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSourcesModal(false)}
-                className="h-10 px-4 rounded-lg bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase cursor-pointer"
+                className="h-10 px-4 rounded-lg bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold uppercase cursor-pointer"
               >
                 Fermer
               </button>

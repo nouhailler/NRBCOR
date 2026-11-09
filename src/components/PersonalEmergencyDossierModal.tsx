@@ -74,16 +74,16 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
       aria-modal="true"
       className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-4 backdrop-blur-sm animate-in fade-in duration-150"
     >
-      <div className="bg-white text-black w-full max-w-2xl rounded-2xl shadow-2xl border-2 border-black flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="bg-card text-black w-full max-w-2xl rounded-2xl shadow-2xl border-2 border-black flex flex-col max-h-[92vh] overflow-hidden">
         {/* En-tête */}
         <div className="p-4 bg-black text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <span className="material-symbols-outlined text-[24px]">contact_emergency</span>
             <div>
-              <h2 className="font-bold text-[16px] font-['Space_Grotesk']">
+              <h2 className="font-bold text-[16px] font-label">
                 {isEn ? 'Personal Emergency File & Printable Sheet' : 'Dossier de Secours Personnel & Fiche Imprimable'}
               </h2>
-              <span className="text-[11px] text-gray-300 font-['Space_Grotesk']">
+              <span className="text-[11px] text-gray-300 font-label">
                 {isEn ? 'Granular selection • Sovereign privacy • Pocket & A4 format' : 'Sélection granulaire • Confidentialité absolue • Format poche & A4'}
               </span>
             </div>
@@ -102,11 +102,11 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
         <div className="p-4 sm:p-5 overflow-y-auto flex flex-col gap-5 text-[12px]">
           {/* Section : Choix explicite des rubriques à inclure */}
           <section className="bg-gray-50 border border-gray-300 rounded-xl p-3.5 flex flex-col gap-2.5">
-            <span className="font-['Space_Grotesk'] text-[12px] font-black uppercase text-[#001126] tracking-wider">
+            <span className="font-label text-[12px] font-black uppercase text-ink tracking-wider">
               {isEn ? 'Sections to include on printable sheet (user explicit opt-in):' : "Rubriques à inclure sur la fiche imprimée (au choix de l'utilisateur) :"}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+              <label className="flex items-center gap-2 p-2 bg-card rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                 <input
                   type="checkbox"
                   checked={includeContacts}
@@ -118,7 +118,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+              <label className="flex items-center gap-2 p-2 bg-card rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                 <input
                   type="checkbox"
                   checked={includeAssemblyPoints}
@@ -130,7 +130,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+              <label className="flex items-center gap-2 p-2 bg-card rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                 <input
                   type="checkbox"
                   checked={includeOfflineProtocols}
@@ -142,7 +142,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+              <label className="flex items-center gap-2 p-2 bg-card rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                 <input
                   type="checkbox"
                   checked={includeAssistanceNeeds}
@@ -179,7 +179,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-amber-700 text-[20px]">lock</span>
-                  <strong className="text-[12px] uppercase font-['Space_Grotesk'] font-bold">
+                  <strong className="text-[12px] uppercase font-label font-bold">
                     {isEn ? 'Strict Health Data Privacy Guarantee' : 'Garantie de stricte confidentialité des données de santé'}
                   </strong>
                 </div>
@@ -260,17 +260,17 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
 
           {/* APERÇU IMPRIMABLE HAUTE DÉFINITION (NOIR & BLANC OPTIMISÉ POUR IMPRIMANTE) */}
           <div className="flex flex-col gap-1.5">
-            <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-gray-500">
+            <span className="font-label text-[11px] font-bold uppercase text-gray-500">
               {isEn
                 ? 'Printable Document Preview (Ink Saver & B&W High Legibility):'
                 : "Aperçu du document imprimable (Économie d'encre & Lisibilité N&B) :"}
             </span>
 
-            <div className="border-2 border-black p-4 rounded-xl bg-white flex flex-col gap-3 font-sans print:border-black print:m-0 print:p-2">
+            <div className="border-2 border-black p-4 rounded-xl bg-card flex flex-col gap-3 font-sans print:border-black print:m-0 print:p-2">
               {/* En-tête du document */}
               <div className="border-b-2 border-black pb-2 flex items-center justify-between">
                 <div>
-                  <h1 className="text-[15px] font-black uppercase font-['Space_Grotesk'] leading-tight">
+                  <h1 className="text-[15px] font-black uppercase font-label leading-tight">
                     {isEn
                       ? 'INDIVIDUAL CIVIL EMERGENCY DOSSIER • NRBCOR'
                       : 'DOSSIER DE SECOURS CIVILE INDIVIDUEL • NRBCOR'}
@@ -294,7 +294,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {includeMedicalInfo && (
                 <div className="p-2.5 border-2 border-black bg-gray-50 rounded flex flex-col gap-1">
                   <div className="flex justify-between items-center border-b border-black pb-1">
-                    <span className="font-black text-[11px] uppercase font-['Space_Grotesk']">
+                    <span className="font-black text-[11px] uppercase font-label">
                       {isEn
                         ? 'EMERGENCY MEDICAL DATA (FIRST RESPONDERS CONFIDENTIAL)'
                         : "DONNÉES MÉDICALES D'URGENCE (CONFIDENTIEL SECOURS)"}
@@ -323,7 +323,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {/* CARTE PORTEFEUILLE DÉCOUPABLE */}
               <div className="border-2 border-dashed border-black p-3 rounded-lg flex flex-col gap-2">
                 <div className="flex items-center justify-between border-b border-black pb-1">
-                  <span className="text-[10px] font-black uppercase font-['Space_Grotesk']">
+                  <span className="text-[10px] font-black uppercase font-label">
                     ✂️ {isEn ? 'CUT-OUT POCKET CARD (Format 8.5 x 5.5 cm)' : 'CARTE DE POCHE DÉCOUPABLE (Format 8.5 x 5.5 cm)'}
                   </span>
                   <span className="text-[9px] uppercase font-bold">
@@ -373,7 +373,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {/* PROTOCOLES HORS-RÉSEAU */}
               {includeOfflineProtocols && (
                 <div className="border border-black p-2.5 rounded text-[11px] flex flex-col gap-1.5">
-                  <strong className="font-['Space_Grotesk'] text-[11px] uppercase">
+                  <strong className="font-label text-[11px] uppercase">
                     {isEn ? 'Emergency Protocols in Case of Cellular Blackout:' : 'Protocoles d\'Urgence en Cas de Coupure de Réseau Cellulaire :'}
                   </strong>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-gray-800">
@@ -408,7 +408,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
               {/* BESOINS D'ASSISTANCE & FOYER */}
               {includeAssistanceNeeds && members.length > 0 && (
                 <div className="border border-gray-300 p-2.5 rounded text-[11px]">
-                  <strong className="font-['Space_Grotesk'] text-[10px] uppercase block mb-1">
+                  <strong className="font-label text-[10px] uppercase block mb-1">
                     {isEn ? 'Household Composition & Specific Assistance Needs:' : 'Composition du Foyer & Besoins Spécifiques d\'Assistance :'}
                   </strong>
                   <div className="divide-y divide-gray-200">
@@ -436,7 +436,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
             <button
               type="button"
               onClick={handlePrint}
-              className="h-10 px-5 bg-black hover:bg-gray-800 active:bg-gray-900 text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors"
+              className="h-10 px-5 bg-black hover:bg-gray-800 active:bg-gray-900 text-white rounded-xl font-label text-[12px] font-bold uppercase flex items-center justify-center gap-2 shadow-sm transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">print</span>
               <span>{isEn ? 'Print / Export PDF' : 'Imprimer / Exporter PDF'}</span>
@@ -444,7 +444,7 @@ export const PersonalEmergencyDossierModal: React.FC<PersonalEmergencyDossierMod
             <button
               type="button"
               onClick={onClose}
-              className="h-10 px-4 bg-white border border-black hover:bg-gray-50 text-black rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors"
+              className="h-10 px-4 bg-card border border-black hover:bg-gray-50 text-black rounded-xl font-label text-[12px] font-bold uppercase transition-colors"
             >
               {isEn ? 'Close' : 'Fermer'}
             </button>

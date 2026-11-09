@@ -276,7 +276,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={isEn ? 'Automatic Discovery Tour' : 'Visite Guidée Découverte Automatique'}
-      className="fixed inset-0 z-50 pointer-events-auto select-none font-['Public_Sans']"
+      className="fixed inset-0 z-50 pointer-events-auto select-none font-body"
     >
       {/* 1. Découpe SVG pour le spotlight / halo lumineux sur l'élément cible */}
       {targetRect && !isCompleted ? (
@@ -327,27 +327,27 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
         </svg>
       ) : (
         /* Voile sombre intégral uniforme si pas de cible ou tour terminé */
-        <div className="absolute inset-0 bg-[#001126]/75 backdrop-blur-xs transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-navy/75 backdrop-blur-xs transition-opacity duration-300" />
       )}
 
       {/* 2. Écran de Clôture / Félicitations si la visite est terminée */}
       {isCompleted ? (
         <div className="absolute inset-0 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-[#001126] text-white rounded-2xl p-6 sm:p-8 border border-[#1e3a5f] shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#98f6c5]/20 text-[#98f6c5] border border-[#98f6c5]/40 flex items-center justify-center mb-4">
+          <div className="max-w-md w-full bg-navy text-white rounded-2xl p-6 sm:p-8 border border-ink shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-2xl bg-ok-soft/20 text-ok-bright border border-ok-bright/40 flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-[36px]">verified</span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-['Space_Grotesk'] tracking-wider uppercase text-[#98f6c5] font-bold mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#98f6c5]"></span>
+            <div className="flex items-center gap-2 text-xs font-label tracking-wider uppercase text-ok-bright font-bold mb-2">
+              <span className="w-2 h-2 rounded-full bg-ok-soft"></span>
               <span>{isEn ? 'Tour Completed' : 'Visite Guidée Terminée'}</span>
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-bold font-['Space_Grotesk'] text-white mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold font-label text-white mb-3">
               {isEn ? 'You are ready to explore NRBCOR' : 'Vous connaissez désormais les bases de NRBCOR'}
             </h3>
 
-            <p className="text-sm text-[#c4c6ce] leading-relaxed mb-6">
+            <p className="text-sm text-on-navy-muted leading-relaxed mb-6">
               {isEn
                 ? 'All protocols, maps, and offline data are now at your fingertips. You can restart this guided tour anytime from the main menu.'
                 : 'Tous les protocoles, cartes radar PPI, guides et checklists sont disponibles sans connexion. Vous pouvez relancer cette visite à tout moment depuis le menu principal.'}
@@ -357,7 +357,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
               <button
                 type="button"
                 onClick={handleRestart}
-                className="min-h-[46px] px-4 rounded-xl bg-[#05172e] hover:bg-[#0b2447] text-white border border-[#1e3a5f] font-['Space_Grotesk'] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="min-h-[46px] px-4 rounded-xl bg-navy-2 hover:bg-navy-2 text-white border border-ink font-label font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">replay</span>
                 <span>{isEn ? 'Restart Tour' : 'Recommencer la visite'}</span>
@@ -366,7 +366,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
               <button
                 type="button"
                 onClick={handleQuit}
-                className="min-h-[46px] px-6 rounded-xl bg-[#98f6c5] hover:bg-[#b2f8d4] text-[#001126] font-['Space_Grotesk'] font-bold text-xs tracking-wide transition-all shadow-md flex-1 flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                className="min-h-[46px] px-6 rounded-xl bg-ok-soft hover:bg-ok-soft text-ink font-label font-bold text-xs tracking-wide transition-all shadow-md flex-1 flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
               >
                 <span>{isEn ? 'Start Using App' : 'Accéder à l’application'}</span>
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -380,30 +380,30 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
           style={cardPositionStyle}
           className="absolute z-10 animate-in fade-in zoom-in-95 duration-200 transition-all"
         >
-          <div className="bg-[#001126] text-white rounded-2xl shadow-2xl border border-[#1e3a5f] overflow-hidden backdrop-blur-md flex flex-col">
+          <div className="bg-navy text-white rounded-2xl shadow-2xl border border-ink overflow-hidden backdrop-blur-md flex flex-col">
             {/* Ligne fine de progression du timer automatique */}
-            <div className="w-full h-1.5 bg-[#05172e] overflow-hidden relative">
+            <div className="w-full h-1.5 bg-navy-2 overflow-hidden relative">
               <div
-                className="h-full bg-gradient-to-r from-[#0036ce] via-[#3f9d73] to-[#98f6c5] transition-all duration-75"
+                className="h-full bg-gradient-to-r from-brand via-ok to-ok-soft transition-all duration-75"
                 style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
               />
             </div>
 
             {/* En-tête de la carte : Numéro d'étape + Indicateur automatique + Bouton Fermer */}
-            <div className="p-4 sm:p-5 pb-3 flex items-center justify-between border-b border-[#12263f]">
+            <div className="p-4 sm:p-5 pb-3 flex items-center justify-between border-b border-ink">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#98f6c5]/15 text-[#98f6c5] border border-[#98f6c5]/30 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-ok-soft/15 text-ok-bright border border-ok-bright/30 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">
                     {currentStep.icon}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-['Space_Grotesk'] font-bold tracking-wider uppercase text-[#98f6c5]">
+                    <span className="text-[10px] font-label font-bold tracking-wider uppercase text-ok-bright">
                       {isEn ? currentStep.badge.en : currentStep.badge.fr}
                     </span>
-                    <span aria-hidden="true" className="text-[#334155] text-xs">·</span>
-                    <span className="text-[11px] font-['Space_Grotesk'] text-[#94a3b8] font-semibold">
+                    <span aria-hidden="true" className="text-ink-muted text-xs">·</span>
+                    <span className="text-[11px] font-label text-on-navy-muted font-semibold">
                       {isEn ? `Step ${currentStepIndex + 1} of ${totalSteps}` : `Étape ${currentStepIndex + 1} sur ${totalSteps}`}
                     </span>
                   </div>
@@ -412,10 +412,10 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
 
               {/* État automatique / en pause & Bouton Quitter */}
               <div className="flex items-center gap-2">
-                <span className={`text-[10px] font-['Space_Grotesk'] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 ${
-                  isPlaying ? 'bg-[#98f6c5]/20 text-[#98f6c5]' : 'bg-amber-500/20 text-amber-300'
+                <span className={`text-[10px] font-label font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 ${
+                  isPlaying ? 'bg-ok-soft/20 text-ok-bright' : 'bg-amber-500/20 text-amber-300'
                 }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-[#98f6c5] animate-ping' : 'bg-amber-400'}`}></span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-ok-soft animate-ping' : 'bg-amber-400'}`}></span>
                   <span>{isPlaying ? (isEn ? 'Auto' : 'Auto') : (isEn ? 'Paused' : 'En pause')}</span>
                 </span>
 
@@ -433,28 +433,28 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
 
             {/* Corps de la carte : Titre & Explication contextuelle */}
             <div className="p-4 sm:p-5 pt-3.5 flex flex-col gap-2">
-              <h4 className="text-base sm:text-lg font-bold font-['Space_Grotesk'] text-white leading-snug">
+              <h4 className="text-base sm:text-lg font-bold font-label text-white leading-snug">
                 {isEn ? currentStep.title.en : currentStep.title.fr}
               </h4>
 
-              <p className="text-xs sm:text-sm text-[#c4c6ce] leading-relaxed">
+              <p className="text-xs sm:text-sm text-on-navy-muted leading-relaxed">
                 {isEn ? currentStep.description.en : currentStep.description.fr}
               </p>
 
               {currentStep.details && (
-                <p className="text-[11px] sm:text-xs text-[#98f6c5]/90 bg-[#05172e] p-2.5 rounded-xl border border-[#1e3a5f] mt-1 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-ok-bright/90 bg-navy-2 p-2.5 rounded-xl border border-ink mt-1 leading-relaxed">
                   💡 {isEn ? currentStep.details.en : currentStep.details.fr}
                 </p>
               )}
             </div>
 
             {/* Barre de Commandes Obligatoires : Précédent, Pause / Continuer, Suivant, Quitter */}
-            <div className="p-3 sm:p-4 bg-[#05172e] border-t border-[#12263f] flex items-center justify-between gap-2 flex-wrap">
+            <div className="p-3 sm:p-4 bg-navy-2 border-t border-ink flex items-center justify-between gap-2 flex-wrap">
               {/* Bouton Quitter discret à gauche */}
               <button
                 type="button"
                 onClick={handleQuit}
-                className="px-3 py-2 rounded-xl text-[12px] font-['Space_Grotesk'] font-bold text-[#94a3b8] hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-3 py-2 rounded-xl text-[12px] font-label font-bold text-on-navy-muted hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">close</span>
                 <span>{isEn ? 'Exit' : 'Quitter'}</span>
@@ -467,9 +467,9 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
                   type="button"
                   onClick={handlePrev}
                   disabled={currentStepIndex === 0}
-                  className={`px-3 py-2 rounded-xl font-['Space_Grotesk'] font-semibold text-xs flex items-center gap-1 transition-all ${
+                  className={`px-3 py-2 rounded-xl font-label font-semibold text-xs flex items-center gap-1 transition-all ${
                     currentStepIndex === 0
-                      ? 'opacity-40 cursor-not-allowed text-[#64748b]'
+                      ? 'opacity-40 cursor-not-allowed text-ink-muted'
                       : 'bg-white/10 hover:bg-white/20 text-white cursor-pointer active:scale-95'
                   }`}
                   title={isEn ? 'Previous step (Left Arrow)' : 'Étape précédente (Flèche Gauche)'}
@@ -482,10 +482,10 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
                 <button
                   type="button"
                   onClick={handleTogglePlay}
-                  className={`px-3.5 py-2 rounded-xl font-['Space_Grotesk'] font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 ${
+                  className={`px-3.5 py-2 rounded-xl font-label font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 ${
                     isPlaying
-                      ? 'bg-amber-400 hover:bg-amber-300 text-[#001126]'
-                      : 'bg-[#98f6c5] hover:bg-[#b2f8d4] text-[#001126]'
+                      ? 'bg-amber-400 hover:bg-amber-300 text-ink'
+                      : 'bg-ok-soft hover:bg-ok-soft text-ink'
                   }`}
                   title={isEn ? 'Pause or Resume (Space)' : 'Mettre en pause ou reprendre (Espace)'}
                 >
@@ -501,7 +501,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-['Space_Grotesk'] font-semibold text-xs flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+                  className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-label font-semibold text-xs flex items-center gap-1 transition-all cursor-pointer active:scale-95"
                   title={isEn ? 'Next step (Right Arrow)' : 'Étape suivante (Flèche Droite)'}
                 >
                   <span>{currentStepIndex === totalSteps - 1 ? (isEn ? 'Finish' : 'Terminer') : (isEn ? 'Next' : 'Suivant')}</span>

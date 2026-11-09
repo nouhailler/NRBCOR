@@ -6,6 +6,39 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [Non publié] - Modernisation UX/UI « Modern Civil Protection Dashboard »
+
+### 🎨 Design System
+- **Polices 100 % locales** : Inter (variable, latin + latin-ext) embarquée dans `public/fonts/` et pré-cachée par le Service Worker (`nrbcor-cache-v2`). Les familles `Public Sans` / `Space Grotesk`, référencées mais jamais chargées (rendu en police à empattements par défaut), pointent désormais vers Inter.
+- **Tokens sémantiques** (`src/index.css`) : `navy`, `brand`, `canvas`, `card`, `subtle`, `tint`, `ink`, `ink-muted`, `ok`, `warn`, `danger`… remplaçant ~4 500 couleurs hexadécimales codées en dur.
+- **Thème sombre réellement fonctionnel** : le sélecteur existait mais n'avait aucun effet. Le mode CRISE garde son identité à contraste fixe (`.theme-fixed`).
+- **Composants partagés** : `ds-card`, `ds-btn-*`, `ds-badge-*`, `ds-progress`, `ds-input`, `ds-icon-btn`, `ds-container`, titres `ds-page-title` / `ds-section-title` / `ds-eyebrow`.
+- **Accessibilité** : focus visible homogène, respect de `prefers-reduced-motion`, `aria-current`, `aria-expanded`, `aria-pressed`, menu fermable avec Échap.
+
+### 🏠 Accueil = tableau de bord de préparation
+- Niveau global de préparation (même moteur que « Suis-je prêt ? »), indicateurs réels : kit 72 h, plan familial, inventaire à vérifier, actions en attente.
+- Accès rapides (Réagir, foyer, kit, plan, inventaire, risques locaux, guides, formation), péremptions à surveiller, risques locaux.
+- Grille responsive 1 à 4 colonnes (largeur max. 80 rem) ; suppression de l'image distante (non disponible hors-ligne) et de la mention fictive « Seveso à 4,2 km ».
+
+### 🧭 En-tête & navigation
+- En-tête compact (64 px) : navigation principale intégrée sur desktop, barre inférieure réservée au mobile/tablette.
+- Profil, installation, thème et sources regroupés dans le menu (sélecteur de profil ajouté au menu).
+
+### 🚨 Mode CRISE
+- En-tête collant (Quitter + éclairage toujours accessibles), typographie agrandie (plus aucun texte à 9–11 px).
+- Les consignes ne sont plus tronquées (ex. « Uniquement si le Préfet l'ordonne formellement »).
+- Les 4 actions prioritaires remontent au-dessus du bloc radio/lecture vocale. Contenus de sécurité inchangés.
+
+### 📐 Autres écrans
+- Conteneurs élargis sur desktop (lecture : 48 rem, outils : 64 rem) ; Réagir et Guides en 2 colonnes sur grand écran.
+- Correction de la carte « Mode crise simplifié » de Réagir (texte écrasé sur desktop).
+
+### 🧪 Outillage
+- `scripts/ux-capture.ts` : captures multi-résolutions (320 / 390 / 768 / 1440) en clair ou sombre, avec détection de débordement et d'erreurs console.
+- `scripts/ux-smoke.ts` : 33 vérifications de parcours (navigation, CRISE, menu, langue, thème, hors-ligne, cache PWA).
+
+---
+
 ## [1.6.0] - 2026-11-04
 
 ### 🌐 Internationalisation Intégrale Bilingue & Parité 100% (Français & Anglais)

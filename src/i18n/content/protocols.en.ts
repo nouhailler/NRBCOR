@@ -140,7 +140,7 @@ export const PROTOCOLS_DATA_EN: Record<string, ProtocolData> = {
         {
           title: 'Biological Toxins of Natural Origin',
           tag: 'HIGH TOXICITY TOXINS',
-          tagClass: 'bg-[#001126] text-white',
+          tagClass: 'bg-navy text-white',
           examples: 'Botulinum toxin, Ricin, Staphylococcal enterotoxin B',
           specificity: 'Non-replicating proteins with extreme acute toxicity, requiring supportive intensive care and specific antitoxins.',
           icon: 'science'
@@ -173,7 +173,7 @@ export const PROTOCOLS_DATA_EN: Record<string, ProtocolData> = {
     reviewDate: 'REVIEWED: OCT 14, 2026',
     regulatoryBody: 'DGSCGC / SGDSN • CALFEUTRAGE',
     badgeCriticality: 'UNIVERSAL DEFENSE',
-    badgeBg: 'bg-[#0036ce]',
+    badgeBg: 'bg-brand',
     docId: 'DOC-ID: CONF-U01',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCtN5Wu8YQzHl8Uad8fKzbCO_A_CKTZS7F-dtxnWnm4EsQe1433IyWpXlW-7gxZqE1fjDORt2uD_bF5SG1C9ik06oEjJFVEKsNXS0e7if83vIHjZKTpxzP0Trt91n_o_rBoA-wwn_lJxFqSHz7XkROiwAOGE9b4RIeNUrk5mfoERKwVdSl3Kq78iLTe9kI-HNbGL_7WZErnE8aonBR8_liWF_aRRQY6xNcMav-xVtltsFp56oF0w1Q',
     imageAlt: 'Family sealing windows and door gaps with tape and plastic foil during a containment exercise',
@@ -260,14 +260,14 @@ export const PROTOCOLS_DATA_EN: Record<string, ProtocolData> = {
         {
           title: 'Level 1: Basic Window & Door Closure',
           tag: 'BASIC CLOSURE',
-          tagClass: 'bg-[#eef4ff] text-[#001126]',
+          tagClass: 'bg-subtle text-ink',
           specificity: 'Locks all latches and window handles. Reduces air infiltration by 40%.',
           icon: 'door_front'
         },
         {
           title: 'Level 2: Taped Sealing & Damp Barrier',
           tag: 'RECOMMENDED CIVIL DEFENSE STANDARD',
-          tagClass: 'bg-[#98f6c5] text-[#002c1b]',
+          tagClass: 'bg-ok-soft text-ok-ink',
           specificity: 'Heavy adhesive tape along all joints plus soaked towels at thresholds. Eliminates 90% of toxic particle infiltration.',
           icon: 'meeting_room'
         }
@@ -699,21 +699,21 @@ export const PROTOCOLS_DATA_EN: Record<string, ProtocolData> = {
         {
           title: 'Time Factor',
           tag: 'EXPOSURE DURATION',
-          tagClass: 'bg-[#001126] text-white',
+          tagClass: 'bg-navy text-white',
           specificity: 'Accumulated radiation dose is directly proportional to exposure time: Halving the time halves the dose.',
           icon: 'timer'
         },
         {
           title: 'Distance Factor',
           tag: 'INVERSE SQUARE LAW',
-          tagClass: 'bg-[#0036ce] text-white',
+          tagClass: 'bg-brand text-white',
           specificity: 'Dose rate decreases with the square of the distance: Doubling your distance divides the radiation intensity by four.',
           icon: 'straighten'
         },
         {
           title: 'Shielding Factor',
           tag: 'MASS ATTENUATION',
-          tagClass: 'bg-[#002c1b] text-white',
+          tagClass: 'bg-ok-deep text-white',
           specificity: 'Dense materials (concrete, lead, water, packed earth) absorb and scatter ionizing radiation photons.',
           icon: 'security'
         }

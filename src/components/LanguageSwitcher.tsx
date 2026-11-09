@@ -26,17 +26,17 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       <div
         role="radiogroup"
         aria-label="Sélection de langue / Language selection"
-        className={`inline-flex items-center bg-[#e4efff] p-0.5 rounded-lg border border-[#c4c6ce] shadow-2xs ${className}`}
+        className={`inline-flex items-center bg-tint p-0.5 rounded-lg border border-line-strong shadow-2xs ${className}`}
       >
         <button
           type="button"
           role="radio"
           aria-checked={language === 'fr'}
           onClick={() => handleSelectLanguage('fr')}
-          className={`h-7 px-2 rounded-md font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-all cursor-pointer ${
+          className={`h-7 px-2 rounded-md font-label text-[11px] font-bold uppercase transition-all cursor-pointer ${
             language === 'fr'
-              ? 'bg-[#001126] text-white shadow-xs'
-              : 'text-[#44474d] hover:text-[#001126]'
+              ? 'bg-navy text-white shadow-xs'
+              : 'text-ink-muted hover:text-ink'
           }`}
           title="Afficher l'application en Français"
         >
@@ -47,10 +47,10 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           role="radio"
           aria-checked={language === 'en'}
           onClick={() => handleSelectLanguage('en')}
-          className={`h-7 px-2 rounded-md font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-all cursor-pointer ${
+          className={`h-7 px-2 rounded-md font-label text-[11px] font-bold uppercase transition-all cursor-pointer ${
             language === 'en'
-              ? 'bg-[#001126] text-white shadow-xs'
-              : 'text-[#44474d] hover:text-[#001126]'
+              ? 'bg-navy text-white shadow-xs'
+              : 'text-ink-muted hover:text-ink'
           }`}
           title="Display application in English"
         >
@@ -75,21 +75,21 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           onClick={() => handleSelectLanguage('fr')}
           className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
             language === 'fr'
-              ? 'bg-[#eef4ff] border-[#0036ce] text-[#001258] shadow-xs'
-              : 'bg-white border-[#c4c6ce] text-[#44474d] hover:border-[#0036ce]'
+              ? 'bg-subtle border-brand-ink text-brand-ink shadow-xs'
+              : 'bg-card border-line-strong text-ink-muted hover:border-brand-ink'
           }`}
         >
           <div className="flex items-center gap-2">
             <span className="text-[18px]">🇫🇷</span>
             <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
+              <span className="font-label text-[13px] font-bold text-ink">
                 Français
               </span>
-              <span className="text-[10px] text-[#74777e]">Langue officielle de référence</span>
+              <span className="text-[10px] text-ink-faint">Langue officielle de référence</span>
             </div>
           </div>
           {language === 'fr' && (
-            <span className="material-symbols-outlined text-[18px] text-[#0036ce]">check_circle</span>
+            <span className="material-symbols-outlined text-[18px] text-brand-ink">check_circle</span>
           )}
         </button>
 
@@ -100,21 +100,21 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           onClick={() => handleSelectLanguage('en')}
           className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
             language === 'en'
-              ? 'bg-[#eef4ff] border-[#0036ce] text-[#001258] shadow-xs'
-              : 'bg-white border-[#c4c6ce] text-[#44474d] hover:border-[#0036ce]'
+              ? 'bg-subtle border-brand-ink text-brand-ink shadow-xs'
+              : 'bg-card border-line-strong text-ink-muted hover:border-brand-ink'
           }`}
         >
           <div className="flex items-center gap-2">
             <span className="text-[18px]">🇬🇧</span>
             <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[13px] font-bold text-[#001126]">
+              <span className="font-label text-[13px] font-bold text-ink">
                 English
               </span>
-              <span className="text-[10px] text-[#74777e]">Full international version</span>
+              <span className="text-[10px] text-ink-faint">Full international version</span>
             </div>
           </div>
           {language === 'en' && (
-            <span className="material-symbols-outlined text-[18px] text-[#0036ce]">check_circle</span>
+            <span className="material-symbols-outlined text-[18px] text-brand-ink">check_circle</span>
           )}
         </button>
       </div>
