@@ -8,7 +8,9 @@ const STATIC_ASSETS = [
   '/fonts/inter-latin-var.woff2',
   '/fonts/inter-latin-ext-var.woff2',
   '/icon.svg',
-  '/logo.svg'
+  '/logo.svg',
+  '/theme-init.js',
+  '/sw-register.js'
 ];
 
 self.addEventListener('install', (event) => {

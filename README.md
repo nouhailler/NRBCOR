@@ -10,7 +10,8 @@
   <a href="landing.html"><strong>✨ Découvrir la Landing Page NRBCOR</strong></a> • 
   <a href="README.en.md"><strong>🇬🇧 English Documentation (README.en.md)</strong></a> • 
   <a href="docs/I18N_IMPLEMENTATION_REPORT.md"><strong>🌐 Rapport d'Implémentation i18n</strong></a> • 
-  <a href="docs/LANDING_PAGE_DEPLOYMENT.md"><strong>🚀 Guide Déploiement Cloudflare / Netlify</strong></a>
+  <a href="docs/DEPLOIEMENT_CLOUDFLARE.md"><strong>🚀 Déploiement Cloudflare Pages</strong></a> • 
+  <a href="docs/LANDING_PAGE_DEPLOYMENT.md"><strong>Netlify / page de présentation</strong></a>
 </p>
 
 <p align="center">

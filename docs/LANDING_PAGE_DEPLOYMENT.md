@@ -18,6 +18,8 @@ Ce document fournit les instructions pas-à-pas pour déployer la **Landing Page
 
 ## 2. Déploiement Gratuit sur Cloudflare Pages
 
+> Guide à jour et complet (application + page de présentation, en-têtes, tests locaux) : [DEPLOIEMENT_CLOUDFLARE.md](DEPLOIEMENT_CLOUDFLARE.md).
+
 ### Option A : Déploiement Direct depuis GitHub (Recommandé)
 
 1. Connectez-vous à votre tableau de bord **Cloudflare** et rendez-vous dans **Workers & Pages**.
@@ -27,7 +29,7 @@ Ce document fournit les instructions pas-à-pas pour déployer la **Landing Page
    - **Framework preset :** `Vite` (ou `None`)
    - **Build command :** `npm run build`
    - **Build output directory :** `dist`
-   - **Node.js version :** `20` ou `22` (ajouter la variable d'environnement `NODE_VERSION=20` si nécessaire).
+   - **Node.js version :** fixée à `22` par le fichier `.node-version` (aucune variable nécessaire).
 5. (Optionnel) Variable d'environnement pour lier l'application PWA hébergée :
    - `VITE_APP_URL` : `https://votre-app-nrbcor.domaine.fr`
 6. Cliquez sur **Save and Deploy**.
@@ -40,7 +42,7 @@ Ce document fournit les instructions pas-à-pas pour déployer la **Landing Page
 npm run build
 
 # Déployer le dossier dist sur Cloudflare Pages
-npx wrangler pages deploy dist --project-name=nrbcor-landing
+npm run cf:deploy   # = build + wrangler pages deploy dist --project-name nrbcor
 ```
 
 ---

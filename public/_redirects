@@ -1,3 +1,4 @@
-# Redirections pour Netlify et Cloudflare Pages
-/landing         /landing.html   200
-/presentation    /landing.html   200
+# Redirections — Cloudflare Pages (aussi compris par Netlify)
+# Doc : https://developers.cloudflare.com/pages/configuration/redirects/
+# Pages sert déjà /landing.html à l'adresse /landing ; /presentation en est un alias.
+/presentation    /landing    200

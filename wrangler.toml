@@ -1,0 +1,6 @@
+# Configuration Cloudflare Pages pour NRBCOR (site statique, aucun backend).
+# Déploiement : npm run cf:deploy   ·   Test local : npm run cf:dev
+# Doc : https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+name = "nrbcor"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-01"
