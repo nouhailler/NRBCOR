@@ -37,7 +37,7 @@ export const DRILL_SCENARIOS: DrillScenario[] = [
     title: 'Alerte Seveso Seuil Haut : Nuage Toxique de Chlore',
     subtitle: 'Rupture de cuve industrielle sous le vent à 1,8 km de votre domicile',
     badge: 'CHIMIQUE • SEVESO SEUIL HAUT',
-    badgeBg: 'bg-[#ba1a1a]',
+    badgeBg: 'bg-danger',
     context: 'La sirène nationale retentit (son modulé 1 min 41 s). Une odeur piquante et suffocante est perceptible dans la rue. Le panache se déplace rapidement vers votre zone.',
     initialTimeSec: 180, // 3 min chrono d'adrénaline
     essentialSteps: [
@@ -93,7 +93,7 @@ export const DRILL_SCENARIOS: DrillScenario[] = [
     title: 'Accident Réacteur Nucléaire : Panache Radioactif Immédiat',
     subtitle: 'Rejet atmosphérique majeur dans le périmètre PPI (Plan Particulier d’Intervention)',
     badge: 'NUCLÉAIRE • REJET VOLATIL',
-    badgeBg: 'bg-[#001126]',
+    badgeBg: 'bg-navy',
     context: 'Notification FR-Alert : Défaillance de confinement sur le CNPE voisin. Retombées d’aérosols radioactifs imminentes sous 15 minutes.',
     initialTimeSec: 240, // 4 min
     essentialSteps: [
@@ -416,27 +416,27 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#001126]/75 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/75 backdrop-blur-xs overflow-y-auto"
     >
-      <div className="bg-white max-w-lg w-full rounded-2xl p-4 sm:p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3.5 my-auto max-h-[92vh] overflow-y-auto">
+      <div className="bg-card max-w-lg w-full rounded-2xl p-4 sm:p-5 shadow-2xl border border-line-strong flex flex-col gap-3.5 my-auto max-h-[92vh] overflow-y-auto">
         {/* En-tête */}
-        <div className="flex items-start justify-between border-b border-[#e4efff] pb-2.5">
+        <div className="flex items-start justify-between border-b border-line pb-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-[#ba1a1a] text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-danger text-white flex items-center justify-center shadow-xs">
               <span className="material-symbols-outlined text-[24px]">
                 timer
               </span>
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-['Space_Grotesk'] text-[10px] text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                <span className="font-label text-[10px] text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded font-black uppercase tracking-wider">
                   EXERCICE — AUCUNE ALERTE RÉELLE
                 </span>
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 font-bold">
                   SIMULATION
                 </span>
               </div>
-              <h3 className="text-[17px] font-bold text-[#001126] leading-tight mt-0.5">
+              <h3 className="text-[17px] font-bold text-ink leading-tight mt-0.5">
                 {scenario.title}
               </h3>
             </div>
@@ -447,7 +447,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
               onClose();
             }}
             type="button"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#44474d] hover:text-[#001126] hover:bg-[#eef4ff]"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-muted hover:text-ink hover:bg-subtle"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -455,14 +455,14 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
 
         {/* Bouton de tirage aléatoire d'un autre scénario */}
         {!isRunning && !isFinished && (
-          <div className="flex items-center justify-between gap-2 p-2 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8]">
-            <span className="text-[11px] text-[#44474d]">
+          <div className="flex items-center justify-between gap-2 p-2 bg-canvas rounded-xl border border-line">
+            <span className="text-[11px] text-ink-muted">
               Scénario {scenarioIndex + 1} sur {DRILL_SCENARIOS.length}
             </span>
             <button
               type="button"
               onClick={handleNextRandomScenario}
-              className="px-2.5 py-1 bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001126] rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1 transition-colors"
+              className="px-2.5 py-1 bg-subtle hover:bg-tint text-ink rounded-lg font-label text-[11px] font-bold uppercase flex items-center gap-1 transition-colors"
             >
               <span className="material-symbols-outlined text-[15px]">shuffle</span>
               <span>Changer de scénario</span>
@@ -471,8 +471,8 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
         )}
 
         {/* Contexte opérationnel sous stress */}
-        <div className="bg-[#dee1ff] p-3 rounded-xl border border-[#b9c3ff] text-[12px] text-[#001258] leading-relaxed">
-          <strong className="block text-[11px] font-['Space_Grotesk'] uppercase tracking-wider mb-0.5">
+        <div className="bg-tint p-3 rounded-xl border border-brand-bright text-[12px] text-brand-ink leading-relaxed">
+          <strong className="block text-[11px] font-label uppercase tracking-wider mb-0.5">
             Mise en situation d'urgence :
           </strong>
           {scenario.context}
@@ -483,26 +483,26 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
           {/* Chrono Box */}
           <div className={`p-3 rounded-xl text-center flex flex-col justify-center items-center shadow-inner border transition-colors ${
             secondsRemaining < 30 && isRunning
-              ? 'bg-[#ba1a1a] text-white border-[#ff897d] animate-pulse'
-              : 'bg-[#001126] text-white border-[#12263f]'
+              ? 'bg-danger text-white border-danger-bright animate-pulse'
+              : 'bg-navy text-white border-ink'
           }`}>
-            <span className="font-['Space_Grotesk'] text-[32px] font-bold tracking-wider leading-none">
+            <span className="font-label text-[32px] font-bold tracking-wider leading-none">
               {formatClock(secondsRemaining)}
             </span>
-            <span className="text-[10px] font-['Space_Grotesk'] uppercase opacity-80 mt-1">
+            <span className="text-[10px] font-label uppercase opacity-80 mt-1">
               {isFinished ? 'Temps Écoulé' : isRunning ? 'Chrono en cours' : 'Temps Alloué'}
             </span>
           </div>
 
           {/* Score Live Box */}
-          <div className="bg-[#f0fdf4] p-3 rounded-xl text-center border border-[#bbf7d0] flex flex-col justify-center items-center">
+          <div className="bg-ok-soft p-3 rounded-xl text-center border border-ok-line flex flex-col justify-center items-center">
             <div className="flex items-baseline gap-1">
-              <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#166534] leading-none">
+              <span className="font-label text-[32px] font-bold text-ok-ink leading-none">
                 {liveScore}
               </span>
-              <span className="text-[12px] text-[#166534] font-bold">/ 100</span>
+              <span className="text-[12px] text-ok-ink font-bold">/ 100</span>
             </div>
-            <span className="text-[10px] font-['Space_Grotesk'] uppercase text-[#15803d] font-bold mt-1">
+            <span className="text-[10px] font-label uppercase text-ok-ink font-bold mt-1">
               Score Réflexe Live
             </span>
           </div>
@@ -513,10 +513,10 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
           <button
             type="button"
             onClick={handleToggleSiren}
-            className={`flex-1 min-h-[40px] px-3 rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border transition-all ${
+            className={`flex-1 min-h-[40px] px-3 rounded-xl font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 border transition-all ${
               sirenPlaying
-                ? 'bg-[#ba1a1a] text-white border-[#ba1a1a] animate-pulse'
-                : 'bg-white hover:bg-[#eef4ff] text-[#001126] border-[#c4c6ce]'
+                ? 'bg-danger text-white border-danger-ink animate-pulse'
+                : 'bg-card hover:bg-subtle text-ink border-line-strong'
             }`}
             title="Activer la sirène nationale en fond pour un entraînement sous stress sonore réaliste"
           >
@@ -530,7 +530,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
             <button
               type="button"
               onClick={handleStartDrill}
-              className="flex-1 min-h-[40px] px-3 bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 min-h-[40px] px-3 bg-navy hover:bg-navy-2 text-ok-bright rounded-xl font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
             >
               <span className="material-symbols-outlined text-[17px]">play_arrow</span>
               <span>Lancer l'Exercice</span>
@@ -539,7 +539,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
             <button
               type="button"
               onClick={handleFinishEarly}
-              className="flex-1 min-h-[40px] px-3 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
+              className="flex-1 min-h-[40px] px-3 bg-ok hover:bg-ok text-white rounded-xl font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
             >
               <span className="material-symbols-outlined text-[17px]">check_circle</span>
               <span>Terminer & Débriefing</span>
@@ -548,7 +548,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
             <button
               type="button"
               onClick={handleResetCurrent}
-              className="flex-1 min-h-[40px] px-3 bg-[#eef4ff] text-[#001126] rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase border border-[#c4c6ce]"
+              className="flex-1 min-h-[40px] px-3 bg-subtle text-ink rounded-xl font-label text-[11px] font-bold uppercase border border-line-strong"
             >
               Recommencer
             </button>
@@ -560,7 +560,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
           <div className="flex flex-col gap-3 pt-1">
             {/* 1. Étapes tactiques indispensables */}
             <div className="flex flex-col gap-1.5">
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold uppercase tracking-wider">
+              <span className="font-label text-[11px] text-ink font-bold uppercase tracking-wider">
                 1. Gestes vitaux sous le chronomètre :
               </span>
               <div className="space-y-1.5">
@@ -569,8 +569,8 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
                     key={st.id}
                     className={`flex items-center gap-2.5 p-2 rounded-xl border text-[12px] cursor-pointer transition-colors ${
                       checkedSteps[st.id]
-                        ? 'bg-[#f0fdf4] border-[#bbf7d0] text-[#166534]'
-                        : 'bg-[#f8f9ff] border-[#d6e4f8] text-[#001126] hover:bg-[#eef4ff]'
+                        ? 'bg-ok-soft border-ok-line text-ok-ink'
+                        : 'bg-canvas border-line text-ink hover:bg-subtle'
                     }`}
                   >
                     <input
@@ -580,10 +580,10 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
                         triggerHaptic('light');
                         setCheckedSteps((prev) => ({ ...prev, [st.id]: !prev[st.id] }));
                       }}
-                      className="w-4 h-4 accent-[#16a34a] rounded"
+                      className="w-4 h-4 accent-ok-ink rounded"
                     />
                     <span className="flex-1 font-medium">{st.text}</span>
-                    <span className="text-[10px] font-['Space_Grotesk'] text-[#44474d] shrink-0 font-bold">
+                    <span className="text-[10px] font-label text-ink-muted shrink-0 font-bold">
                       {st.timeHint}
                     </span>
                   </label>
@@ -592,14 +592,14 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
             </div>
 
             {/* 2. Dilemmes tactiques sous stress */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-[#e4efff]">
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-2 pt-1 border-t border-line">
+              <span className="font-label text-[11px] text-ink font-bold uppercase tracking-wider">
                 2. Décisions critiques & pièges opérationnels :
               </span>
 
               {scenario.dilemmas.map((d) => (
-                <div key={d.id} className="p-3 bg-[#eef4ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
-                  <p className="text-[12px] font-bold text-[#001126] leading-snug">
+                <div key={d.id} className="p-3 bg-subtle rounded-xl border border-line flex flex-col gap-2">
+                  <p className="text-[12px] font-bold text-ink leading-snug">
                     {d.question}
                   </p>
                   <div className="flex flex-col gap-1.5">
@@ -614,9 +614,9 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
                         className={`p-2.5 rounded-lg text-left text-[12px] border transition-all ${
                           selectedDilemmaOptions[d.id] === opt.id
                             ? opt.isTrap
-                              ? 'bg-[#ffdad6] text-[#93000a] border-[#ba1a1a] font-bold'
-                              : 'bg-[#001126] text-white border-[#001126] font-bold shadow-xs'
-                            : 'bg-white hover:bg-[#e4efff] text-[#001126] border-[#c4c6ce]'
+                              ? 'bg-danger-soft text-danger-ink-strong border-danger-ink font-bold'
+                              : 'bg-navy text-white border-ink font-bold shadow-xs'
+                            : 'bg-card hover:bg-tint text-ink border-line-strong'
                         }`}
                       >
                         {opt.label}
@@ -626,7 +626,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
 
                   {/* Feedback en temps réel si option choisie */}
                   {selectedDilemmaOptions[d.id] && (
-                    <div className="text-[11px] p-2 rounded bg-white border border-[#c4c6ce] text-[#44474d] leading-relaxed">
+                    <div className="text-[11px] p-2 rounded bg-card border border-line-strong text-ink-muted leading-relaxed">
                       {d.options.find((o) => o.id === selectedDilemmaOptions[d.id])?.feedback}
                     </div>
                   )}
@@ -639,16 +639,16 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
           <div className="flex flex-col gap-3 py-1">
             <div className={`p-4 rounded-xl border text-center flex flex-col gap-1 shadow-sm ${
               liveScore >= 85
-                ? 'bg-[#f0fdf4] border-[#bbf7d0] text-[#166534]'
+                ? 'bg-ok-soft border-ok-line text-ok-ink'
                 : liveScore >= 65
-                ? 'bg-[#fefce8] border-[#fef08a] text-[#854d0e]'
-                : 'bg-[#ffdad6] border-[#ffb4ab] text-[#93000a]'
+                ? 'bg-warn-soft border-warn-line text-warn-ink'
+                : 'bg-danger-soft border-danger-line text-danger-ink-strong'
             }`}>
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold tracking-wider">
+              <span className="font-label text-[11px] uppercase font-bold tracking-wider">
                 Débriefing Opérationnel • Bilan d'Exercice
               </span>
               <div className="flex items-center justify-center gap-2">
-                <span className="font-['Space_Grotesk'] text-[42px] font-bold">
+                <span className="font-label text-[42px] font-bold">
                   {liveScore}
                 </span>
                 <span className="text-[16px] font-bold">/ 100</span>
@@ -663,31 +663,31 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
             </div>
 
             {/* Analyse détaillée des choix */}
-            <div className="bg-[#f8f9ff] p-3 rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
-              <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold uppercase">
+            <div className="bg-canvas p-3 rounded-xl border border-line flex flex-col gap-2">
+              <span className="font-label text-[11px] text-ink font-bold uppercase">
                 Points Clés Doctrিনaux de Sécurité Civile :
               </span>
-              <ul className="space-y-1.5 text-[11.5px] text-[#0f1c2b]">
+              <ul className="space-y-1.5 text-[11.5px] text-ink">
                 <li className="flex items-start gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#16a34a] shrink-0 mt-0.5">check_circle</span>
+                  <span className="material-symbols-outlined text-[16px] text-ok-ink shrink-0 mt-0.5">check_circle</span>
                   <span><strong>Confinement immédiat :</strong> Divise par plus de 90% l'exposition aux toxiques aéroportés par rapport à une fuite extérieure.</span>
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#ba1a1a] shrink-0 mt-0.5">cancel</span>
+                  <span className="material-symbols-outlined text-[16px] text-danger-ink shrink-0 mt-0.5">cancel</span>
                   <span><strong>Interdiction de fuite en voiture :</strong> L'habitacle automobile n'offre aucune étanchéité et crée des embouteillages paralysant les secours.</span>
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#ba1a1a] shrink-0 mt-0.5">cancel</span>
+                  <span className="material-symbols-outlined text-[16px] text-danger-ink shrink-0 mt-0.5">cancel</span>
                   <span><strong>Zéro automédication d'iode :</strong> L'iode n'agit que contre l'iode 131 d'un réacteur nucléaire. Inutile contre le chlore ou le Césium.</span>
                 </li>
               </ul>
             </div>
 
-            <div className="flex gap-2 pt-1 border-t border-[#e4efff]">
+            <div className="flex gap-2 pt-1 border-t border-line">
               <button
                 type="button"
                 onClick={handleNextRandomScenario}
-                className="flex-1 min-h-[46px] bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl font-['Space_Grotesk'] text-[11px] uppercase font-bold flex items-center justify-center gap-1.5 shadow-sm"
+                className="flex-1 min-h-[46px] bg-navy hover:bg-navy-2 text-ok-bright rounded-xl font-label text-[11px] uppercase font-bold flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <span className="material-symbols-outlined text-[17px]">shuffle</span>
                 <span>Scénario Aléatoire Suivant</span>
@@ -700,7 +700,7 @@ export const CrisisDrillModal: React.FC<CrisisDrillModalProps> = ({
                     onClose();
                     onGoToGuides();
                   }}
-                  className="px-3 min-h-[46px] bg-white text-[#001126] rounded-xl font-['Space_Grotesk'] text-[11px] uppercase font-bold border border-[#c4c6ce]"
+                  className="px-3 min-h-[46px] bg-card text-ink rounded-xl font-label text-[11px] uppercase font-bold border border-line-strong"
                 >
                   Fiches Réflexes
                 </button>

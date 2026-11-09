@@ -569,7 +569,7 @@ export const NRBC_TOOL_CATEGORIES_EN: NrbcToolCategory[] = [
     id: 'detection',
     name: '1. Detection, Measurement & Rapid Identification',
     icon: 'radar',
-    color: 'text-[#0036ce]',
+    color: 'text-brand-ink',
     description: 'Because CBRN agents are predominantly invisible, odorless, and intangible, early detection is the primary line of survival to alert populations and qualify the hazard.',
     tools: [
       {
@@ -610,7 +610,7 @@ export const NRBC_TOOL_CATEGORIES_EN: NrbcToolCategory[] = [
     id: 'protection',
     name: '2. Personal & Collective Protection (PPE & Shelters)',
     icon: 'masks',
-    color: 'text-[#ba1a1a]',
+    color: 'text-danger-ink',
     description: 'Prevent hazardous particles, toxic vapors, or fallout from entering contact with the body (airways, eyes, mucous membranes, intact skin).',
     tools: [
       {
@@ -643,7 +643,7 @@ export const NRBC_TOOL_CATEGORIES_EN: NrbcToolCategory[] = [
     id: 'decontamination',
     name: '3. Decontamination & Neutralization',
     icon: 'sanitizer',
-    color: 'text-[#005236]',
+    color: 'text-ok-ink',
     description: 'Remove, neutralize, or chemically inactivate toxic agents deposited on personnel, clothing, equipment, or living environments.',
     tools: [
       {
@@ -676,7 +676,7 @@ export const NRBC_TOOL_CATEGORIES_EN: NrbcToolCategory[] = [
     id: 'antidotes',
     name: '4. Medical Countermeasures & Specific Antidotes',
     icon: 'medication',
-    color: 'text-[#6750a4]',
+    color: 'text-brand-ink',
     description: 'Emergency pharmaceuticals administered to counter intracellular toxic damage or accelerate the excretion of internal radionuclides.',
     tools: [
       {

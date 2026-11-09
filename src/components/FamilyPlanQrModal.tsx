@@ -256,22 +256,22 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/70 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/70 backdrop-blur-xs overflow-y-auto"
     >
-      <div className="bg-white max-w-md w-full rounded-2xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3 my-auto">
+      <div className="bg-card max-w-md w-full rounded-2xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3 my-auto">
         {/* En-tête */}
-        <div className="flex items-center justify-between border-b border-[#e4efff] pb-3">
+        <div className="flex items-center justify-between border-b border-line pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-[#001126] text-white flex items-center justify-center">
-              <span className="material-symbols-outlined text-[22px] text-[#98f6c5]">
+            <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center">
+              <span className="material-symbols-outlined text-[22px] text-ok-bright">
                 qr_code_2
               </span>
             </div>
             <div>
-              <span className="font-['Space_Grotesk'] text-[10px] text-[#0036ce] uppercase font-bold">
+              <span className="font-label text-[10px] text-brand-ink uppercase font-bold">
                 Partage Direct Sans Cloud
               </span>
-              <h3 className="text-[17px] font-bold text-[#001126]">
+              <h3 className="text-[17px] font-bold text-ink">
                 QR Code Plan Familial
               </h3>
             </div>
@@ -282,14 +282,14 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
               onClose();
             }}
             type="button"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#44474d] hover:text-[#001126] hover:bg-[#eef4ff]"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-muted hover:text-ink hover:bg-subtle"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Onglets Partager vs Scanner */}
-        <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#eef4ff] rounded-xl border border-[#d6e4f8]">
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-subtle rounded-xl border border-line">
           <button
             type="button"
             onClick={() => {
@@ -298,10 +298,10 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
               stopCamera();
               setScannedPlan(null);
             }}
-            className={`min-h-[40px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all ${
+            className={`min-h-[40px] rounded-lg font-label text-[12px] font-bold uppercase transition-all ${
               activeTab === 'share'
-                ? 'bg-[#001126] text-white shadow-xs'
-                : 'text-[#001126] hover:bg-white/60'
+                ? 'bg-navy text-white shadow-xs'
+                : 'text-ink hover:bg-white/60'
             }`}
           >
             Afficher mon QR Code
@@ -314,10 +314,10 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
               setActiveTab('scan');
               setScannedPlan(null);
             }}
-            className={`min-h-[40px] rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all ${
+            className={`min-h-[40px] rounded-lg font-label text-[12px] font-bold uppercase transition-all ${
               activeTab === 'scan'
-                ? 'bg-[#001126] text-white shadow-xs'
-                : 'text-[#001126] hover:bg-white/60'
+                ? 'bg-navy text-white shadow-xs'
+                : 'text-ink hover:bg-white/60'
             }`}
           >
             Scanner / Importer
@@ -335,27 +335,27 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
         {/* VUE 1 : PARTAGER MON PLAN */}
         {activeTab === 'share' && (
           <div className="flex flex-col items-center gap-3 py-1">
-            <p className="text-[12px] text-[#44474d] text-center leading-snug">
+            <p className="text-[12px] text-ink-muted text-center leading-snug">
               Présentez ce QR Code à un proche. Il lui suffit d'ouvrir NRBCOR sur son téléphone et de cliquer sur <strong>« Scanner »</strong> pour cloner le plan familial sans Internet.
             </p>
 
             {/* QR Canvas Box */}
-            <div className="p-3 bg-white rounded-2xl shadow-sm border-2 border-[#001126] flex items-center justify-center">
+            <div className="p-3 bg-card rounded-2xl shadow-sm border-2 border-ink flex items-center justify-center">
               <canvas ref={canvasRef} className="max-w-full h-auto" />
             </div>
 
-            <div className="w-full flex items-center justify-between text-[11px] text-[#002c1b] bg-[#f0fdf4] px-3 py-2 rounded-xl border border-[#bbf7d0]">
+            <div className="w-full flex items-center justify-between text-[11px] text-ok-ink bg-ok-soft px-3 py-2 rounded-xl border border-ok-line">
               <span className="flex items-center gap-1.5 font-medium">
-                <span className="material-symbols-outlined text-[16px] text-[#16a34a]">lock</span>
+                <span className="material-symbols-outlined text-[16px] text-ok-ink">lock</span>
                 Transmission 100% locale (zéro transit serveur)
               </span>
-              <span className="font-['Space_Grotesk'] font-bold uppercase text-[10px]">P2P LOCAL</span>
+              <span className="font-label font-bold uppercase text-[10px]">P2P LOCAL</span>
             </div>
 
             <button
               type="button"
               onClick={copyPayloadToClipboard}
-              className="w-full min-h-[44px] bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001126] rounded-xl font-['Space_Grotesk'] text-[11px] uppercase font-bold flex items-center justify-center gap-2 border border-[#d6e4f8] transition-colors"
+              className="w-full min-h-[44px] bg-subtle hover:bg-tint text-ink rounded-xl font-label text-[11px] uppercase font-bold flex items-center justify-center gap-2 border border-line transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">content_copy</span>
               <span>{copiedText ? 'Copié dans le presse-papier !' : 'Copier le code de secours en texte'}</span>
@@ -368,26 +368,26 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
           <div className="flex flex-col gap-3 py-1">
             {!scannedPlan ? (
               <>
-                <p className="text-[12px] text-[#44474d] leading-snug">
+                <p className="text-[12px] text-ink-muted leading-snug">
                   Pointez votre appareil vers le QR Code affiché sur le téléphone d'un membre de votre famille.
                 </p>
 
                 {/* Caméra Live */}
-                <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-[#c4c6ce] flex items-center justify-center">
+                <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-line-strong flex items-center justify-center">
                   <video ref={videoRef} className="w-full h-full object-cover" />
                   <canvas ref={scanCanvasRef} className="hidden" />
 
                   {/* Viseur visuel */}
-                  <div className="absolute inset-8 border-2 border-[#98f6c5] rounded-lg pointer-events-none opacity-80 animate-pulse"></div>
+                  <div className="absolute inset-8 border-2 border-ok-bright rounded-lg pointer-events-none opacity-80 animate-pulse"></div>
 
                   {!scannerActive && (
-                    <div className="absolute inset-0 bg-[#001126]/90 p-4 flex flex-col items-center justify-center text-center gap-2 text-white">
-                      <span className="material-symbols-outlined text-[32px] text-[#ffdad6]">videocam_off</span>
-                      <p className="text-[12px] text-[#ffdad6]">{cameraError || 'Caméra arrêtée'}</p>
+                    <div className="absolute inset-0 bg-navy/90 p-4 flex flex-col items-center justify-center text-center gap-2 text-white">
+                      <span className="material-symbols-outlined text-[32px] text-danger-bright">videocam_off</span>
+                      <p className="text-[12px] text-danger-bright">{cameraError || 'Caméra arrêtée'}</p>
                       <button
                         type="button"
                         onClick={startCamera}
-                        className="px-3 py-1.5 bg-[#98f6c5] text-[#002c1b] rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase"
+                        className="px-3 py-1.5 bg-ok-soft text-ok-ink rounded-lg font-label text-[11px] font-bold uppercase"
                       >
                         Réactiver la caméra
                       </button>
@@ -396,8 +396,8 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
                 </div>
 
                 {/* Fallbacks : Image ou Texte */}
-                <div className="flex flex-col gap-2 pt-1 border-t border-[#e4efff]">
-                  <label className="min-h-[44px] bg-[#f8f9ff] hover:bg-[#eef4ff] text-[#001126] border border-[#d6e4f8] rounded-xl flex items-center justify-center gap-2 text-[12px] font-bold font-['Space_Grotesk'] uppercase cursor-pointer">
+                <div className="flex flex-col gap-2 pt-1 border-t border-line">
+                  <label className="min-h-[44px] bg-canvas hover:bg-subtle text-ink border border-line rounded-xl flex items-center justify-center gap-2 text-[12px] font-bold font-label uppercase cursor-pointer">
                     <span className="material-symbols-outlined text-[18px]">photo_library</span>
                     <span>Téléverser une photo du QR Code</span>
                     <input
@@ -414,35 +414,35 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
                       value={manualCode}
                       onChange={(e) => setManualCode(e.target.value)}
                       placeholder="Ou coller le code texte..."
-                      className="flex-1 px-3 py-2 bg-white rounded-xl border border-[#c4c6ce] text-[12px] font-mono text-[#001126]"
+                      className="flex-1 px-3 py-2 bg-card rounded-xl border border-line-strong text-[12px] font-mono text-ink"
                     />
                     <button
                       type="submit"
-                      className="px-3 py-2 bg-[#001126] text-white rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0"
+                      className="px-3 py-2 bg-navy text-white rounded-xl font-label text-[11px] font-bold uppercase shrink-0"
                     >
                       Valider
                     </button>
                   </form>
                   {manualError && (
-                    <p className="text-[11px] text-[#ba1a1a] font-medium">{manualError}</p>
+                    <p className="text-[11px] text-danger-ink font-medium">{manualError}</p>
                   )}
                 </div>
               </>
             ) : (
               /* Prévisualisation avant confirmation d'écrasement */
-              <div className="bg-[#f0fdf4] p-4 rounded-xl border border-[#bbf7d0] flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-[#166534]">
+              <div className="bg-ok-soft p-4 rounded-xl border border-ok-line flex flex-col gap-2.5">
+                <div className="flex items-center gap-2 text-ok-ink">
                   <span className="material-symbols-outlined text-[20px]">verified</span>
                   <h4 className="font-bold text-[14px]">Plan Familial Détecté !</h4>
                 </div>
 
-                <div className="space-y-1 text-[12px] text-[#166534]">
+                <div className="space-y-1 text-[12px] text-ok-ink">
                   <p>• <strong>{scannedPlan.members?.length || 0}</strong> membres configurés</p>
                   <p>• <strong>{scannedPlan.assemblyPoints?.length || 0}</strong> points de ralliement définis</p>
                   <p>• Contact relais : <strong>{scannedPlan.outZoneContact?.name || 'Non défini'}</strong> ({scannedPlan.outZoneContact?.phone || '-'})</p>
                 </div>
 
-                <div className="p-2.5 bg-white rounded-lg border border-[#bbf7d0] text-[11px] text-[#44474d]">
+                <div className="p-2.5 bg-card rounded-lg border border-ok-line text-[11px] text-ink-muted">
                   ⚠️ L'importation remplacera votre plan actuel sur cet appareil par celui du QR code.
                 </div>
 
@@ -450,7 +450,7 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
                   <button
                     type="button"
                     onClick={handleConfirmImport}
-                    className="flex-1 min-h-[46px] bg-[#16a34a] hover:bg-[#15803d] text-white rounded-xl font-['Space_Grotesk'] text-[12px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
+                    className="flex-1 min-h-[46px] bg-ok hover:bg-ok text-white rounded-xl font-label text-[12px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <span className="material-symbols-outlined text-[18px]">download_done</span>
                     <span>Importer ce plan</span>
@@ -461,7 +461,7 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
                       setScannedPlan(null);
                       startCamera();
                     }}
-                    className="px-3 min-h-[46px] bg-white text-[#44474d] rounded-xl font-['Space_Grotesk'] text-[11px] font-bold uppercase border border-[#c4c6ce]"
+                    className="px-3 min-h-[46px] bg-card text-ink-muted rounded-xl font-label text-[11px] font-bold uppercase border border-line-strong"
                   >
                     Annuler
                   </button>

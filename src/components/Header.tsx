@@ -1,39 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { TabType } from '../types';
+import { NAV_TABS } from './BottomNav';
 
 interface HeaderProps {
   currentTitle?: string;
-  subtitle?: string;
   showBack?: boolean;
   onBack?: () => void;
   onOpenMenu: () => void;
-  onOpenSources?: () => void;
   onOpenSettings?: () => void;
-  onInstallClick?: () => void;
-  canInstall?: boolean;
-  theme?: 'light' | 'dark' | 'system';
-  onToggleTheme?: () => void;
   profileMode?: 'simplified' | 'expert';
   onToggleProfileMode?: () => void;
   onOpenModeCrise?: () => void;
+  currentTab?: TabType;
+  isSubScreen?: boolean;
+  onSelectTab?: (tab: TabType) => void;
 }
 
+/**
+ * En-tête unifié NRBCOR
+ * - Mobile : [Menu|Retour] [Logo + titre de page] … [statut réseau] [FR/EN] [CRISE]
+ * - Desktop (≥ lg) : navigation principale intégrée ; fonctions secondaires regroupées dans le menu.
+ */
 export const Header: React.FC<HeaderProps> = ({
   currentTitle,
-  subtitle,
   showBack = false,
   onBack,
   onOpenMenu,
-  onOpenSources,
   onOpenSettings,
-  onInstallClick,
-  canInstall = false,
-  theme = 'light',
-  onToggleTheme,
   profileMode = 'simplified',
   onToggleProfileMode,
   onOpenModeCrise,
+  currentTab,
+  isSubScreen = false,
+  onSelectTab,
 }) => {
   const { t } = useTranslation();
   const displayTitle = currentTitle || t('nav.home');
@@ -53,151 +54,133 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   return (
-    <header className="fixed top-0 w-full z-40 bg-[#f8f9ff]/95 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e4efff]">
-      <div data-tour="header-controls" className="h-20 px-3 sm:px-4 flex items-center justify-between gap-2 max-w-4xl mx-auto">
-        {/* Bloc Gauche : Hamburger + Logo + Titres */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          {/* Bouton Hamburger ou Retour */}
+    <header className="fixed top-0 inset-x-0 z-40 bg-card/90 backdrop-blur-xl pt-safe border-b border-line">
+      <div data-tour="header-controls" className="ds-container h-16 flex items-center gap-2 lg:gap-4">
+        {/* Gauche : menu / retour + identité */}
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 lg:flex-none">
           {showBack && onBack ? (
             <button
               aria-label={t('common.back')}
               onClick={onBack}
-              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0"
+              className="ds-icon-btn shrink-0 -ml-1.5"
               type="button"
             >
-              <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[24px]" aria-hidden="true">arrow_back</span>
             </button>
           ) : (
             <button
               aria-label={t('nav.openMenu')}
               onClick={onOpenMenu}
-              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-[#001126] hover:bg-[#e4efff] active:bg-[#dce9fd] rounded-xl transition-colors shrink-0 border border-[#c4c6ce] shadow-xs"
+              className="ds-icon-btn shrink-0 -ml-1.5"
               type="button"
             >
-              <span className="material-symbols-outlined text-[24px]">menu</span>
+              <span className="material-symbols-outlined text-[24px]" aria-hidden="true">menu</span>
             </button>
           )}
 
-          {/* Logo vectoriel SVG & Titres */}
-          <div className="flex items-center gap-2 min-w-0">
-            <img
-              alt="NRBCOR Logo"
-              className="h-7 sm:h-8 w-auto object-contain shrink-0"
-              src="/logo.svg"
-            />
-
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[14px] sm:text-[15px] text-[#001126] tracking-wide uppercase font-extrabold truncate">
-                NRBCOR
+          <button
+            type="button"
+            onClick={() => onSelectTab?.('accueil')}
+            className="flex items-center gap-2 min-w-0 overflow-hidden rounded-lg cursor-pointer"
+            aria-label={`NRBCOR — ${t('nav.home')}`}
+          >
+            <img alt="" aria-hidden="true" className="h-8 w-8 shrink-0" src="/icon.svg" />
+            <span className="flex flex-col min-w-0 items-start leading-none max-[359px]:sr-only">
+              <span className="text-[15px] font-extrabold tracking-[0.04em] text-ink">NRBCOR</span>
+              <span className="text-[12px] font-medium text-ink-muted truncate max-w-[40vw] sm:max-w-[16rem] mt-1 lg:hidden">
+                {displayTitle}
               </span>
-              <div className="flex items-center gap-1 text-[11px] font-['Space_Grotesk'] text-[#44474d] truncate">
-                <span className="text-[#001126] font-semibold truncate">{displayTitle}</span>
-                <span className="text-[#c4c6ce] hidden sm:inline">•</span>
-                <span className="text-[#3f9d73] font-medium truncate hidden sm:inline">{t('header.autonomousStorage')} v1.2</span>
-              </div>
-            </div>
-          </div>
+              <span className="hidden lg:block text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-faint mt-1">
+                {t('ui.brandTagline')}
+              </span>
+            </span>
+          </button>
         </div>
 
-        {/* Actions Droite */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Boutons secondaires desktop (Profil, Installer, Thème, Sources, Paramètres) */}
-          <div className="hidden sm:flex items-center gap-1.5">
-            {onToggleProfileMode && (
-              <button
-                onClick={onToggleProfileMode}
-                title={profileMode === 'simplified' ? t('header.profileSimplifiedTooltip') : t('header.profileExpertTooltip')}
-                className={`h-9 px-2 rounded-lg items-center gap-1 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-all border cursor-pointer shrink-0 flex ${
-                  profileMode === 'simplified'
-                    ? 'bg-[#eef4ff] hover:bg-[#dce9fd] text-[#0036ce] border-[#0036ce]/30'
-                    : 'bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] border-[#98f6c5]/40 shadow-xs'
-                }`}
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[16px]">
-                  {profileMode === 'simplified' ? 'person' : 'school'}
-                </span>
-                <span>{profileMode === 'simplified' ? t('nav.simplified') : t('nav.expert')}</span>
-              </button>
-            )}
+        {/* Centre (desktop) : navigation principale */}
+        {onSelectTab && (
+          <nav aria-label={t('ui.mainNav')} className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+            {NAV_TABS.map((tab) => {
+              const active = !isSubScreen && currentTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => onSelectTab(tab.id)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`h-10 px-2.5 xl:px-3 rounded-lg flex items-center gap-1.5 text-[14px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                    active
+                      ? 'bg-tint text-ink'
+                      : tab.isEmergency
+                      ? 'text-danger-ink hover:bg-danger-soft'
+                      : 'text-ink-muted hover:text-ink hover:bg-subtle'
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-[20px] hidden xl:inline-block"
+                    aria-hidden="true"
+                    style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
+                  >
+                    {tab.icon}
+                  </span>
+                  <span>{t(tab.labelKey)}</span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
 
-            {onInstallClick && (
-              <button
-                onClick={onInstallClick}
-                title={t('header.installTitle')}
-                className="h-9 px-2.5 rounded-lg bg-[#001258] hover:bg-[#0024a8] text-white items-center gap-1.5 font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-colors shadow-xs shrink-0 hidden md:flex"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[16px]">install_mobile</span>
-                <span>{t('nav.install')}</span>
-              </button>
-            )}
+        {/* Droite : statut, profil, langue, paramètres, CRISE */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <span
+            role="status"
+            title={isOnline ? t('common.onlineBadge') : t('common.offlineBadge')}
+            className={`ds-badge ${isOnline ? 'ds-badge-ok' : 'ds-badge-warn'} max-[379px]:hidden max-sm:px-1.5 max-sm:py-1.5`}
+          >
+            <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? 'bg-ok' : 'bg-warn'}`} aria-hidden="true"></span>
+            <span className="hidden sm:inline">{isOnline ? t('common.online') : t('common.offline')}</span>
+            <span className="sr-only sm:hidden">{isOnline ? t('common.online') : t('common.offline')}</span>
+          </span>
 
-            {onToggleTheme && (
-              <button
-                onClick={onToggleTheme}
-                title={theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
-                className="w-9 h-9 rounded-full bg-white hover:bg-[#e4efff] text-[#001126] flex items-center justify-center transition-colors shadow-xs border border-[#c4c6ce] shrink-0"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-                </span>
-              </button>
-            )}
-
+          {onToggleProfileMode && (
             <button
-              onClick={onOpenSources}
-              title={`${t('nav.sources')} (v2.4)`}
-              className="w-9 h-9 rounded-full bg-[#001126] hover:bg-[#12263f] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+              onClick={onToggleProfileMode}
+              title={profileMode === 'simplified' ? t('header.profileSimplifiedTooltip') : t('header.profileExpertTooltip')}
+              className="hidden 2xl:inline-flex h-9 px-2.5 rounded-lg items-center gap-1.5 text-[12.5px] font-semibold border border-line-strong text-ink hover:bg-subtle transition-colors cursor-pointer"
               type="button"
             >
-              <span className="material-symbols-outlined text-[18px]">policy</span>
+              <span className="material-symbols-outlined text-[18px] text-brand-ink" aria-hidden="true">
+                {profileMode === 'simplified' ? 'person' : 'school'}
+              </span>
+              <span>{profileMode === 'simplified' ? t('nav.simplified') : t('nav.expert')}</span>
             </button>
+          )}
 
-            {onOpenSettings && (
-              <button
-                onClick={onOpenSettings}
-                title={t('nav.settings')}
-                className="w-9 h-9 rounded-full bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] flex items-center justify-center transition-colors shadow-sm shrink-0"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[18px]">settings</span>
-              </button>
-            )}
-          </div>
-
-          {/* Sélecteur de Langue Compact (FR | EN) */}
           <LanguageSwitcher variant="compact" />
 
-          {/* Les 2 boutons empilés verticalement l'un au-dessous de l'autre (En Ligne au-dessus, Crise en dessous) */}
-          <div className="flex flex-col items-end justify-center gap-1 shrink-0">
-            {/* 1. Bouton / Badge statut réseau En Ligne au-dessus */}
-            <span
-              title={isOnline ? t('common.onlineBadge') : t('common.offlineBadge')}
-              className={`font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded-full uppercase font-bold flex items-center gap-1 shadow-2xs shrink-0 ${
-                isOnline
-                  ? 'bg-[#98f6c5] text-[#005236] border border-[#005236]/20'
-                  : 'bg-[#ffdad6] text-[#93000a] border border-[#93000a]/20'
-              }`}
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
+              title={t('nav.settings')}
+              aria-label={t('nav.settings')}
+              className="ds-icon-btn hidden md:inline-flex w-10 h-10"
+              type="button"
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isOnline ? 'bg-[#005236]' : 'bg-[#93000a]'}`}></span>
-              <span>{isOnline ? t('common.online') : t('common.offline')}</span>
-            </span>
+              <span className="material-symbols-outlined text-[22px]" aria-hidden="true">settings</span>
+            </button>
+          )}
 
-            {/* 2. Bouton SOS Mode Crise en dessous */}
-            {onOpenModeCrise && (
-              <button
-                onClick={onOpenModeCrise}
-                title={t('crisis.subtitle')}
-                className="h-7 px-2.5 rounded-md bg-[#ba1a1a] hover:bg-[#93000a] text-white flex items-center gap-1 font-['Space_Grotesk'] text-[11px] font-black uppercase transition-all shadow-sm active:scale-95 animate-pulse border border-red-400 shrink-0 cursor-pointer"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[15px]">emergency</span>
-                <span>{t('nav.crisisButton')}</span>
-              </button>
-            )}
-          </div>
+          {onOpenModeCrise && (
+            <button
+              onClick={onOpenModeCrise}
+              title={t('crisis.subtitle')}
+              className="h-10 px-3 sm:px-3.5 rounded-xl bg-danger hover:bg-danger-strong text-white inline-flex items-center gap-1.5 text-[13px] font-extrabold tracking-wide uppercase transition-colors shadow-sm cursor-pointer"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-[20px]" aria-hidden="true">emergency</span>
+              <span>{t('nav.crisisButton')}</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

@@ -63,7 +63,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           onClick={toggle}
           aria-label="Aide contextuelle"
           title="Cliquez pour afficher l'aide contextuelle"
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#dee1ff] text-[#001258] hover:bg-[#b9c3ff] transition-colors text-[13px] font-bold focus:outline-none"
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-tint text-brand-ink hover:bg-tint-strong transition-colors text-[13px] font-bold focus:outline-none"
         >
           <span className="material-symbols-outlined text-[14px]">info</span>
         </button>
@@ -72,24 +72,24 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {isOpen && (
         <div
           role="tooltip"
-          className={`absolute z-50 w-64 max-w-xs p-3 bg-[#001126] text-white rounded-xl shadow-xl text-[12px] leading-relaxed border border-[#354862] animate-in fade-in zoom-in-95 duration-150 ${getPositionClasses()}`}
+          className={`absolute z-50 w-64 max-w-xs p-3 bg-navy text-white rounded-xl shadow-xl text-[12px] leading-relaxed border border-ink-muted animate-in fade-in zoom-in-95 duration-150 ${getPositionClasses()}`}
         >
           <div className="flex items-start justify-between gap-1 pb-1">
             {title && (
-              <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-wider text-[#98f6c5]">
+              <span className="font-label text-[11px] font-bold uppercase tracking-wider text-ok-bright">
                 {title}
               </span>
             )}
             <button
               onClick={() => setIsOpen(false)}
-              className="text-[#b4c8e8] hover:text-white ml-auto"
+              className="text-brand-bright hover:text-white ml-auto"
               aria-label="Fermer"
             >
               <span className="material-symbols-outlined text-[14px]">close</span>
             </button>
           </div>
-          <p className="text-[#dce9fd] text-[11px] leading-snug">{content}</p>
-          <div className="mt-1 pt-1 border-t border-white/10 flex items-center gap-1 text-[9px] text-[#98f6c5] uppercase tracking-wider font-semibold">
+          <p className="text-on-navy-soft text-[11px] leading-snug">{content}</p>
+          <div className="mt-1 pt-1 border-t border-white/10 flex items-center gap-1 text-[9px] text-ok-bright uppercase tracking-wider font-semibold">
             <span>💡 Infobulle d'aide</span>
           </div>
         </div>

@@ -250,7 +250,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       name: pointName.trim(),
       desc: pointDesc.trim() || 'Lieu de repli désigné pour le foyer.',
       coords: pointCoords.trim() || 'À pied depuis le domicile',
-      color: 'bg-[#001126] text-white',
+      color: 'bg-navy text-white',
     };
     setAssemblyPoints((prev) => [...prev, newPoint]);
     setPointName('');
@@ -278,24 +278,24 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
+    <div className="flex flex-col w-full px-4 sm:px-6 pt-20 lg:pt-24 pb-28 lg:pb-12 gap-4 max-w-xl lg:max-w-5xl mx-auto">
       {/* Top Offline Sync & Strict Local Privacy Banner */}
-      <div className="bg-[#001126] text-white p-3 rounded-xl shadow-sm border border-[#12263f]">
+      <div className="bg-navy text-white p-3 rounded-xl shadow-sm border border-ink">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span
-              className="material-symbols-outlined text-[#98f6c5] text-[18px] shrink-0"
+              className="material-symbols-outlined text-ok-bright text-[18px] shrink-0"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               lock
             </span>
-            <span className="font-['Space_Grotesk'] text-[11px] tracking-wider uppercase font-bold text-[#98f6c5] truncate">
+            <span className="font-label text-[11px] tracking-wider uppercase font-bold text-ok-bright truncate">
               CONFIDENTIALITÉ ABSOLUE • DONNÉES LOCALES UNIQUEMENT
             </span>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 bg-white/10 px-2 py-0.5 rounded">
-            <span className="w-2 h-2 rounded-full bg-[#98f6c5] animate-pulse"></span>
-            <span className="font-['Space_Grotesk'] text-[10px] text-[#eef4ff] uppercase">
+            <span className="w-2 h-2 rounded-full bg-ok-soft animate-pulse"></span>
+            <span className="font-label text-[10px] text-on-navy uppercase">
               INDEXEDDB SÉCURISÉ
             </span>
           </div>
@@ -303,36 +303,36 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </div>
 
       {/* Privacy Statement Card with Discreet Mode Toggle */}
-      <section data-tour="plan-privacy" className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section data-tour="plan-privacy" className="bg-card p-4 rounded-xl shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-start justify-between gap-2">
           <div className="flex gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[#e4efff] flex items-center justify-center shrink-0 text-[#001126]">
+            <div className="w-9 h-9 rounded-full bg-tint flex items-center justify-center shrink-0 text-ink">
               <span className="material-symbols-outlined text-[20px]">shield_person</span>
             </div>
             <div className="space-y-0.5">
-              <h2 className="text-[17px] text-[#001126] font-bold leading-tight">
+              <h2 className="text-[17px] text-ink font-bold leading-tight">
                 Stockage Zéro-Serveur
               </h2>
-              <p className="text-[12px] text-[#44474d] leading-relaxed">
+              <p className="text-[12px] text-ink-muted leading-relaxed">
                 Ces informations restent exclusivement stockées sur votre appareil (IndexedDB). Aucun compte, aucun cloud, aucun serveur distant. Option de masquage rapide et d'effacement intégral d'urgence.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="pt-1 flex items-center justify-between bg-[#eef4ff] p-2.5 rounded-lg border border-[#d6e4f8]">
+        <div className="pt-1 flex items-center justify-between bg-subtle p-2.5 rounded-lg border border-line">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#44474d] text-[18px]">
+            <span className="material-symbols-outlined text-ink-muted text-[18px]">
               {isDiscreet ? 'visibility_off' : 'visibility'}
             </span>
-            <span className="font-['Space_Grotesk'] text-[12px] text-[#001126] font-semibold">
+            <span className="font-label text-[12px] text-ink font-semibold">
               {isDiscreet ? 'Mode discret ACTIF (données masquées)' : 'Mode d\'affichage standard'}
             </span>
           </div>
           <button
             type="button"
             onClick={() => setIsDiscreet(!isDiscreet)}
-            className="min-h-[44px] px-3 py-1 bg-[#dce9fd] hover:bg-[#cedbef] text-[#001126] rounded flex items-center gap-1.5 transition-colors font-['Space_Grotesk'] text-[11px] uppercase font-bold"
+            className="min-h-[44px] px-3 py-1 bg-tint hover:bg-tint text-ink rounded flex items-center gap-1.5 transition-colors font-label text-[11px] uppercase font-bold"
           >
             <span className="material-symbols-outlined text-[16px]">
               {isDiscreet ? 'visibility' : 'visibility_off'}
@@ -345,34 +345,34 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       {/* Header Section */}
       <header className="space-y-1">
         <div className="flex items-center gap-2">
-          <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#12263f] text-white uppercase font-bold tracking-wider">
+          <span className="font-label text-[11px] px-2 py-0.5 rounded bg-navy-2 text-white uppercase font-bold tracking-wider">
             SECTION 4.9 • RÉSILIENCE DU FOYER
           </span>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
+          <span className="font-label text-[11px] text-ink-muted font-medium">
             • HORS-RÉSEAU
           </span>
         </div>
-        <h1 className="text-[24px] text-[#001126] tracking-tight font-bold">
+        <h1 className="text-[24px] text-ink tracking-tight font-bold">
           Plan Familial de Mise en Sûreté
         </h1>
-        <p className="text-[14px] text-[#44474d] leading-relaxed">
+        <p className="text-[14px] text-ink-muted leading-relaxed">
           Organisation coordonnée des proches et protocoles de rassemblement hors réseau.
         </p>
       </header>
 
       {/* Section: Foyer & Vulnérabilités */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-3 border border-[#c4c6ce]">
-        <div className="flex items-center justify-between pb-1 border-b border-[#e4efff]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
+        <div className="flex items-center justify-between pb-1 border-b border-line">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce] text-[22px]">
+            <span className="material-symbols-outlined text-brand-ink text-[22px]">
               family_restroom
             </span>
-            <h2 className="text-[17px] text-[#001126] font-bold">Composition du Foyer</h2>
+            <h2 className="text-[17px] text-ink font-bold">Composition du Foyer</h2>
           </div>
           <button
             onClick={() => setShowMemberModal(true)}
             type="button"
-            className="min-h-[44px] px-3 bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001126] rounded font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1 transition-colors border border-[#d6e4f8]"
+            className="min-h-[44px] px-3 bg-subtle hover:bg-tint text-ink rounded font-label text-[11px] font-bold uppercase flex items-center gap-1 transition-colors border border-line"
           >
             <span className="material-symbols-outlined text-[16px]">edit</span>
             <span>Modifier</span>
@@ -380,19 +380,19 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         </div>
 
         {/* Member count chip */}
-        <div className="bg-[#eef4ff] p-2.5 rounded-lg flex items-center justify-between border border-[#d6e4f8]">
+        <div className="bg-subtle p-2.5 rounded-lg flex items-center justify-between border border-line">
           <div className="flex items-center gap-2">
             <span
-              className="material-symbols-outlined text-[#005236] text-[20px]"
+              className="material-symbols-outlined text-ok-ink text-[20px]"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               groups
             </span>
-            <span className="font-['Space_Grotesk'] text-[13px] text-[#001126] font-bold">
+            <span className="font-label text-[13px] text-ink font-bold">
               {members.length} membres du foyer configurés
             </span>
           </div>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
+          <span className="font-label text-[11px] text-ink-muted font-medium">
             Fiche à jour
           </span>
         </div>
@@ -400,10 +400,10 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         {/* Specific Vulnerabilities */}
         <div className="space-y-2 pt-1">
           <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[#44474d] text-[18px]">
+            <span className="material-symbols-outlined text-ink-muted text-[18px]">
               health_and_safety
             </span>
-            <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] uppercase font-bold tracking-wider">
+            <span className="font-label text-[11px] text-ink-muted uppercase font-bold tracking-wider">
               Besoins particuliers & Vulnérabilités (Sans diagnostic médical)
             </span>
           </div>
@@ -413,42 +413,42 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
               members.map((mem) => (
                 <div
                   key={mem.id}
-                  className="bg-[#eef4ff] p-3 rounded-lg flex items-start gap-3 border border-[#d6e4f8] group"
+                  className="bg-subtle p-3 rounded-lg flex items-start gap-3 border border-line group"
                 >
-                  <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 mt-0.5 text-[#001126] border border-[#c4c6ce]">
+                  <div className="w-7 h-7 rounded-full bg-card flex items-center justify-center shrink-0 mt-0.5 text-ink border border-line-strong">
                     <span className="material-symbols-outlined text-[16px]">{mem.icon}</span>
                   </div>
                   <div className="space-y-0.5 min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-['Space_Grotesk'] text-[13px] text-[#001126] font-bold">
+                      <p className="font-label text-[13px] text-ink font-bold">
                         {maskText(mem.role)}
                       </p>
                       <button
                         onClick={() => handleDeleteMember(mem.id)}
-                        className="text-[#ba1a1a] opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                        className="text-danger-ink opacity-0 group-hover:opacity-100 transition-opacity p-1"
                         title="Supprimer"
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
                       </button>
                     </div>
-                    <p className="text-[12px] text-[#0f1c2b] leading-relaxed">
+                    <p className="text-[12px] text-ink leading-relaxed">
                       {mem.details}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="bg-[#f0f4f9] p-3.5 rounded-lg border border-[#c4c6ce] flex flex-col gap-1.5 text-center">
-                <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+              <div className="bg-subtle p-3.5 rounded-lg border border-line-strong flex flex-col gap-1.5 text-center">
+                <span className="font-label text-[12px] font-bold text-ink">
                   Aucun membre renseigné (Feuille blanche)
                 </span>
-                <p className="text-[11px] text-[#44474d]">
+                <p className="text-[11px] text-ink-muted">
                   Configurez vos proches pour enregistrer leurs besoins spécifiques d'évacuation ou de confinement.
                 </p>
                 <button
                   type="button"
                   onClick={() => setShowMemberModal(true)}
-                  className="mt-1 min-h-[40px] px-3 bg-[#001126] text-white rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase self-center flex items-center gap-1.5"
+                  className="mt-1 min-h-[40px] px-3 bg-navy text-white rounded-lg font-label text-[11px] font-bold uppercase self-center flex items-center gap-1.5"
                 >
                   <span className="material-symbols-outlined text-[16px]">person_add</span>
                   <span>Ajouter un membre</span>
@@ -460,18 +460,18 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Section: Lieux de Rassemblement & Ralliement */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce] text-[22px]">pin_drop</span>
-            <h2 className="text-[17px] text-[#001126] font-bold">
+            <span className="material-symbols-outlined text-brand-ink text-[22px]">pin_drop</span>
+            <h2 className="text-[17px] text-ink font-bold">
               Lieux de Rassemblement & Ralliement
             </h2>
           </div>
           <button
             onClick={() => setShowAssemblyModal(true)}
             type="button"
-            className="min-h-[40px] px-2.5 bg-[#eef4ff] hover:bg-[#dce9fd] text-[#001126] rounded font-['Space_Grotesk'] text-[11px] font-bold uppercase flex items-center gap-1 transition-colors border border-[#d6e4f8]"
+            className="min-h-[40px] px-2.5 bg-subtle hover:bg-tint text-ink rounded font-label text-[11px] font-bold uppercase flex items-center gap-1 transition-colors border border-line"
           >
             <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
             <span>Ajouter</span>
@@ -479,18 +479,18 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         </div>
 
         {/* Crucial Safety Rule Alert Banner */}
-        <div className="bg-[#ffdad6] text-[#93000a] p-3 rounded-lg flex items-start gap-2.5 border border-[#ffb4ab]">
+        <div className="bg-danger-soft text-danger-ink-strong p-3 rounded-lg flex items-start gap-2.5 border border-danger-line">
           <span
-            className="material-symbols-outlined text-[#ba1a1a] text-[22px] shrink-0 mt-0.5"
+            className="material-symbols-outlined text-danger-ink text-[22px] shrink-0 mt-0.5"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             warning
           </span>
           <div className="space-y-0.5">
-            <p className="font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-wide text-[#ba1a1a]">
+            <p className="font-label text-[11px] font-bold uppercase tracking-wide text-danger-ink">
               Règle absolue de sécurité
             </p>
-            <p className="text-[12px] text-[#93000a] leading-relaxed">
+            <p className="text-[12px] text-danger-ink-strong leading-relaxed">
               Si l'alerte impose un confinement immédiat (toxique chimique ou retombées radiologiques), <strong className="underline font-bold">NE PAS SE DÉPLACER</strong> vers les points de ralliement. Restez calfeutré sur place.
             </p>
           </div>
@@ -502,20 +502,20 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
             assemblyPoints.map((pt, i) => (
               <div
                 key={i}
-                className="bg-[#eef4ff] p-3.5 rounded-lg space-y-2 border border-[#d6e4f8] group"
+                className="bg-subtle p-3.5 rounded-lg space-y-2 border border-line group"
               >
                 <div className="flex items-center justify-between">
-                  <span className={`font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded uppercase font-bold tracking-wide ${pt.color || 'bg-[#001126] text-white'}`}>
+                  <span className={`font-label text-[11px] px-2 py-0.5 rounded uppercase font-bold tracking-wide ${pt.color || 'bg-navy text-white'}`}>
                     {pt.type}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-bold">
+                    <span className="font-label text-[11px] text-ink-muted font-bold">
                       {pt.radius}
                     </span>
                     <button
                       type="button"
                       onClick={() => setAssemblyPoints((prev) => prev.filter((_, idx) => idx !== i))}
-                      className="text-[#ba1a1a] opacity-0 group-hover:opacity-100 p-0.5 transition-opacity"
+                      className="text-danger-ink opacity-0 group-hover:opacity-100 p-0.5 transition-opacity"
                       title="Supprimer ce point"
                     >
                       <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -523,29 +523,29 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   </div>
                 </div>
                 <div className="space-y-0.5">
-                  <h3 className="text-[16px] text-[#001126] font-bold">
+                  <h3 className="text-[16px] text-ink font-bold">
                     {maskText(pt.name)}
                   </h3>
-                  <p className="text-[12px] text-[#44474d] leading-relaxed">{pt.desc}</p>
+                  <p className="text-[12px] text-ink-muted leading-relaxed">{pt.desc}</p>
                 </div>
-                <div className="pt-1 flex items-center gap-1.5 text-[12px] font-medium text-[#0036ce]">
+                <div className="pt-1 flex items-center gap-1.5 text-[12px] font-medium text-brand-ink">
                   <span className="material-symbols-outlined text-[16px]">location_on</span>
-                  <span className="font-['Space_Grotesk']">{maskText(pt.coords)}</span>
+                  <span className="font-label">{maskText(pt.coords)}</span>
                 </div>
               </div>
             ))
           ) : (
-            <div className="bg-[#f0f4f9] p-3.5 rounded-lg border border-[#c4c6ce] flex flex-col gap-1.5 text-center">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+            <div className="bg-subtle p-3.5 rounded-lg border border-line-strong flex flex-col gap-1.5 text-center">
+              <span className="font-label text-[12px] font-bold text-ink">
                 Aucun point de ralliement défini (Feuille blanche)
               </span>
-              <p className="text-[11px] text-[#44474d]">
+              <p className="text-[11px] text-ink-muted">
                 Définissez un point primaire immédiat (ex. parc ou kiosque du quartier) et un point secondaire de repli.
               </p>
               <button
                 type="button"
                 onClick={() => setShowAssemblyModal(true)}
-                className="mt-1 min-h-[40px] px-3 bg-[#001126] text-white rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase self-center flex items-center gap-1.5"
+                className="mt-1 min-h-[40px] px-3 bg-navy text-white rounded-lg font-label text-[11px] font-bold uppercase self-center flex items-center gap-1.5"
               >
                 <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
                 <span>Ajouter un point de ralliement</span>
@@ -556,28 +556,28 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Section: Protocole de Communication */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#0036ce] text-[22px]">cell_tower</span>
-          <h2 className="text-[17px] text-[#001126] font-bold">Protocole Réseau & Crise</h2>
+          <span className="material-symbols-outlined text-brand-ink text-[22px]">cell_tower</span>
+          <h2 className="text-[17px] text-ink font-bold">Protocole Réseau & Crise</h2>
         </div>
 
         {/* Guidelines */}
-        <div className="bg-[#eef4ff] p-3 rounded-lg space-y-2 border border-[#d6e4f8]">
-          <p className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold uppercase tracking-wider">
+        <div className="bg-subtle p-3 rounded-lg space-y-2 border border-line">
+          <p className="font-label text-[11px] text-ink font-bold uppercase tracking-wider">
             Règles de communication sous saturation réseau :
           </p>
-          <ul className="space-y-1.5 text-[12px] text-[#0f1c2b]">
+          <ul className="space-y-1.5 text-[12px] text-ink">
             <li className="flex items-start gap-2">
-              <span className="font-['Space_Grotesk'] text-[12px] text-[#ba1a1a] font-bold">
+              <span className="font-label text-[12px] text-danger-ink font-bold">
                 1.
               </span>
               <span>
-                <strong className="text-[#ba1a1a]">Ne jamais téléphoner :</strong> Préserver les fréquences cellulaires et lignes pour le 15 / 18 / 112.
+                <strong className="text-danger-ink">Ne jamais téléphoner :</strong> Préserver les fréquences cellulaires et lignes pour le 15 / 18 / 112.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="font-['Space_Grotesk'] text-[12px] text-[#001126] font-bold">
+              <span className="font-label text-[12px] text-ink font-bold">
                 2.
               </span>
               <span>
@@ -585,7 +585,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="font-['Space_Grotesk'] text-[12px] text-[#001126] font-bold">
+              <span className="font-label text-[12px] text-ink font-bold">
                 3.
               </span>
               <span>
@@ -597,17 +597,17 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
 
         {/* Out-of-zone Contact Relay */}
         {outZoneContact ? (
-          <div className="bg-[#001126] text-white p-4 rounded-xl space-y-2 border border-[#12263f]">
+          <div className="bg-navy text-white p-4 rounded-xl space-y-2 border border-ink">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
-                  className="material-symbols-outlined text-[#98f6c5] text-[18px]"
+                  className="material-symbols-outlined text-ok-bright text-[18px]"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                   hub
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-['Space_Grotesk'] text-[11px] uppercase font-bold text-[#98f6c5] tracking-wide">
+                  <span className="font-label text-[11px] uppercase font-bold text-ok-bright tracking-wide">
                     Contact Relais Hors Zone Prioritaire
                   </span>
                   <Tooltip
@@ -617,7 +617,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-['Space_Grotesk'] text-[10px] bg-white/20 px-2 py-0.5 rounded text-white font-medium">
+                <span className="font-label text-[10px] bg-white/20 px-2 py-0.5 rounded text-white font-medium">
                   {outZoneContact.dist}
                 </span>
                 <button
@@ -629,7 +629,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                     setOutDist(outZoneContact.dist);
                     setShowOutZoneModal(true);
                   }}
-                  className="text-[#98f6c5] hover:text-white p-0.5"
+                  className="text-ok-bright hover:text-white p-0.5"
                   title="Modifier le contact relais"
                 >
                   <span className="material-symbols-outlined text-[16px]">edit</span>
@@ -642,28 +642,28 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 <p className="text-[16px] font-bold text-white">
                   {maskText(outZoneContact.name)}
                 </p>
-                <span className="material-symbols-outlined text-[#98f6c5] text-[18px]">
+                <span className="material-symbols-outlined text-ok-bright text-[18px]">
                   verified
                 </span>
               </div>
-              <p className="font-['Space_Grotesk'] text-[15px] text-[#98f6c5] tracking-wide font-bold">
+              <p className="font-label text-[15px] text-ok-bright tracking-wide font-bold">
                 {maskText(outZoneContact.phone)}
               </p>
             </div>
 
-            <p className="text-[12px] text-[#dce9fd] leading-relaxed pt-0.5">
+            <p className="text-[12px] text-on-navy-soft leading-relaxed pt-0.5">
               {outZoneContact.role}
             </p>
           </div>
         ) : (
-          <div className="bg-[#f0f4f9] p-4 rounded-xl border border-[#c4c6ce] flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[#001126]">
-              <span className="material-symbols-outlined text-[20px] text-[#44474d]">hub</span>
-              <span className="font-['Space_Grotesk'] text-[13px] font-bold">
+          <div className="bg-subtle p-4 rounded-xl border border-line-strong flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-ink">
+              <span className="material-symbols-outlined text-[20px] text-ink-muted">hub</span>
+              <span className="font-label text-[13px] font-bold">
                 Aucun contact relais hors zone (Feuille blanche)
               </span>
             </div>
-            <p className="text-[11px] text-[#44474d] leading-relaxed">
+            <p className="text-[11px] text-ink-muted leading-relaxed">
               Désignez un membre de votre famille ou un proche habitant à plus de 50-100 km pour centraliser vos SMS brefs en cas de saturation du réseau local.
             </p>
             <button
@@ -674,7 +674,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 setShowOutZoneModal(true);
               }}
               type="button"
-              className="mt-1 min-h-[40px] px-3 bg-[#001126] text-white rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase self-start flex items-center gap-1.5"
+              className="mt-1 min-h-[40px] px-3 bg-navy text-white rounded-lg font-label text-[11px] font-bold uppercase self-start flex items-center gap-1.5"
             >
               <span className="material-symbols-outlined text-[16px]">add_call</span>
               <span>Définir le contact relais hors zone</span>
@@ -685,13 +685,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         {/* Local Trusted Contacts */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-bold uppercase tracking-wider">
+            <p className="font-label text-[11px] text-ink-muted font-bold uppercase tracking-wider">
               Contacts de Confiance Locaux
             </p>
             <button
               onClick={() => setShowContactModal(true)}
               type="button"
-              className="text-[#0036ce] text-[11px] font-['Space_Grotesk'] font-bold flex items-center gap-0.5 hover:underline"
+              className="text-brand-ink text-[11px] font-label font-bold flex items-center gap-0.5 hover:underline"
             >
               <span className="material-symbols-outlined text-[16px]">add</span>
               Ajouter
@@ -703,24 +703,24 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
               localContacts.map((con) => (
                 <div
                   key={con.id}
-                  className="bg-[#eef4ff] p-3 rounded-lg flex items-center justify-between min-h-[48px] border border-[#d6e4f8] group"
+                  className="bg-subtle p-3 rounded-lg flex items-center justify-between min-h-[48px] border border-line group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="material-symbols-outlined text-[#001126] text-[20px]">
+                    <span className="material-symbols-outlined text-ink text-[20px]">
                       {con.icon}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-['Space_Grotesk'] text-[13px] text-[#001126] font-bold truncate">
+                      <p className="font-label text-[13px] text-ink font-bold truncate">
                         {maskText(con.name)}
                       </p>
-                      <p className="text-[12px] text-[#44474d] truncate">{con.role}</p>
+                      <p className="text-[12px] text-ink-muted truncate">{con.role}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => setLocalContacts((prev) => prev.filter((c) => c.id !== con.id))}
-                      className="text-[#ba1a1a] opacity-0 group-hover:opacity-100 p-1.5 transition-opacity"
+                      className="text-danger-ink opacity-0 group-hover:opacity-100 p-1.5 transition-opacity"
                       title="Supprimer ce contact"
                     >
                       <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -735,7 +735,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                           desc: 'Contact local du Plan Familial de Mise en Sûreté.',
                         })
                       }
-                      className="w-9 h-9 rounded-lg bg-white flex items-center justify-center text-[#001126] border border-[#c4c6ce] hover:bg-[#dce9fd] transition-colors"
+                      className="w-9 h-9 rounded-lg bg-card flex items-center justify-center text-ink border border-line-strong hover:bg-tint transition-colors"
                     >
                       <span className="material-symbols-outlined text-[18px]">sms</span>
                     </button>
@@ -743,8 +743,8 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 </div>
               ))
             ) : (
-              <div className="bg-[#f0f4f9] p-3 rounded-lg border border-[#c4c6ce] text-center">
-                <span className="text-[12px] text-[#44474d]">
+              <div className="bg-subtle p-3 rounded-lg border border-line-strong text-center">
+                <span className="text-[12px] text-ink-muted">
                   Aucun contact local enregistré. Cliquez sur « Ajouter » (ex. voisin avec double de clé, médecin).
                 </span>
               </div>
@@ -754,13 +754,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Section: Checklist du Plan Familial */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce] text-[22px]">checklist</span>
-            <h2 className="text-[17px] text-[#001126] font-bold">Checklist du Plan Familial</h2>
+            <span className="material-symbols-outlined text-brand-ink text-[22px]">checklist</span>
+            <h2 className="text-[17px] text-ink font-bold">Checklist du Plan Familial</h2>
           </div>
-          <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#002c1b] bg-[#98f6c5] px-2 py-0.5 rounded">
+          <span className="font-label text-[12px] font-bold text-ok-ink bg-ok-soft px-2 py-0.5 rounded">
             {progressPercent}% Prêt
           </span>
         </div>
@@ -768,16 +768,16 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         {/* Progress Meter */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] uppercase font-semibold">
+            <span className="font-label text-[11px] text-ink-muted uppercase font-semibold">
               Jauge de préparation
             </span>
-            <span className="font-['Space_Grotesk'] text-[11px] text-[#001126] font-bold">
+            <span className="font-label text-[11px] text-ink font-bold">
               {doneCount} sur {totalTasks} tâches opérationnelles
             </span>
           </div>
-          <div className="w-full bg-[#e4efff] h-2.5 rounded-full overflow-hidden">
+          <div className="w-full bg-tint h-2.5 rounded-full overflow-hidden">
             <div
-              className="bg-[#0036ce] h-full rounded-full transition-all duration-300"
+              className="bg-brand h-full rounded-full transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             ></div>
           </div>
@@ -788,30 +788,30 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           {getLocalizedPlanTasks(tasks, language).map((task) => (
             <label
               key={task.id}
-              className="flex items-center gap-3 p-2.5 bg-[#eef4ff] rounded-lg cursor-pointer min-h-[48px] hover:bg-[#e4efff] transition-colors border border-[#d6e4f8]"
+              className="flex items-center gap-3 p-2.5 bg-subtle rounded-lg cursor-pointer min-h-[48px] hover:bg-tint transition-colors border border-line"
             >
               <input
                 type="checkbox"
                 checked={task.done}
                 onChange={() => toggleTask(task.id)}
-                className="w-5 h-5 text-[#001126] rounded accent-[#001126] shrink-0"
+                className="w-5 h-5 text-ink rounded accent-ink shrink-0"
               />
               <span
                 className={`text-[13px] flex-1 ${
-                  task.done ? 'text-[#0f1c2b]' : 'font-semibold text-[#001126]'
+                  task.done ? 'text-ink' : 'font-semibold text-ink'
                 }`}
               >
                 {task.label}
               </span>
               {task.done ? (
                 <span
-                  className="material-symbols-outlined text-[#3f9d73] text-[20px] shrink-0"
+                  className="material-symbols-outlined text-ok-ink text-[20px] shrink-0"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                   check_circle
                 </span>
               ) : (
-                <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] uppercase font-bold shrink-0">
+                <span className="font-label text-[11px] text-ink-muted uppercase font-bold shrink-0">
                   {isEn ? 'To plan' : 'À planifier'}
                 </span>
               )}
@@ -821,38 +821,38 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Visual Aid Card */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-2 border border-[#c4c6ce]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-2 border border-line-strong">
         <div className="flex items-center justify-between">
-          <h3 className="text-[17px] text-[#001126] font-bold">Mémo Réflexe Visuel</h3>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#002c1b] bg-[#98f6c5] px-2 py-0.5 rounded font-bold">
+          <h3 className="text-[17px] text-ink font-bold">Mémo Réflexe Visuel</h3>
+          <span className="font-label text-[11px] text-ok-ink bg-ok-soft px-2 py-0.5 rounded font-bold">
             DISPONIBLE HORS-LIGNE
           </span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center pt-1">
-          <div className="bg-[#eef4ff] p-2.5 rounded-lg space-y-1 border border-[#d6e4f8]">
-            <span className="material-symbols-outlined text-[#001126] text-[22px]">air</span>
-            <p className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+          <div className="bg-subtle p-2.5 rounded-lg space-y-1 border border-line">
+            <span className="material-symbols-outlined text-ink text-[22px]">air</span>
+            <p className="font-label text-[12px] font-bold text-ink">
               1. Calfeutrer
             </p>
-            <p className="font-['Space_Grotesk'] text-[10px] text-[#44474d]">
+            <p className="font-label text-[10px] text-ink-muted">
               Stop VMC & joints
             </p>
           </div>
-          <div className="bg-[#eef4ff] p-2.5 rounded-lg space-y-1 border border-[#d6e4f8]">
-            <span className="material-symbols-outlined text-[#001126] text-[22px]">radio</span>
-            <p className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+          <div className="bg-subtle p-2.5 rounded-lg space-y-1 border border-line">
+            <span className="material-symbols-outlined text-ink text-[22px]">radio</span>
+            <p className="font-label text-[12px] font-bold text-ink">
               2. Écouter
             </p>
-            <p className="font-['Space_Grotesk'] text-[10px] text-[#44474d]">
+            <p className="font-label text-[10px] text-ink-muted">
               Radio FM locale
             </p>
           </div>
-          <div className="bg-[#eef4ff] p-2.5 rounded-lg space-y-1 border border-[#d6e4f8]">
-            <span className="material-symbols-outlined text-[#001126] text-[22px]">sms</span>
-            <p className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126]">
+          <div className="bg-subtle p-2.5 rounded-lg space-y-1 border border-line">
+            <span className="material-symbols-outlined text-ink text-[22px]">sms</span>
+            <p className="font-label text-[12px] font-bold text-ink">
               3. Relais
             </p>
-            <p className="font-['Space_Grotesk'] text-[10px] text-[#44474d] truncate">
+            <p className="font-label text-[10px] text-ink-muted truncate">
               {outZoneContact ? `SMS relais ${maskText(outZoneContact.name)}` : 'SMS relais hors zone'}
             </p>
           </div>
@@ -860,10 +860,10 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Section: Actions & Sauvegarde */}
-      <section className="bg-white rounded-xl p-4 shadow-sm space-y-3 border border-[#c4c6ce]">
+      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="space-y-0.5">
-          <h2 className="text-[17px] text-[#001126] font-bold">Actions & Sauvegarde</h2>
-          <p className="text-[12px] text-[#44474d]">
+          <h2 className="text-[17px] text-ink font-bold">Actions & Sauvegarde</h2>
+          <p className="text-[12px] text-ink-muted">
             Imprimez une copie papier physique et gérez le cycle de vie de vos données privées.
           </p>
         </div>
@@ -873,7 +873,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           <button
             onClick={() => setShowQrModal(true)}
             type="button"
-            className="w-full min-h-[48px] bg-[#0036ce] hover:bg-[#0028a3] text-white font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+            className="w-full min-h-[48px] bg-brand hover:bg-[#0028a3] text-white font-label text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span>
             <span>Partager / Transférer via QR Code (sans cloud)</span>
@@ -882,7 +882,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           <button
             onClick={() => setShowPocketCardModal(true)}
             type="button"
-            className="w-full min-h-[48px] bg-white hover:bg-gray-50 text-[#001126] font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border-2 border-[#001126] shadow-sm"
+            className="w-full min-h-[48px] bg-card hover:bg-gray-50 text-ink font-label text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors border-2 border-ink shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">contact_emergency</span>
             <span>Dossier de Secours Personnel & Fiche de Poche Imprimable</span>
@@ -891,22 +891,22 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
           <button
             onClick={handleExportPDF}
             type="button"
-            className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+            className="w-full min-h-[48px] bg-navy hover:bg-navy-2 text-white font-label text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
             <span>Exporter / Imprimer le Plan en PDF (Classeur de Crise)</span>
           </button>
-          <p className="text-[11px] text-[#44474d] leading-relaxed px-1">
-            <span className="font-bold text-[#001126]">Partage direct appareil à appareil :</span> Le QR code permet de transférer le plan à un proche sans Internet ni serveur distant. Conservez vos impressions dans un classeur accessible.
+          <p className="text-[11px] text-ink-muted leading-relaxed px-1">
+            <span className="font-bold text-ink">Partage direct appareil à appareil :</span> Le QR code permet de transférer le plan à un proche sans Internet ni serveur distant. Conservez vos impressions dans un classeur accessible.
           </p>
         </div>
 
         {/* Emergency Wipe Action */}
-        <div className="pt-2 border-t border-[#e4efff]">
+        <div className="pt-2 border-t border-line">
           <button
             onClick={onOpenWipeModal}
             type="button"
-            className="w-full min-h-[48px] bg-[#ffdad6]/60 hover:bg-[#ffdad6] text-[#ba1a1a] font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-[#ffb4ab]"
+            className="w-full min-h-[48px] bg-danger-soft/60 hover:bg-danger-soft text-danger-ink font-label text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-danger-line"
           >
             <span className="material-symbols-outlined text-[18px]">delete_forever</span>
             <span>Effacer toutes les données du plan (Suppression Définitive)</span>
@@ -916,9 +916,9 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
 
       {/* Toast Feedback */}
       {feedbackToast && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-[#001126] text-white px-4 py-2.5 rounded-lg shadow-xl flex items-center gap-2 border border-[#98f6c5]">
-          <span className="material-symbols-outlined text-[#98f6c5] text-[18px]">check_circle</span>
-          <span className="font-['Space_Grotesk'] text-[12px] font-bold">{feedbackToast}</span>
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-navy text-white px-4 py-2.5 rounded-lg shadow-xl flex items-center gap-2 border border-ok-bright">
+          <span className="material-symbols-outlined text-ok-bright text-[18px]">check_circle</span>
+          <span className="font-label text-[12px] font-bold">{feedbackToast}</span>
         </div>
       )}
 
@@ -926,13 +926,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       {showMemberModal && (
         <div
           role="dialog"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">Ajouter un membre du foyer</h3>
+          <div className="bg-card max-w-sm w-full rounded-xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3">
+            <h3 className="text-[18px] font-bold text-ink">Ajouter un membre du foyer</h3>
             <form onSubmit={handleAddMember} className="flex flex-col gap-3">
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Rôle ou Profil :
                 </label>
                 <input
@@ -940,13 +940,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
                   placeholder="Ex : Enfant (12 ans), Grand-parent..."
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Besoins / Instructions spécifiques :
                 </label>
                 <textarea
@@ -954,7 +954,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   onChange={(e) => setNewDetails(e.target.value)}
                   placeholder="Ex : Collège sous PPMS, traitement d'insuline dans le kit..."
                   rows={3}
-                  className="w-full p-2.5 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full p-2.5 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
@@ -962,13 +962,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowMemberModal(false)}
-                  className="h-10 px-3.5 rounded bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase"
+                  className="h-10 px-3.5 rounded bg-subtle text-ink font-label text-[11px] font-bold uppercase"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
+                  className="h-10 px-4 rounded bg-navy text-white font-label text-[11px] font-bold uppercase shadow-sm"
                 >
                   Enregistrer
                 </button>
@@ -982,13 +982,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       {showContactModal && (
         <div
           role="dialog"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">Nouveau contact de confiance</h3>
+          <div className="bg-card max-w-sm w-full rounded-xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3">
+            <h3 className="text-[18px] font-bold text-ink">Nouveau contact de confiance</h3>
             <form onSubmit={handleAddContact} className="flex flex-col gap-3">
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Nom & Prénom :
                 </label>
                 <input
@@ -996,13 +996,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Ex : Jean D. (Voisin rez-de-chaussée)"
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Numéro de mobile :
                 </label>
                 <input
@@ -1010,12 +1010,12 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="+33 6 00 00 00 00"
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Rôle ou clé de secours :
                 </label>
                 <input
@@ -1023,7 +1023,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={contactRole}
                   onChange={(e) => setContactRole(e.target.value)}
                   placeholder="Ex : Détenteur double de clés..."
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
@@ -1031,13 +1031,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowContactModal(false)}
-                  className="h-10 px-3.5 rounded bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase"
+                  className="h-10 px-3.5 rounded bg-subtle text-ink font-label text-[11px] font-bold uppercase"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
+                  className="h-10 px-4 rounded bg-navy text-white font-label text-[11px] font-bold uppercase shadow-sm"
                 >
                   Ajouter
                 </button>
@@ -1051,19 +1051,19 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       {showAssemblyModal && (
         <div
           role="dialog"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">Nouveau point de ralliement</h3>
+          <div className="bg-card max-w-sm w-full rounded-xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3">
+            <h3 className="text-[18px] font-bold text-ink">Nouveau point de ralliement</h3>
             <form onSubmit={handleAddAssemblyPoint} className="flex flex-col gap-3">
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Type de point :
                 </label>
                 <select
                   value={pointType}
                   onChange={(e) => setPointType(e.target.value)}
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] bg-white focus:outline-none"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink bg-card focus:outline-none"
                 >
                   <option value="POINT PRIMAIRE • IMMÉDIAT">POINT PRIMAIRE • IMMÉDIAT</option>
                   <option value="POINT SECONDAIRE • HORS COMMUNE">POINT SECONDAIRE • HORS COMMUNE</option>
@@ -1072,7 +1072,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Nom du lieu :
                 </label>
                 <input
@@ -1080,13 +1080,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={pointName}
                   onChange={(e) => setPointName(e.target.value)}
                   placeholder="Ex : Kiosque du Parc Pasteur, Parking Mairie..."
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Distance / Rayon indicatif :
                 </label>
                 <input
@@ -1094,12 +1094,12 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={pointRadius}
                   onChange={(e) => setPointRadius(e.target.value)}
                   placeholder="Ex : Rayon: 300m, 2 km..."
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Consignes d'accès ou repère :
                 </label>
                 <textarea
@@ -1107,7 +1107,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   onChange={(e) => setPointDesc(e.target.value)}
                   placeholder="Ex : Angle nord près de la statue, attendre 30 min..."
                   rows={2}
-                  className="w-full p-2.5 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full p-2.5 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
@@ -1115,13 +1115,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAssemblyModal(false)}
-                  className="h-10 px-3.5 rounded bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase"
+                  className="h-10 px-3.5 rounded bg-subtle text-ink font-label text-[11px] font-bold uppercase"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
+                  className="h-10 px-4 rounded bg-navy text-white font-label text-[11px] font-bold uppercase shadow-sm"
                 >
                   Enregistrer
                 </button>
@@ -1135,16 +1135,16 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       {showOutZoneModal && (
         <div
           role="dialog"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
         >
-          <div className="bg-white max-w-sm w-full rounded-xl p-5 shadow-2xl border border-[#c4c6ce] flex flex-col gap-3">
-            <h3 className="text-[18px] font-bold text-[#001126]">Contact Relais Hors Zone</h3>
-            <p className="text-[11px] text-[#44474d]">
+          <div className="bg-card max-w-sm w-full rounded-xl p-5 shadow-2xl border border-line-strong flex flex-col gap-3">
+            <h3 className="text-[18px] font-bold text-ink">Contact Relais Hors Zone</h3>
+            <p className="text-[11px] text-ink-muted">
               Proche habitant loin (&gt; 50-100 km) pour centraliser vos SMS si les réseaux locaux de votre agglomération tombent.
             </p>
             <form onSubmit={handleSaveOutZoneContact} className="flex flex-col gap-3">
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Nom & Lien :
                 </label>
                 <input
@@ -1152,13 +1152,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={outName}
                   onChange={(e) => setOutName(e.target.value)}
                   placeholder="Ex : Marc D. (Oncle - Bretagne)"
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Téléphone :
                 </label>
                 <input
@@ -1166,12 +1166,12 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={outPhone}
                   onChange={(e) => setOutPhone(e.target.value)}
                   placeholder="+33 6 00 00 00 00"
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
               <div>
-                <label className="text-[12px] font-['Space_Grotesk'] text-[#44474d] uppercase font-bold block mb-1">
+                <label className="text-[12px] font-label text-ink-muted uppercase font-bold block mb-1">
                   Éloignement indicatif :
                 </label>
                 <input
@@ -1179,7 +1179,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                   value={outDist}
                   onChange={(e) => setOutDist(e.target.value)}
                   placeholder="Ex : Dist. > 150 km, Région Bretagne..."
-                  className="w-full h-11 px-3 border border-[#c4c6ce] rounded-lg text-[13px] text-[#001126] focus:outline-none focus:border-[#0036ce]"
+                  className="w-full h-11 px-3 border border-line-strong rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand-ink"
                 />
               </div>
 
@@ -1187,13 +1187,13 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowOutZoneModal(false)}
-                  className="h-10 px-3.5 rounded bg-[#eef4ff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase"
+                  className="h-10 px-3.5 rounded bg-subtle text-ink font-label text-[11px] font-bold uppercase"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-4 rounded bg-[#001126] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shadow-sm"
+                  className="h-10 px-4 rounded bg-navy text-white font-label text-[11px] font-bold uppercase shadow-sm"
                 >
                   Valider
                 </button>

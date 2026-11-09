@@ -1,25 +1,154 @@
-import React, { useState, useEffect } from 'react';
-import { TabType, SubScreen } from '../types';
-import { FamilyPlanData, AppSettings } from '../services/storage/StorageRepository';
-import { storageService } from '../services/storage/IndexedDbStorage';
-import { triggerHaptic } from '../utils/haptics';
+import React, { useState, useEffect, useMemo } from 'react';
+import { TabType, SubScreen, KitItem } from '../types';
+import { FamilyPlanData, AppSettings, InventoryItem } from '../services/storage/StorageRepository';
+import { storageService, DEFAULT_SPECIFIC_NEEDS } from '../services/storage/IndexedDbStorage';
+import { calculateReadinessScore } from '../utils/readinessScore';
 import { useTranslation } from '../i18n/I18nContext';
 
 interface HomeViewProps {
   onNavigateTab: (tab: TabType) => void;
   onOpenSubScreen: (screen: SubScreen) => void;
   kitCompletionPercent?: number;
+  kitItems?: KitItem[];
   canInstall?: boolean;
   onInstallClick?: () => void;
   onOpenWipeModal?: () => void;
   onStartTour?: () => void;
 }
 
+type Tone = 'ok' | 'warn' | 'danger' | 'info' | 'neutral';
+
+const TONE_BAR: Record<Tone, string> = {
+  ok: 'bg-ok',
+  warn: 'bg-warn',
+  danger: 'bg-danger',
+  info: 'bg-brand',
+  neutral: 'bg-ink-faint',
+};
+const TONE_ICON_BG: Record<Tone, string> = {
+  ok: 'bg-ok-soft text-ok-ink',
+  warn: 'bg-warn-soft text-warn-ink',
+  danger: 'bg-danger-soft text-danger-ink',
+  info: 'bg-tint text-brand-ink',
+  neutral: 'bg-subtle text-ink-muted',
+};
+
+const Icon: React.FC<{ name: string; className?: string; filled?: boolean }> = ({ name, className = '', filled }) => (
+  <span
+    className={`material-symbols-outlined ${className}`}
+    aria-hidden="true"
+    style={filled ? { fontVariationSettings: "'FILL' 1" } : undefined}
+  >
+    {name}
+  </span>
+);
+
+/** Carte d'indicateur de préparation (valeur réelle issue des données locales). */
+const StatCard: React.FC<{
+  icon: string;
+  label: string;
+  value: string;
+  detail: string;
+  tone: Tone;
+  percent?: number;
+  status: string;
+  onClick: () => void;
+  actionLabel: string;
+}> = ({ icon, label, value, detail, tone, percent, status, onClick, actionLabel }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={`${label} : ${value}. ${status}. ${actionLabel}`}
+    className="ds-card p-3 sm:p-4 text-left flex flex-col gap-2 sm:gap-3 hover:border-line-strong hover:shadow-[var(--shadow-raised)] transition-shadow cursor-pointer group"
+  >
+    <div className="flex items-center justify-between gap-2">
+      <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${TONE_ICON_BG[tone]}`}>
+        <Icon name={icon} className="text-[20px]" />
+      </span>
+      <span className={`ds-badge ds-badge-${tone} max-[400px]:text-[10px] max-[400px]:px-1.5`}>{status}</span>
+    </div>
+    <div className="flex flex-col gap-0.5 min-w-0">
+      <span className="text-[12.5px] sm:text-[13px] font-semibold text-ink-muted leading-snug">{label}</span>
+      <span className="text-[24px] leading-8 font-extrabold text-ink tabular-nums tracking-tight">{value}</span>
+      <span className="text-[12px] sm:text-[12.5px] text-ink-muted leading-snug hidden min-[480px]:block">{detail}</span>
+    </div>
+    {typeof percent === 'number' && (
+      <div className="ds-progress" aria-hidden="true">
+        <span className={TONE_BAR[tone]} style={{ width: `${Math.min(100, Math.max(0, percent))}%` }} />
+      </div>
+    )}
+    <span className="mt-auto hidden sm:flex items-center gap-1 text-[13px] font-semibold text-brand-ink group-hover:underline">
+      {actionLabel}
+      <Icon name="arrow_forward" className="text-[16px]" />
+    </span>
+  </button>
+);
+
+/** Carte de raccourci vers une fonctionnalité. */
+const QuickCard: React.FC<{
+  icon: string;
+  title: string;
+  desc: string;
+  onClick: () => void;
+  tone?: Tone;
+}> = ({ icon, title, desc, onClick, tone = 'info' }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="ds-card p-3.5 sm:p-4 text-left flex items-start gap-3 hover:border-line-strong hover:bg-subtle transition-colors cursor-pointer group min-h-[76px]"
+  >
+    <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${TONE_ICON_BG[tone]}`}>
+      <Icon name={icon} className="text-[22px]" />
+    </span>
+    <span className="flex flex-col min-w-0 flex-1 gap-0.5">
+      <span className="text-[14.5px] font-bold text-ink leading-snug">{title}</span>
+      <span className="text-[12.5px] text-ink-muted leading-snug">{desc}</span>
+    </span>
+    <Icon name="chevron_right" className="text-[20px] text-ink-faint group-hover:text-ink self-center shrink-0" />
+  </button>
+);
+
+/** Ligne de liste cliquable (protocoles, gestes). */
+const ListRow: React.FC<{ icon: string; title: string; desc: string; onClick: () => void; tone?: Tone }> = ({
+  icon,
+  title,
+  desc,
+  onClick,
+  tone = 'info',
+}) => (
+  <li>
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-subtle transition-colors cursor-pointer group min-h-[56px]"
+    >
+      <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${TONE_ICON_BG[tone]}`}>
+        <Icon name={icon} className="text-[20px]" />
+      </span>
+      <span className="flex flex-col min-w-0 flex-1">
+        <span className="text-[14px] font-semibold text-ink leading-snug">{title}</span>
+        <span className="text-[12.5px] text-ink-muted leading-snug line-clamp-2">{desc}</span>
+      </span>
+      <Icon name="chevron_right" className="text-[20px] text-ink-faint group-hover:text-ink shrink-0" />
+    </button>
+  </li>
+);
+
+const SectionHeader: React.FC<{ icon: string; title: string; aside?: React.ReactNode; id?: string }> = ({ icon, title, aside, id }) => (
+  <div className="flex items-center justify-between gap-2 mb-3">
+    <h2 id={id} className="ds-section-title flex items-center gap-2">
+      <Icon name={icon} className="text-[20px] text-ink-muted" />
+      {title}
+    </h2>
+    {aside}
+  </div>
+);
+
 export const HomeView: React.FC<HomeViewProps> = ({
   onNavigateTab,
   onOpenSubScreen,
-  kitCompletionPercent = 68,
-  canInstall = false,
+  kitCompletionPercent = 0,
+  kitItems = [],
   onInstallClick,
   onOpenWipeModal,
   onStartTour,
@@ -27,18 +156,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const { t, language } = useTranslation();
   const [familyPlan, setFamilyPlan] = useState<FamilyPlanData | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
-
-  const [isOnline, setIsOnline] = useState<boolean>(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const [inventory, setInventory] = useState<InventoryItem[] | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   useEffect(() => {
-    storageService.getFamilyPlan().then((plan) => {
-      setFamilyPlan(plan);
-    });
-    storageService.getSettings().then((s) => {
-      setSettings(s);
-    });
+    storageService.getFamilyPlan().then(setFamilyPlan);
+    storageService.getSettings().then(setSettings);
+    storageService.getInventoryItems().then(setInventory);
 
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -50,779 +174,489 @@ export const HomeView: React.FC<HomeViewProps> = ({
     };
   }, []);
 
+  // Score de préparation : même moteur de calcul que l'écran « Suis-je prêt ? »
+  const dashboard = useMemo(() => {
+    if (!settings || !familyPlan || !inventory || kitItems.length === 0) return null;
+    try {
+      return calculateReadinessScore(settings.specificNeeds || DEFAULT_SPECIFIC_NEEDS, kitItems, inventory, familyPlan);
+    } catch (e) {
+      return null;
+    }
+  }, [settings, familyPlan, inventory, kitItems]);
+
+  // ---- Indicateurs réels (aucune donnée inventée)
+  const kitDone = kitItems.filter((i) => i.completed).length;
+  const kitTotal = kitItems.length;
+  const kitTone: Tone = kitCompletionPercent >= 80 ? 'ok' : kitCompletionPercent >= 40 ? 'warn' : 'danger';
+
+  const planTasks = familyPlan?.tasks || [];
+  const planDone = planTasks.filter((tk) => tk.done).length;
+  const planPercent = planTasks.length ? Math.round((planDone / planTasks.length) * 100) : 0;
+  const hasRallyPoint = !!(familyPlan?.assemblyPoints && familyPlan.assemblyPoints.length > 0);
+  const contactCount = (familyPlan?.outZoneContact ? 1 : 0) + (familyPlan?.localContacts?.length || 0);
+  const planTone: Tone =
+    planPercent >= 80 && hasRallyPoint ? 'ok' : planPercent >= 40 || hasRallyPoint ? 'warn' : 'danger';
+
+  const expiredCount = dashboard?.expiries.expired.length ?? 0;
+  const soonCount = dashboard?.expiries.expiringSoon.length ?? 0;
+  const toCheck = expiredCount + soonCount;
+  const invTone: Tone = expiredCount > 0 ? 'danger' : soonCount > 0 ? 'warn' : 'ok';
+
+  const pendingActions = dashboard?.recommendedActions.length ?? 0;
+  const urgentActions = dashboard?.recommendedActions.filter((a) => a.urgency === 'high').length ?? 0;
+  const actionTone: Tone = urgentActions > 0 ? 'danger' : pendingActions > 0 ? 'warn' : 'ok';
+
+  const score = dashboard?.scoreResult.totalScore ?? null;
+  const levelNumber = dashboard?.scoreResult.level.number ?? null;
+  const scoreTone: Tone = levelNumber === 4 ? 'ok' : levelNumber === 3 ? 'info' : levelNumber === 2 ? 'warn' : 'danger';
+
+  const expiryWatch = useMemo(() => {
+    if (!dashboard) return [] as { name: string; days: number }[];
+    const list = [
+      ...dashboard.expiries.expired.map((it) => ({
+        name: it.name,
+        days: it.expiryDate ? Math.round((new Date(it.expiryDate).getTime() - Date.now()) / 86400000) : -1,
+      })),
+      ...dashboard.expiries.expiringSoon.map((e) => ({ name: e.item.name, days: e.daysRemaining })),
+    ];
+    return list.sort((a, b) => a.days - b.days).slice(0, 4);
+  }, [dashboard]);
+
+  const communeName = settings?.savedCommune?.name;
+  const statusLabel = (tone: Tone) =>
+    tone === 'ok' ? t('dash.statusGood') : tone === 'warn' ? t('dash.statusInProgress') : t('dash.statusToDo');
+
   return (
-    <div className="flex flex-col w-full px-4 pt-24 pb-28 gap-4 max-w-xl mx-auto">
-      {/* 1. Bannière de statut réseau & fraîcheur doctrinale proéminente */}
-      <section data-tour="home-status" className="w-full bg-[#eef4ff] rounded-xl p-4 shadow-sm border border-[#d6e4f8] flex flex-col gap-2.5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className={`w-3 h-3 rounded-full shrink-0 ${isOnline ? 'bg-[#16a34a] animate-pulse' : 'bg-[#dc2626]'}`}></span>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider text-[#001126]">
-              {isOnline
-                ? (language === 'fr' ? 'Connectivité Réseau Détectée' : 'Network Connection Active')
-                : (language === 'fr' ? 'Mode Déconnecté (Hors-Ligne)' : 'Disconnected (Offline Mode)')}
-            </span>
-          </div>
-          <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase">
-            {language === 'fr' ? 'LOCAL EMBARQUÉ' : 'LOCAL SOVEREIGN'}
-          </span>
+    <div className="ds-container pt-20 lg:pt-24 pb-28 lg:pb-12 flex flex-col gap-6 lg:gap-8">
+      {/* ================= En-tête de page ================= */}
+      <section data-tour="home-status" className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <span className="ds-eyebrow">{t('dash.eyebrow')}</span>
+          <h1 className="ds-page-title">{t('dash.title')}</h1>
+          <p className="text-[14px] text-ink-muted max-w-2xl">{t('dash.subtitle')}</p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[12px] pt-1.5 border-t border-[#d6e4f8]/80">
-          <div className="flex flex-col bg-white p-2.5 rounded-lg border border-[#c4c6ce]">
-            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-bold">
-              {language === 'fr' ? 'Disponibilité locale :' : 'Local availability:'}
-            </span>
-            <span className="font-semibold text-[#001126] mt-0.5">
-              {language === 'fr'
-                ? '100% autonome (5 protocoles complets, déshabillage & kits)'
-                : '100% autonomous (5 complete CBRN protocols, undressing & kits)'}
-            </span>
-          </div>
-
-          <div className="flex flex-col bg-white p-2.5 rounded-lg border border-[#c4c6ce]">
-            <span className="text-[10px] uppercase font-['Space_Grotesk'] text-[#44474d] font-bold">
-              {language === 'fr' ? 'Fraîcheur doctrinale du corpus :' : 'Doctrinal freshness:'}
-            </span>
-            <span className="font-semibold text-[#0036ce] mt-0.5">
-              {language === 'fr'
-                ? 'Dernière révision : 18 Oct. 2026 (IRSN / DGSCGC / SPF)'
-                : 'Latest review: Oct 18, 2026 (IRSN / DGSCGC / SPF)'}
-            </span>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`ds-badge ${isOnline ? 'ds-badge-ok' : 'ds-badge-warn'}`}>
+            <Icon name={isOnline ? 'wifi' : 'wifi_off'} className="text-[14px]" />
+            {isOnline ? t('dash.online') : t('dash.offline')}
+          </span>
+          <span className="ds-badge ds-badge-info">
+            <Icon name="offline_pin" className="text-[14px]" />
+            {t('dash.offlineReady')}
+          </span>
+          <span className="ds-badge ds-badge-neutral">
+            <Icon name="verified" className="text-[14px]" />
+            {t('dash.corpusRevision')}
+          </span>
         </div>
       </section>
 
-      {/* Raccourci Installation PWA sur l'écran d'accueil pour utilisateurs novices */}
-      {onInstallClick && (
-        <section className="w-full bg-[#dee1ff] text-[#001258] rounded-xl p-3.5 shadow-sm border border-[#b9c3ff] flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-[#001258] text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[20px]">install_mobile</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wide truncate">
-                {t('home.installTitle')}
-              </span>
-              <span className="text-[11px] text-[#44474d] truncate">
-                {t('home.installSubtitle')}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onInstallClick}
-            type="button"
-            className="h-10 px-3.5 rounded-lg bg-[#001258] hover:bg-[#0024a8] text-white font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0 transition-colors shadow-xs cursor-pointer"
-          >
-            {t('home.installBtn')}
-          </button>
-        </section>
-      )}
-
-      {/* Découverte guidée automatique de l'application */}
-      {onStartTour && (
-        <section className="w-full bg-[#001126] text-white rounded-xl p-3.5 shadow-sm border border-[#1e3a5f] flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-[#98f6c5]/20 text-[#98f6c5] flex items-center justify-center shrink-0 border border-[#98f6c5]/30">
-              <span className="material-symbols-outlined text-[20px]">explore</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white truncate">
-                {t('tour.startTour')}
-              </span>
-              <span className="text-[11px] text-[#94a3b8] truncate">
-                {t('tour.startTourDesc')}
-              </span>
+      {/* ================= Urgence + niveau global ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+        <section
+          data-tour="urgent-alert"
+          aria-labelledby="urgent-title"
+          className="lg:col-span-7 xl:col-span-8 rounded-[var(--radius-card)] border border-danger-line bg-danger-soft p-4 sm:p-5 flex flex-col gap-4"
+        >
+          <div className="flex items-start gap-3">
+            <span className="w-11 h-11 rounded-xl bg-danger text-white flex items-center justify-center shrink-0">
+              <Icon name="emergency" className="text-[26px]" />
+            </span>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span className="ds-eyebrow !text-danger-ink">{t('home.vitalPriority')}</span>
+              <h2 id="urgent-title" className="text-[20px] sm:text-[22px] font-extrabold text-ink leading-tight tracking-tight">
+                {t('home.urgentSection')}
+              </h2>
+              <p className="text-[14px] text-ink-muted leading-relaxed mt-1">{t('home.urgentDesc')}</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onStartTour}
-            className="h-9 px-3.5 rounded-lg bg-[#98f6c5] hover:bg-[#b2f8d4] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0 transition-all cursor-pointer flex items-center gap-1 active:scale-95 shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[15px]">play_circle</span>
-            <span>{language === 'fr' ? 'Lancer' : 'Start'}</span>
-          </button>
-        </section>
-      )}
 
-      {/* 2. Bloc prioritaire d'urgence 'RÉAGIR MAINTENANT' */}
-      <section data-tour="urgent-alert" className="w-full bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-md relative overflow-hidden border border-[#ffb4ab]">
-        <div className="relative z-10 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#ba1a1a] flex items-center justify-center shadow-sm">
-                <span className="material-symbols-outlined text-white text-[24px]">
-                  emergency
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-['Space_Grotesk'] text-[11px] tracking-wider uppercase font-bold text-[#ba1a1a]">
-                  {t('home.vitalPriority')}
-                </span>
-                <span className="text-[20px] font-bold text-[#93000a] leading-tight">
-                  {t('home.urgentSection')}
-                </span>
-              </div>
-            </div>
-            <span className="w-3 h-3 rounded-full bg-[#ba1a1a] animate-ping"></span>
-          </div>
-
-          <p className="text-[15px] text-[#93000a] font-medium leading-relaxed">
-            {t('home.urgentDesc')}
-          </p>
-
-          <div className="flex flex-col gap-2 pt-1">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
             <button
               onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
               type="button"
-              className="w-full min-h-[52px] bg-[#ba1a1a] hover:bg-[#93000a] active:scale-[0.99] text-white rounded-xl flex items-center justify-center gap-2 px-4 shadow-md transition-all font-['Space_Grotesk'] text-[14px] uppercase font-black cursor-pointer"
+              className="ds-btn ds-btn-danger min-h-[52px] text-[15px] font-bold"
             >
-              <span className="material-symbols-outlined text-[24px]">crisis_alert</span>
-              <span>{t('home.openCrisis')}</span>
+              <Icon name="crisis_alert" className="text-[22px]" />
+              <span>{t('dash.openCrisis')}</span>
             </button>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
-                onClick={() => onNavigateTab('reagir')}
-                type="button"
-                className="min-h-[44px] bg-white hover:bg-[#ffdad6] text-[#93000a] border border-[#ffb4ab] rounded-xl flex items-center justify-center gap-1.5 px-3 text-[12px] font-['Space_Grotesk'] font-bold uppercase transition-colors cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[18px]">bolt</span>
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 xl:contents gap-2">
+              <button onClick={() => onNavigateTab('reagir')} type="button" className="ds-btn ds-btn-secondary min-h-[48px]">
+                <Icon name="bolt" className="text-[20px] text-danger-ink" />
                 <span>{t('home.openReact')}</span>
               </button>
-
               <button
                 onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
                 type="button"
-                className="min-h-[44px] bg-[#001126] hover:bg-[#12263f] text-[#98f6c5] rounded-xl flex items-center justify-center gap-1.5 px-3 text-[12px] font-['Space_Grotesk'] font-bold uppercase transition-colors cursor-pointer"
+                className="ds-btn ds-btn-secondary min-h-[48px]"
               >
-                <span className="material-symbols-outlined text-[18px]">radar</span>
-                <span>{t('home.openRadar')}</span>
+                <Icon name="radar" className="text-[20px] text-brand-ink" />
+                <span>{t('dash.openRadarShort')}</span>
               </button>
             </div>
-
-            <div className="flex items-center justify-center gap-1.5 pt-0.5 text-center">
-              <span className="material-symbols-outlined text-[15px] text-[#93000a]/80">info</span>
-              <span className="text-[11px] text-[#93000a]/90 font-medium">
-                {t('home.noAutoCall')}
-              </span>
-            </div>
           </div>
-        </div>
-      </section>
 
-      {/* 3. Grille des 4 risques NRBC */}
-      <section data-tour="cbrn-cards" className="flex flex-col gap-2">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[#001126] text-[20px]">shield</span>
-            <h2 className="text-[18px] text-[#001126] font-bold">
-              {language === 'fr' ? 'Protocoles NRBC' : 'CBRN Protocols'}
-            </h2>
-          </div>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] font-medium">
-            {language === 'fr' ? '4 Risques Majeurs' : '4 Major Threats'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {/* Nucléaire */}
-          <article className="bg-white rounded-xl p-4 shadow-sm flex flex-col justify-between gap-3 border border-[#c4c6ce]">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-                  <span className="material-symbols-outlined text-[22px]">blur_on</span>
-                </div>
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-semibold">
-                  {language === 'fr' ? 'Hors ligne' : 'Offline'}
-                </span>
-              </div>
-              <h3 className="text-[17px] text-[#001126] font-bold mt-1">
-                {language === 'fr' ? 'Nucléaire' : 'Nuclear'}
-              </h3>
-              <p className="text-[13px] text-[#44474d] line-clamp-2">
-                {language === 'fr'
-                  ? 'Accidents industriels, centrales et installations civiles.'
-                  : 'Reactor accidents, nuclear facilities, and civil fallout.'}
-              </p>
-            </div>
-            <button
-              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'nucleaire' })}
-              type="button"
-              className="min-h-[48px] w-full bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded-lg flex items-center justify-between px-3 hover:bg-[#dce9fd] transition-colors cursor-pointer"
-            >
-              <span>{language === 'fr' ? 'Consulter les guides' : 'View emergency protocol'}</span>
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </article>
-
-          {/* Radiologique */}
-          <article className="bg-white rounded-xl p-4 shadow-sm flex flex-col justify-between gap-3 border border-[#c4c6ce]">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-                  <span className="material-symbols-outlined text-[22px]">radiology</span>
-                </div>
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-semibold">
-                  {language === 'fr' ? 'Hors ligne' : 'Offline'}
-                </span>
-              </div>
-              <h3 className="text-[17px] text-[#001126] font-bold mt-1">
-                {language === 'fr' ? 'Radiologique' : 'Radiological'}
-              </h3>
-              <p className="text-[13px] text-[#44474d] line-clamp-2">
-                {language === 'fr'
-                  ? 'Sources orphelines, dispersion radiologique et irradiation.'
-                  : 'Orphan sources, dirty bombs, dispersion and external gamma.'}
-              </p>
-            </div>
-            <button
-              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'radiologique' })}
-              type="button"
-              className="min-h-[48px] w-full bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded-lg flex items-center justify-between px-3 hover:bg-[#dce9fd] transition-colors cursor-pointer"
-            >
-              <span>{language === 'fr' ? 'Consulter les guides' : 'View emergency protocol'}</span>
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </article>
-
-          {/* Biologique */}
-          <article className="bg-white rounded-xl p-4 shadow-sm flex flex-col justify-between gap-3 border border-[#c4c6ce]">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-                  <span className="material-symbols-outlined text-[22px]">coronavirus</span>
-                </div>
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-semibold">
-                  {language === 'fr' ? 'Hors ligne' : 'Offline'}
-                </span>
-              </div>
-              <h3 className="text-[17px] text-[#001126] font-bold mt-1">
-                {language === 'fr' ? 'Biologique' : 'Biological'}
-              </h3>
-              <p className="text-[13px] text-[#44474d] line-clamp-2">
-                {language === 'fr'
-                  ? 'Agents pathogènes, épidémies et toxines biologiques.'
-                  : 'Pathogenic agents, epidemics, spores and biological toxins.'}
-              </p>
-            </div>
-            <button
-              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'bio' })}
-              type="button"
-              className="min-h-[48px] w-full bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded-lg flex items-center justify-between px-3 hover:bg-[#dce9fd] transition-colors cursor-pointer"
-            >
-              <span>{language === 'fr' ? 'Consulter les guides' : 'View emergency protocol'}</span>
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </article>
-
-          {/* Chimique */}
-          <article className="bg-white rounded-xl p-4 shadow-sm flex flex-col justify-between gap-3 border border-[#c4c6ce]">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-                  <span className="material-symbols-outlined text-[22px]">science</span>
-                </div>
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-semibold">
-                  {language === 'fr' ? 'Hors ligne' : 'Offline'}
-                </span>
-              </div>
-              <h3 className="text-[17px] text-[#001126] font-bold mt-1">
-                {language === 'fr' ? 'Chimique' : 'Chemical'}
-              </h3>
-              <p className="text-[13px] text-[#44474d] line-clamp-2">
-                {language === 'fr'
-                  ? "Fuites toxiques d'usines, transports et produits industriels."
-                  : 'Toxic factory releases, chemical transport leaks and industrial vapors.'}
-              </p>
-            </div>
-            <button
-              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'chimique' })}
-              type="button"
-              className="min-h-[48px] w-full bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded-lg flex items-center justify-between px-3 hover:bg-[#dce9fd] transition-colors cursor-pointer"
-            >
-              <span>{language === 'fr' ? 'Consulter les guides' : 'View emergency protocol'}</span>
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </article>
-        </div>
-      </section>
-
-      {/* Raccourcis Opérationnels Pas-à-Pas */}
-      <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[#001126] text-[20px]">bolt</span>
-            <h2 className="text-[17px] text-[#001126] font-bold">
-              {t('home.stepByStep')}
-            </h2>
-          </div>
-          <span className="font-['Space_Grotesk'] text-[11px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
-            {t('home.immediate')}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          {/* Déshabillage */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'deshabillage' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#002c1b] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#002c1b] text-[#98f6c5] flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">sanitizer</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#002c1b]">
-              {language === 'fr' ? 'Déshabillage Décontamination' : 'Undressing & Decontamination'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? '8 étapes sans dispersion & rinçage' : '8 dispersion-free steps & rinsing'}
-            </span>
-          </button>
-
-          {/* Confinement Étanche */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'confinement-guide' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#0036ce] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#0036ce] text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">meeting_room</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#0036ce]">
-              {language === 'fr' ? 'Guide Confinement Étanche' : 'Airtight Sheltering Guide'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? "Calfeutrage & calcul d'oxygène" : 'Sealing joints & oxygen calculation'}
-            </span>
-          </button>
-
-          {/* Fiche Iode */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'iode' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#ba1a1a] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#ffdad6] text-[#ba1a1a] flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">medication</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#ba1a1a]">
-              {language === 'fr' ? 'Fiche Iode Stable' : 'Stable Iodine Prophylaxis'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? 'Calculateur de posologie KI' : 'KI 65mg dosage calculator'}
-            </span>
-          </button>
-
-          {/* Sirène d'alerte RNA */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'siren-guide' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#001126] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#12263f] text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">campaign</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#001126]">
-              {language === 'fr' ? "Signaux d'Alerte RNA" : 'Civil Siren Warning Signals'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? 'Simulateur sonore & FR-Alert' : 'Audio simulator & Cell Broadcast'}
-            </span>
-          </button>
-
-          {/* Encyclopédie & Histoire */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'histoire' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#0036ce] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#001126] text-[#98f6c5] flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">history_edu</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#0036ce]">
-              {language === 'fr' ? 'Histoire & Doctrines' : 'History & CBRN Doctrines'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? 'Origines, armées & traités' : 'Military origins & countermeasures'}
-            </span>
-          </button>
-
-          {/* Glossaire A-Z */}
-          <button
-            onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'glossaire' })}
-            type="button"
-            className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] hover:border-[#005236] text-left flex flex-col gap-1.5 transition-all group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#005236] text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[18px]">spellcheck</span>
-            </div>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] leading-snug group-hover:text-[#005236]">
-              {language === 'fr' ? 'Glossaire A-Z' : 'A-Z Glossary'}
-            </span>
-            <span className="text-[11px] text-[#44474d] leading-tight">
-              {language === 'fr' ? 'Dictionnaire & acronymes' : 'Dictionary & acronym index'}
-            </span>
-          </button>
-        </div>
-      </section>
-
-      {/* 4. Tableau de Bord « Suis-je prêt ? » & Résilience du Foyer */}
-      <section className="w-full bg-[#001126] text-white rounded-2xl p-5 shadow-md flex flex-col gap-3.5 border border-[#12263f] relative overflow-hidden">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#0036ce] text-white flex items-center justify-center shrink-0 shadow-xs">
-              <span className="material-symbols-outlined text-[26px]">speed</span>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <h2 className="text-[18px] font-bold text-white">{t('home.dashboardTitle')}</h2>
-                <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-1.5 py-0.2 rounded font-bold uppercase">
-                  {language === 'fr' ? 'Nouveau' : 'New'}
-                </span>
-              </div>
-              <span className="text-[12px] text-[#c4c6ce]">
-                {t('home.dashboardSubtitle')}
-              </span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpenSubScreen({ type: 'suis-je-pret' })}
-            className="font-['Space_Grotesk'] text-[13px] font-bold text-[#98f6c5] bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-          >
-            {t('home.viewScore')}
-          </button>
-        </div>
-
-        {/* Jauge d'autonomie et points vitaux */}
-        <div className="flex flex-col gap-1.5">
-          <div className="w-full h-3 bg-white/15 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#98f6c5] rounded-full transition-all duration-500"
-              style={{ width: `${Math.max(20, kitCompletionPercent)}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between items-center text-[#c4c6ce] font-['Space_Grotesk'] text-[11px]">
-            <span>{t('home.targetAutonomy')}</span>
-            <span className="text-[#98f6c5] font-semibold">{t('home.calculatedLocally')}</span>
-          </div>
-        </div>
-
-        {/* 3 piliers rapides */}
-        <div className="grid grid-cols-3 gap-1.5 pt-1">
-          <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-2 rounded-xl border border-white/10">
-            <span className="material-symbols-outlined text-[16px] text-[#98f6c5]">water_drop</span>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[10px] text-[#c4c6ce] uppercase">
-                {language === 'fr' ? 'Eau 72h' : 'Water 72h'}
-              </span>
-              <span className="text-[11px] font-bold text-white truncate">3L / d / person</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-2 rounded-xl border border-white/10">
-            <span className="material-symbols-outlined text-[16px] text-[#ffd599]">cell_tower</span>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[10px] text-[#c4c6ce] uppercase">
-                {language === 'fr' ? 'Info Alerte' : 'Alert info'}
-              </span>
-              <span className="text-[11px] font-bold text-white truncate">FM / DAB+</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-2 rounded-xl border border-white/10">
-            <span className="material-symbols-outlined text-[16px] text-[#98f6c5]">manage_accounts</span>
-            <div className="flex flex-col min-w-0">
-              <span className="font-['Space_Grotesk'] text-[10px] text-[#c4c6ce] uppercase">
-                {language === 'fr' ? 'Besoins' : 'Needs'}
-              </span>
-              <span className="text-[11px] font-bold text-white truncate">
-                {language === 'fr' ? 'Ajustables' : 'Adjustable'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-2 pt-1">
-          <button
-            onClick={() => onOpenSubScreen({ type: 'suis-je-pret' })}
-            type="button"
-            className="min-h-[46px] flex-1 bg-[#0036ce] hover:bg-[#002ba8] active:scale-[0.99] text-white rounded-xl flex items-center justify-center gap-2 transition-all font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider shadow-sm cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[18px]">speed</span>
-            <span>{language === 'fr' ? 'Ouvrir mon tableau de bord' : 'Open Readiness Dashboard'}</span>
-          </button>
-          <button
-            onClick={() => onNavigateTab('preparation')}
-            type="button"
-            className="min-h-[46px] px-4 bg-white/10 hover:bg-white/15 text-white rounded-xl flex items-center justify-center gap-1.5 transition-colors font-['Space_Grotesk'] text-[12px] font-semibold cursor-pointer"
-          >
-            <span>{language === 'fr' ? 'Kit détaillé' : 'Detailed Kit'}</span>
-            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          </button>
-        </div>
-      </section>
-
-      {/* 5. Carte Plan Familial */}
-      {(() => {
-        const hasPoint = familyPlan?.assemblyPoints && familyPlan.assemblyPoints.length > 0;
-        const primaryPointName = hasPoint ? familyPlan.assemblyPoints![0].name : null;
-        const contactCount = (familyPlan?.outZoneContact ? 1 : 0) + (familyPlan?.localContacts?.length || 0);
-        const membersCount = familyPlan?.members?.length || 0;
-        const isPlanConfigured = hasPoint || contactCount > 0 || membersCount > 0;
-
-        return (
-          <section className="w-full bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-                  <span className="material-symbols-outlined text-[20px]">family_restroom</span>
-                </div>
-                <div className="flex flex-col">
-                  <h2 className="text-[18px] font-bold text-[#001126]">
-                    {language === 'fr' ? 'Plan Familial' : 'Family Emergency Plan'}
-                  </h2>
-                  <span className="text-[13px] text-[#44474d]">
-                    {language === 'fr' ? 'Dispositif de rassemblement hors ligne' : 'Offline rally and contact blueprint'}
-                  </span>
-                </div>
-              </div>
-              {isPlanConfigured ? (
-                <span
-                  className="material-symbols-outlined text-[#3f9d73] text-[22px]"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                  title={language === 'fr' ? 'Fiche configurée' : 'Configured'}
-                >
-                  verified
-                </span>
-              ) : (
-                <span className="font-['Space_Grotesk'] text-[11px] bg-[#ffd599] text-[#723b00] px-2 py-0.5 rounded font-bold uppercase">
-                  {language === 'fr' ? 'À configurer' : 'Pending setup'}
-                </span>
-              )}
-            </div>
-
-            <div className="bg-[#eef4ff] rounded-lg p-3 flex flex-col gap-2 border border-[#d6e4f8]">
-              <div className="flex items-center gap-2 text-[#0f1c2b]">
-                <span className="material-symbols-outlined text-[18px] text-[#001126]">pin_drop</span>
-                <div className="flex flex-col">
-                  <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d]">
-                    {hasPoint
-                      ? (language === 'fr' ? 'Point de ralliement défini' : 'Designated rally point')
-                      : (language === 'fr' ? 'Point de ralliement' : 'Rally point')}
-                  </span>
-                  <span className="text-[15px] font-bold text-[#001126]">
-                    {primaryPointName || (language === 'fr' ? 'Non défini (feuille blanche)' : 'Not set')}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 pt-1 text-[#44474d] font-['Space_Grotesk'] text-[11px]">
-                <span className="material-symbols-outlined text-[16px] text-[#0036ce]">contact_phone</span>
-                <span>
-                  {contactCount > 0
-                    ? (language === 'fr'
-                        ? `${contactCount} contact${contactCount > 1 ? 's' : ''} d'urgence enregistré${contactCount > 1 ? 's' : ''} en mémoire locale`
-                        : `${contactCount} emergency contact${contactCount > 1 ? 's' : ''} saved locally`)
-                    : (language === 'fr' ? 'Aucun contact enregistré (0 contact)' : 'No contacts saved yet')}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onNavigateTab('mon-plan')}
-              type="button"
-              className="min-h-[48px] w-full bg-[#e4efff] hover:bg-[#dce9fd] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer"
-            >
-              <span>{isPlanConfigured
-                ? (language === 'fr' ? 'Gérer les membres et le protocole' : 'Manage members & protocols')
-                : (language === 'fr' ? 'Configurer mon plan familial maintenant' : 'Configure family plan now')}</span>
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </section>
-        );
-      })()}
-
-      {/* 6. Risques locaux & Géorisques */}
-      <section className="w-full bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3 border border-[#c4c6ce]">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#e4efff] flex items-center justify-center text-[#001126]">
-              <span className="material-symbols-outlined text-[20px]">near_me</span>
-            </div>
-            <div className="flex flex-col">
-              <h2 className="text-[18px] font-bold text-[#001126]">
-                {language === 'fr' ? 'Risques locaux & Géorisques' : 'Local Risks & Georisques'}
-              </h2>
-              <span className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#001126]">
-                {language === 'fr' ? 'Commune :' : 'Municipality:'} {settings?.savedCommune?.name || (language === 'fr' ? 'Non configurée (définir dans Géorisques)' : 'Not configured')}
-              </span>
-            </div>
-          </div>
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#44474d] bg-[#dce9fd] px-2 py-0.5 rounded">
-            {settings?.savedCommune ? (language === 'fr' ? 'Données Géorisques' : 'Georisques Data') : (language === 'fr' ? 'Non synchronisé' : 'Unsynchronized')}
-          </span>
-        </div>
-
-        {/* Aperçu de la cartographie géorisque locale */}
-        <div
-          onClick={() => onOpenSubScreen({ type: 'georisques' })}
-          className="w-full h-32 rounded-lg relative overflow-hidden bg-[#e4efff] shadow-inner cursor-pointer group border border-[#c4c6ce]"
-        >
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
-            style={{
-              backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4be-zzzr9iZWTNMjH0UnIb-D0VZXYXMqrhS6uEYAHmjfHy7urZFptFy0-fChD4zNX9zz8vaYirDq1LRZ2WJdmk17_MnflfbxMiUmsibD-ht7HWEw5Hv9GbRBP64ThtaAGI2RPG8_fx7sI9AHUUYTP2FZP6r4Bwwp6ga2OO_ibHOxelm2hp7J59TInll7PQtjRLM5e0oBE66sUOnm2eFiiClmtEXFarw8dchUrIXbod0U9WtM8fk0')`
-            }}
-          ></div>
-          <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded text-[#001126] font-['Space_Grotesk'] text-[11px] flex items-center gap-1.5 shadow-sm font-bold">
-            <span className="w-2 h-2 rounded-full bg-[#0036ce]"></span>
-            <span>{language === 'fr' ? 'Zone Seveso seuil haut à 4.2 km' : 'Upper-tier Seveso site at 4.2 km'}</span>
-          </div>
-          <div className="absolute top-2 right-2 bg-[#001126]/80 text-white px-2 py-0.5 rounded text-[11px] font-['Space_Grotesk'] flex items-center gap-1">
-            <span>{language === 'fr' ? 'Ouvrir la carte' : 'Open map'}</span>
-            <span className="material-symbols-outlined text-[14px]">open_in_full</span>
-          </div>
-        </div>
-
-        <div className="bg-[#eef4ff] rounded-lg p-2.5 flex items-start gap-2 border border-[#d6e4f8]">
-          <span className="material-symbols-outlined text-[#74777e] text-[18px] shrink-0 mt-0.5">policy</span>
-          <p className="text-[12px] text-[#44474d] leading-snug">
-            {language === 'fr'
-              ? 'Mention de transparence : Aucun risque affiché ne garantit une zone exempte de danger. Consultez régulièrement les plans communaux de sauvegarde.'
-              : 'Transparency note: The absence of displayed risks never guarantees a hazard-free zone. Periodically check municipal safeguarding directives.'}
+          <p className="mt-auto flex items-center gap-1.5 text-[12.5px] text-ink-muted">
+            <Icon name="info" className="text-[16px] shrink-0" />
+            {t('home.noAutoCall')}
           </p>
-        </div>
-      </section>
+        </section>
 
-      {/* Raccourcis Modules Complémentaires */}
-      <section className="grid grid-cols-2 gap-2">
-        <button
-          onClick={() => onOpenSubScreen({ type: 'formation' })}
-          type="button"
-          className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] text-left hover:bg-[#eef4ff] transition-colors flex items-center gap-2 min-h-[52px] cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-[#0036ce] text-[24px]">school</span>
-          <div className="min-w-0">
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] uppercase block truncate">
-              {language === 'fr' ? 'Quiz & Entraînement' : 'Quiz & Drills'}
+        <section aria-labelledby="score-title" className="lg:col-span-5 xl:col-span-4 ds-card p-4 sm:p-5 flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 id="score-title" className="ds-section-title flex items-center gap-2">
+              <Icon name="speed" className="text-[20px] text-ink-muted" />
+              {t('dash.globalLevel')}
+            </h2>
+            {levelNumber !== null && <span className={`ds-badge ds-badge-${scoreTone}`}>{t('dash.level', { n: levelNumber })}</span>}
+          </div>
+
+          <div className="flex items-end gap-2">
+            <span className="text-[44px] leading-none font-extrabold tracking-tight text-ink tabular-nums">
+              {score !== null ? score : '—'}
             </span>
-            <span className="text-[11px] text-[#44474d]">{language === 'fr' ? 'Exercices civils' : 'Civic simulations'}</span>
+            <span className="text-[16px] font-semibold text-ink-muted pb-1">/ 100</span>
           </div>
-        </button>
-
-        <button
-          onClick={() => onOpenSubScreen({ type: 'tracabilite' })}
-          type="button"
-          className="p-3 bg-white rounded-xl shadow-sm border border-[#c4c6ce] text-left hover:bg-[#eef4ff] transition-colors flex items-center gap-2 min-h-[52px] cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-[#3f9d73] text-[24px]">verified_user</span>
-          <div className="min-w-0">
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] uppercase block truncate">
-              {language === 'fr' ? 'Sources & Traçabilité' : 'Sources & Audit'}
-            </span>
-            <span className="text-[11px] text-[#44474d]">{language === 'fr' ? "Doctrines d'État" : 'State doctrines'}</span>
-          </div>
-        </button>
-      </section>
-
-      {/* 7. Bloc de gestion des données du prototype */}
-      {onOpenWipeModal && (
-        <section className="w-full bg-[#f0f4f9] rounded-xl p-3.5 border border-[#c4c6ce] flex items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-[#001126] text-white flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[20px]">restart_alt</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="font-['Space_Grotesk'] text-[12px] font-bold text-[#001126] uppercase tracking-wide truncate">
-                  {language === 'fr' ? 'Données du prototype' : 'Prototype data'}
-                </span>
-                <span className="font-['Space_Grotesk'] text-[10px] bg-[#e4efff] text-[#0036ce] px-1.5 py-0.2 rounded font-bold uppercase">
-                  {language === 'fr' ? 'Feuille blanche' : 'Clean slate'}
-                </span>
-              </div>
-              <span className="text-[11px] text-[#44474d] truncate">
-                {language === 'fr'
-                  ? "Effacer les données d'exemple pour démarrer propre de zéro"
-                  : 'Clear demo items to start sovereign from scratch'}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onOpenWipeModal}
-            type="button"
-            className="h-9 px-3 rounded-lg bg-white hover:bg-[#ffdad6] text-[#ba1a1a] border border-[#ffb4ab] font-['Space_Grotesk'] text-[11px] font-bold uppercase shrink-0 transition-colors shadow-xs cursor-pointer"
+          <div
+            className="ds-progress h-2.5"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={score ?? 0}
+            aria-label={t('dash.globalLevel')}
           >
-            {language === 'fr' ? 'Remise à zéro' : 'Reset'}
+            <span className={TONE_BAR[scoreTone]} style={{ width: `${score ?? 0}%` }} />
+          </div>
+          <p className="text-[13px] text-ink-muted leading-snug">{t(`dash.levelDesc${levelNumber ?? 1}`)}</p>
+
+          <button type="button" onClick={() => onOpenSubScreen({ type: 'suis-je-pret' })} className="mt-auto ds-btn ds-btn-primary w-full">
+            <Icon name="insights" className="text-[20px]" />
+            {t('dash.openReadiness')}
           </button>
         </section>
-      )}
+      </div>
 
-      {/* 8. Pied d'information institutionnelle */}
-      <footer className="w-full bg-[#eef4ff] rounded-xl p-4 flex flex-col gap-3 text-[#44474d] border border-[#d6e4f8]">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 text-[#001126]">
-            <span className="material-symbols-outlined text-[18px]">account_balance</span>
-            <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider">
-              {language === 'fr' ? 'Portails Officiels & Références' : 'Official Portals & References'}
-            </span>
+      {/* ================= Indicateurs de préparation ================= */}
+      <section aria-labelledby="indicators-title">
+        <SectionHeader icon="monitoring" title={t('dash.indicators')} id="indicators-title" />
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4">
+          <StatCard
+            icon="backpack"
+            label={t('dash.kitLabel')}
+            value={`${kitCompletionPercent} %`}
+            detail={t('dash.kitDetail', { done: kitDone, total: kitTotal })}
+            percent={kitCompletionPercent}
+            tone={kitTone}
+            status={statusLabel(kitTone)}
+            onClick={() => onNavigateTab('preparation')}
+            actionLabel={t('dash.kitAction')}
+          />
+          <StatCard
+            icon="family_restroom"
+            label={t('dash.planLabel')}
+            value={planTasks.length ? `${planDone}/${planTasks.length}` : '—'}
+            detail={`${hasRallyPoint ? t('dash.planRallyOk') : t('dash.planRallyMissing')} · ${t('dash.planContacts', { n: contactCount })}`}
+            percent={planPercent}
+            tone={planTone}
+            status={statusLabel(planTone)}
+            onClick={() => onNavigateTab('mon-plan')}
+            actionLabel={t('dash.planAction')}
+          />
+          <StatCard
+            icon="inventory_2"
+            label={t('dash.invLabel')}
+            value={inventory ? String(toCheck) : '—'}
+            detail={t('dash.invDetail', { expired: expiredCount, soon: soonCount, total: inventory?.length ?? 0 })}
+            tone={invTone}
+            status={invTone === 'ok' ? t('dash.statusUpToDate') : invTone === 'warn' ? t('dash.statusWatch') : t('dash.statusExpired')}
+            onClick={() => onOpenSubScreen({ type: 'inventory' })}
+            actionLabel={t('dash.invAction')}
+          />
+          <StatCard
+            icon="checklist"
+            label={t('dash.actionsLabel')}
+            value={dashboard ? String(pendingActions) : '—'}
+            detail={t('dash.actionsDetail', { n: urgentActions })}
+            tone={actionTone}
+            status={actionTone === 'danger' ? t('dash.statusPriority') : statusLabel(actionTone)}
+            onClick={() => onOpenSubScreen({ type: 'suis-je-pret' })}
+            actionLabel={t('dash.actionsAction')}
+          />
+        </div>
+      </section>
+
+      {/* ================= Accès rapides ================= */}
+      <section aria-labelledby="quick-title">
+        <SectionHeader icon="apps" title={t('dash.quickAccess')} id="quick-title" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          <QuickCard icon="bolt" tone="danger" title={t('dash.qReact')} desc={t('dash.qReactDesc')} onClick={() => onNavigateTab('reagir')} />
+          <QuickCard icon="home_health" title={t('dash.qHome')} desc={t('dash.qHomeDesc')} onClick={() => onOpenSubScreen({ type: 'suis-je-pret' })} />
+          <QuickCard icon="backpack" title={t('dash.qKit')} desc={t('dash.qKitDesc')} onClick={() => onNavigateTab('preparation')} />
+          <QuickCard icon="family_restroom" title={t('dash.qPlan')} desc={t('dash.qPlanDesc')} onClick={() => onNavigateTab('mon-plan')} />
+          <QuickCard icon="inventory_2" title={t('dash.qInventory')} desc={t('dash.qInventoryDesc')} onClick={() => onOpenSubScreen({ type: 'inventory' })} />
+          <QuickCard icon="near_me" title={t('dash.qRisks')} desc={t('dash.qRisksDesc')} onClick={() => onOpenSubScreen({ type: 'georisques' })} />
+          <QuickCard icon="local_library" title={t('dash.qGuides')} desc={t('dash.qGuidesDesc')} onClick={() => onNavigateTab('guides')} />
+          <QuickCard icon="school" title={t('dash.qTraining')} desc={t('dash.qTrainingDesc')} onClick={() => onOpenSubScreen({ type: 'formation' })} />
+        </div>
+      </section>
+
+      {/* ================= Protocoles, gestes, contexte ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <section data-tour="cbrn-cards" aria-labelledby="cbrn-title" className="ds-card p-3 sm:p-4">
+          <div className="px-1">
+            <SectionHeader
+              icon="shield"
+              title={t('dash.cbrnTitle')}
+              id="cbrn-title"
+              aside={
+                <span className="ds-badge ds-badge-ok">
+                  <Icon name="offline_pin" className="text-[14px]" />
+                  {t('dash.offlineShort')}
+                </span>
+              }
+            />
           </div>
-          <p className="text-[13px] text-[#44474d]">
-            {language === 'fr'
-              ? "Données d'instructions harmonisées d'après les directives de la Sécurité Civile et des agences de santé :"
-              : 'Instruction guidelines harmonized with Civil Security and Public Health Agencies:'}
-          </p>
-        </div>
+          <ul className="flex flex-col">
+            <ListRow
+              icon="blur_on"
+              title={language === 'fr' ? 'Nucléaire' : 'Nuclear'}
+              desc={language === 'fr' ? 'Accidents industriels, centrales et installations civiles.' : 'Reactor accidents, nuclear facilities, and civil fallout.'}
+              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'nucleaire' })}
+            />
+            <ListRow
+              icon="radiology"
+              title={language === 'fr' ? 'Radiologique' : 'Radiological'}
+              desc={language === 'fr' ? 'Sources orphelines, dispersion radiologique et irradiation.' : 'Orphan sources, dirty bombs, dispersion and external gamma.'}
+              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'radiologique' })}
+            />
+            <ListRow
+              icon="coronavirus"
+              title={language === 'fr' ? 'Biologique' : 'Biological'}
+              desc={language === 'fr' ? 'Agents pathogènes, épidémies et toxines biologiques.' : 'Pathogenic agents, epidemics, spores and biological toxins.'}
+              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'bio' })}
+            />
+            <ListRow
+              icon="science"
+              title={language === 'fr' ? 'Chimique' : 'Chemical'}
+              desc={language === 'fr' ? "Fuites toxiques d'usines, transports et produits industriels." : 'Toxic factory releases, chemical transport leaks and industrial vapors.'}
+              onClick={() => onOpenSubScreen({ type: 'protocol', id: 'chimique' })}
+            />
+          </ul>
+        </section>
 
-        <div className="grid grid-cols-2 gap-2 font-['Space_Grotesk'] text-[11px]">
-          <a
-            className="min-h-[48px] bg-white hover:bg-[#e4efff] rounded-lg p-2.5 flex items-center justify-between text-[#001126] border border-[#c4c6ce] font-medium transition-colors"
-            href="https://www.gouvernement.fr/risques"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <span className="truncate">Info.gouv.fr</span>
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-          </a>
-          <a
-            className="min-h-[48px] bg-white hover:bg-[#e4efff] rounded-lg p-2.5 flex items-center justify-between text-[#001126] border border-[#c4c6ce] font-medium transition-colors"
-            href="https://www.interieur.gouv.fr"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <span className="truncate">Min. Intérieur</span>
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-          </a>
-          <a
-            className="min-h-[48px] bg-white hover:bg-[#e4efff] rounded-lg p-2.5 flex items-center justify-between text-[#001126] border border-[#c4c6ce] font-medium transition-colors"
-            href="https://www.asn.fr"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <span className="truncate">ASNR Nucléaire</span>
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-          </a>
-          <a
-            className="min-h-[48px] bg-white hover:bg-[#e4efff] rounded-lg p-2.5 flex items-center justify-between text-[#001126] border border-[#c4c6ce] font-medium transition-colors"
-            href="https://www.santepubliquefrance.fr"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <span className="truncate">Santé Publique Fr.</span>
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-          </a>
-        </div>
+        <section aria-labelledby="steps-title" className="ds-card p-3 sm:p-4">
+          <div className="px-1">
+            <SectionHeader icon="bolt" title={t('home.stepByStep')} id="steps-title" />
+          </div>
+          <ul className="flex flex-col">
+            <ListRow
+              icon="sanitizer"
+              tone="ok"
+              title={language === 'fr' ? 'Déshabillage & décontamination' : 'Undressing & Decontamination'}
+              desc={language === 'fr' ? '8 étapes sans dispersion & rinçage' : '8 dispersion-free steps & rinsing'}
+              onClick={() => onOpenSubScreen({ type: 'deshabillage' })}
+            />
+            <ListRow
+              icon="meeting_room"
+              title={language === 'fr' ? 'Guide confinement étanche' : 'Airtight Sheltering Guide'}
+              desc={language === 'fr' ? "Calfeutrage & calcul d'oxygène" : 'Sealing joints & oxygen calculation'}
+              onClick={() => onOpenSubScreen({ type: 'confinement-guide' })}
+            />
+            <ListRow
+              icon="medication"
+              tone="warn"
+              title={language === 'fr' ? 'Fiche iode stable' : 'Stable Iodine Prophylaxis'}
+              desc={language === 'fr' ? 'Calculateur de posologie KI' : 'KI 65mg dosage calculator'}
+              onClick={() => onOpenSubScreen({ type: 'iode' })}
+            />
+            <ListRow
+              icon="campaign"
+              tone="neutral"
+              title={language === 'fr' ? "Signaux d'alerte RNA" : 'Civil Siren Warning Signals'}
+              desc={language === 'fr' ? 'Simulateur sonore & FR-Alert' : 'Audio simulator & Cell Broadcast'}
+              onClick={() => onOpenSubScreen({ type: 'siren-guide' })}
+            />
+            <ListRow
+              icon="history_edu"
+              tone="neutral"
+              title={language === 'fr' ? 'Histoire & doctrines' : 'History & CBRN Doctrines'}
+              desc={language === 'fr' ? 'Origines, armées & traités' : 'Military origins & countermeasures'}
+              onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'histoire' })}
+            />
+            <ListRow
+              icon="spellcheck"
+              tone="neutral"
+              title={language === 'fr' ? 'Glossaire A-Z' : 'A-Z Glossary'}
+              desc={language === 'fr' ? 'Dictionnaire & acronymes' : 'Dictionary & acronym index'}
+              onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'glossaire' })}
+            />
+          </ul>
+        </section>
 
-        {/* Avertissement FR-Alert */}
-        <div className="p-3 bg-[#ffdad6]/60 rounded-lg flex items-start gap-2 border border-[#ffb4ab]">
-          <span className="material-symbols-outlined text-[#ba1a1a] text-[18px] shrink-0 mt-0.5">
-            notifications_off
+        <div className="flex flex-col gap-4 lg:gap-6 md:col-span-2 lg:col-span-1 md:grid md:grid-cols-2 lg:flex">
+          <section aria-labelledby="risks-title" className="ds-card p-4 flex flex-col gap-3">
+            <SectionHeader
+              icon="near_me"
+              title={t('dash.localRisks')}
+              id="risks-title"
+              aside={
+                <span className={`ds-badge ${communeName ? 'ds-badge-info' : 'ds-badge-warn'}`}>
+                  {communeName ? t('dash.communeSet') : t('dash.communeMissing')}
+                </span>
+              }
+            />
+            <div className="flex items-center gap-2 text-[14px] min-w-0">
+              <Icon name="location_on" className="text-[20px] text-ink-muted shrink-0" />
+              <span className="text-ink-muted shrink-0">{t('dash.commune')}</span>
+              <span className="font-semibold text-ink truncate">{communeName || t('dash.communeNotSet')}</span>
+            </div>
+            <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-2">
+              <button type="button" onClick={() => onOpenSubScreen({ type: 'georisques' })} className="ds-btn ds-btn-secondary text-[13px] px-2">
+                <Icon name="travel_explore" className="text-[18px]" />
+                {t('dash.openGeorisques')}
+              </button>
+              <button type="button" onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })} className="ds-btn ds-btn-secondary text-[13px] px-2">
+                <Icon name="radar" className="text-[18px]" />
+                {t('dash.openPerimeters')}
+              </button>
+            </div>
+            <p className="text-[12px] text-ink-faint leading-snug">
+              {language === 'fr'
+                ? 'Aucun risque affiché ne garantit une zone exempte de danger. Consultez régulièrement les plans communaux de sauvegarde.'
+                : 'The absence of displayed risks never guarantees a hazard-free zone. Periodically check municipal safeguarding directives.'}
+            </p>
+          </section>
+
+          <section aria-labelledby="expiry-title" className="ds-card p-4 flex flex-col gap-2">
+            <SectionHeader
+              icon="event_busy"
+              title={t('dash.expiryTitle')}
+              id="expiry-title"
+              aside={<span className={`ds-badge ds-badge-${invTone}`}>{toCheck}</span>}
+            />
+            {expiryWatch.length === 0 ? (
+              <p className="text-[13px] text-ink-muted flex items-center gap-2">
+                <Icon name="check_circle" className="text-[18px] text-ok-ink" />
+                {t('dash.expiryNone')}
+              </p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-line">
+                {expiryWatch.map((e, i) => (
+                  <li key={i} className="flex items-center justify-between gap-2 py-2 text-[13.5px]">
+                    <span className="text-ink truncate">{e.name}</span>
+                    <span className={`ds-badge shrink-0 ${e.days < 0 ? 'ds-badge-danger' : 'ds-badge-warn'}`}>
+                      {e.days < 0 ? t('dash.expired') : t('dash.daysLeft', { n: e.days })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              type="button"
+              onClick={() => onOpenSubScreen({ type: 'inventory' })}
+              className="ds-btn ds-btn-ghost justify-start px-2 text-brand-ink text-[13px] mt-auto"
+            >
+              {t('dash.invAction')}
+              <Icon name="arrow_forward" className="text-[16px]" />
+            </button>
+          </section>
+        </div>
+      </div>
+
+      {/* ================= Rappel d'autorité ================= */}
+      <section className="rounded-[var(--radius-card)] border border-warn-line bg-warn-soft p-4 flex items-start gap-3">
+        <Icon name="notifications_off" className="text-[22px] text-warn-ink shrink-0 mt-0.5" />
+        <p className="text-[13.5px] text-ink leading-relaxed">
+          {language === 'fr'
+            ? "Rappel d'autorité : Cette application ne reçoit pas les alertes prioritaires FR-Alert transmises par diffusion cellulaire. En situation d'urgence réelle, fiez-vous au signal sonore national des sirènes (RNA) et aux canaux radio FM officiels (France Bleu, France Info)."
+            : 'Operational Reminder: This application does not receive broadcast cell alerts (FR-Alert / Alertswiss / BE-Alert). In real emergencies, prioritize civil defense siren alerts and national emergency radio broadcasts.'}
+        </p>
+      </section>
+
+      {/* ================= Utilitaires ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {onInstallClick && (
+          <div className="ds-card p-4 flex flex-wrap items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-tint text-brand-ink flex items-center justify-center shrink-0">
+              <Icon name="install_mobile" className="text-[22px]" />
+            </span>
+            <div className="flex flex-col min-w-0 flex-1 basis-40">
+              <span className="text-[14px] font-bold text-ink leading-snug">{t('home.installTitle')}</span>
+              <span className="text-[12.5px] text-ink-muted leading-snug">{t('home.installSubtitle')}</span>
+            </div>
+            <button type="button" onClick={onInstallClick} className="ds-btn ds-btn-primary shrink-0 px-3">
+              {t('home.installBtn')}
+            </button>
+          </div>
+        )}
+        {onStartTour && (
+          <div className="ds-card p-4 flex flex-wrap items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-tint text-brand-ink flex items-center justify-center shrink-0">
+              <Icon name="explore" className="text-[22px]" />
+            </span>
+            <div className="flex flex-col min-w-0 flex-1 basis-40">
+              <span className="text-[14px] font-bold text-ink leading-snug">{t('tour.startTour')}</span>
+              <span className="text-[12.5px] text-ink-muted leading-snug">{t('tour.startTourDesc')}</span>
+            </div>
+            <button type="button" onClick={onStartTour} className="ds-btn ds-btn-secondary shrink-0 px-3">
+              <Icon name="play_circle" className="text-[18px]" />
+              {language === 'fr' ? 'Lancer' : 'Start'}
+            </button>
+          </div>
+        )}
+        {onOpenWipeModal && (
+          <div className="ds-card p-4 flex flex-wrap items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-subtle text-ink-muted flex items-center justify-center shrink-0">
+              <Icon name="restart_alt" className="text-[22px]" />
+            </span>
+            <div className="flex flex-col min-w-0 flex-1 basis-40">
+              <span className="text-[14px] font-bold text-ink leading-snug">{language === 'fr' ? 'Données du prototype' : 'Prototype data'}</span>
+              <span className="text-[12.5px] text-ink-muted leading-snug">
+                {language === 'fr' ? "Effacer les données d'exemple pour démarrer de zéro" : 'Clear demo items to start from scratch'}
+              </span>
+            </div>
+            <button type="button" onClick={onOpenWipeModal} className="ds-btn ds-btn-secondary shrink-0 px-3 !text-danger-ink">
+              {language === 'fr' ? 'Remise à zéro' : 'Reset'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ================= Références officielles ================= */}
+      <footer className="flex flex-col gap-3 pt-4 border-t border-line">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <span className="ds-eyebrow flex items-center gap-1.5">
+            <Icon name="account_balance" className="text-[16px]" />
+            {language === 'fr' ? 'Portails officiels & références' : 'Official portals & references'}
           </span>
-          <p className="text-[12px] text-[#0f1c2b] font-medium leading-snug">
-            {language === 'fr'
-              ? "Rappel d'autorité : Cette application ne reçoit pas les alertes prioritaires FR-Alert transmises par diffusion cellulaire. En situation d'urgence réelle, fiez-vous au signal sonore national des sirènes (RNA) et aux canaux radio FM officiels (France Bleu, France Info)."
-              : 'Operational Reminder: This application does not receive broadcast cell alerts (FR-Alert / Alertswiss / BE-Alert). In real emergencies, prioritize civil defense siren alerts and national emergency radio broadcasts.'}
-          </p>
+          <button
+            type="button"
+            onClick={() => onOpenSubScreen({ type: 'tracabilite' })}
+            className="text-[13px] font-semibold text-brand-ink hover:underline flex items-center gap-1 cursor-pointer min-h-[44px]"
+          >
+            <Icon name="verified_user" className="text-[16px]" />
+            {language === 'fr' ? 'Sources & traçabilité' : 'Sources & audit'}
+          </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {[
+            { label: 'Info.gouv.fr', href: 'https://www.gouvernement.fr/risques' },
+            { label: 'Min. Intérieur', href: 'https://www.interieur.gouv.fr' },
+            { label: 'ASNR Nucléaire', href: 'https://www.asn.fr' },
+            { label: 'Santé Publique Fr.', href: 'https://www.santepubliquefrance.fr' },
+          ].map((l) => (
+            <a
+              key={l.href}
+              className="min-h-[44px] rounded-xl border border-line bg-card px-3 py-2 flex items-center justify-between gap-2 text-[13px] font-medium text-ink hover:bg-subtle transition-colors"
+              href={l.href}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span className="truncate">{l.label}</span>
+              <Icon name="open_in_new" className="text-[16px] text-ink-faint" />
+              <span className="sr-only">{t('dash.externalLink')}</span>
+            </a>
+          ))}
         </div>
       </footer>
     </div>

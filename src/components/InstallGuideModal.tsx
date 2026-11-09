@@ -24,20 +24,20 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="install-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001126]/80 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/80 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl border border-[#c4c6ce] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 text-[#0f1c2b]">
+      <div className="bg-card max-w-md w-full rounded-2xl shadow-2xl border border-line-strong flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 text-ink">
         {/* En-tête modal */}
-        <div className="bg-[#001126] text-white p-5 flex items-center justify-between border-b border-[#12263f]">
+        <div className="bg-navy text-white p-5 flex items-center justify-between border-b border-ink">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#98f6c5] flex items-center justify-center text-[#005236]">
+            <div className="w-9 h-9 rounded-xl bg-ok-soft flex items-center justify-center text-ok-ink">
               <span className="material-symbols-outlined text-[22px]">install_mobile</span>
             </div>
             <div className="flex flex-col">
-              <h2 id="install-title" className="font-['Space_Grotesk'] text-[16px] font-bold tracking-tight">
+              <h2 id="install-title" className="font-label text-[16px] font-bold tracking-tight">
                 {isEn ? 'Install NRBCOR Application' : "Installer l'application NRBCOR"}
               </h2>
-              <span className="text-[11px] text-[#98f6c5] font-['Space_Grotesk'] uppercase font-semibold">
+              <span className="text-[11px] text-ok-bright font-label uppercase font-semibold">
                 {isEn ? 'Direct 100% Offline Access' : 'Accès direct 100% hors-ligne'}
               </span>
             </div>
@@ -53,7 +53,7 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
 
         {/* Corps des instructions pas-à-pas pour utilisateurs novices */}
         <div className="p-5 flex flex-col gap-4 overflow-y-auto max-h-[70vh] text-[13px]">
-          <p className="text-[#44474d] leading-relaxed">
+          <p className="text-ink-muted leading-relaxed">
             {isEn
               ? 'Installing the application adds it to your home screen or desktop as a native app, always accessible even during full cellular network failures or power outages.'
               : "L'installation de l'application permet de l'ajouter sur votre écran d'accueil comme une application native, consultable même en cas de panne de réseau Internet ou de coupure électrique."}
@@ -67,7 +67,7 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
                 onClose();
               }}
               type="button"
-              className="w-full min-h-[48px] bg-[#001126] hover:bg-[#12263f] text-white rounded-xl font-['Space_Grotesk'] text-[13px] uppercase font-bold tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+              className="w-full min-h-[48px] bg-navy hover:bg-navy-2 text-white rounded-xl font-label text-[13px] uppercase font-bold tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">download</span>
               <span>{isEn ? 'Install directly in 1 click' : 'Installer directement en 1 clic'}</span>
@@ -75,17 +75,17 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           )}
 
           {/* Guide spécifique iPhone / iPad (Safari) */}
-          <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[#001126] font-bold">
-              <span className="material-symbols-outlined text-[#0036ce] text-[20px]">phone_iphone</span>
+          <div className="p-3.5 bg-canvas rounded-xl border border-line flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-ink font-bold">
+              <span className="material-symbols-outlined text-brand-ink text-[20px]">phone_iphone</span>
               <span>{isEn ? 'On iPhone or iPad (Safari):' : 'Sur iPhone ou iPad (Safari) :'}</span>
             </div>
-            <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-[#44474d] leading-snug pl-1">
+            <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-ink-muted leading-snug pl-1">
               <li>
                 {isEn ? (
-                  <>Tap the <strong>Share</strong> button at the bottom of Safari (<span className="text-[#0036ce] font-bold">rectangle icon with upward arrow ⎋</span>).</>
+                  <>Tap the <strong>Share</strong> button at the bottom of Safari (<span className="text-brand-ink font-bold">rectangle icon with upward arrow ⎋</span>).</>
                 ) : (
-                  <>Appuyez sur le bouton <strong>Partager</strong> en bas de Safari (<span className="text-[#0036ce] font-bold">icône rectangle avec flèche vers le haut ⎋</span>).</>
+                  <>Appuyez sur le bouton <strong>Partager</strong> en bas de Safari (<span className="text-brand-ink font-bold">icône rectangle avec flèche vers le haut ⎋</span>).</>
                 )}
               </li>
               <li>
@@ -106,12 +106,12 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           </div>
 
           {/* Guide spécifique Android (Chrome / Firefox / Samsung Internet) */}
-          <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[#001126] font-bold">
-              <span className="material-symbols-outlined text-[#3f9d73] text-[20px]">phone_android</span>
+          <div className="p-3.5 bg-canvas rounded-xl border border-line flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-ink font-bold">
+              <span className="material-symbols-outlined text-ok-ink text-[20px]">phone_android</span>
               <span>{isEn ? 'On Android Mobile:' : 'Sur Mobile Android :'}</span>
             </div>
-            <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-[#44474d] leading-snug pl-1">
+            <ol className="list-decimal list-inside space-y-1.5 text-[12px] text-ink-muted leading-snug pl-1">
               <li>
                 {isEn ? (
                   <>Tap the browser menu (<strong className="font-bold">the 3 vertical dots ⋮</strong> in the top right corner).</>
@@ -137,12 +137,12 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
           </div>
 
           {/* Guide Ordinateur Desktop (Chrome, Edge, Brave) */}
-          <div className="p-3.5 bg-[#f8f9ff] rounded-xl border border-[#d6e4f8] flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-[#001126] font-bold">
-              <span className="material-symbols-outlined text-[#001126] text-[20px]">laptop</span>
+          <div className="p-3.5 bg-canvas rounded-xl border border-line flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-ink font-bold">
+              <span className="material-symbols-outlined text-ink text-[20px]">laptop</span>
               <span>{isEn ? 'On Desktop Computer:' : 'Sur Ordinateur (Desktop) :'}</span>
             </div>
-            <p className="text-[12px] text-[#44474d] leading-snug">
+            <p className="text-[12px] text-ink-muted leading-snug">
               {isEn ? (
                 <>Click the install icon on the far right of your browser's address bar (<span className="font-semibold">computer screen icon with down arrow ⭳ or Install button</span>).</>
               ) : (
@@ -153,11 +153,11 @@ export const InstallGuideModal: React.FC<InstallGuideModalProps> = ({
         </div>
 
         {/* Footer modal */}
-        <div className="p-4 bg-[#f8f9ff] border-t border-[#c4c6ce] flex justify-end">
+        <div className="p-4 bg-canvas border-t border-line-strong flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[42px] px-5 rounded-xl bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-colors cursor-pointer"
+            className="min-h-[42px] px-5 rounded-xl bg-navy hover:bg-navy-2 text-white font-label text-[12px] font-bold uppercase transition-colors cursor-pointer"
           >
             {isEn ? 'Close Guide' : 'Fermer le guide'}
           </button>

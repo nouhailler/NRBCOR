@@ -628,7 +628,7 @@ export const NRBC_TOOL_CATEGORIES: NrbcToolCategory[] = [
     id: 'detection',
     name: '1. Détection, Mesure & Identification Rapide',
     icon: 'radar',
-    color: 'text-[#0036ce]',
+    color: 'text-brand-ink',
     description: 'Les agents NRBC étant pour la plupart invisibles, inodores et impalpables, la détection précoce est la première ligne de survie pour alerter et qualifier la menace.',
     tools: [
       {
@@ -669,7 +669,7 @@ export const NRBC_TOOL_CATEGORIES: NrbcToolCategory[] = [
     id: 'protection',
     name: '2. Protection Individuelle & Collective (EPI & Abris)',
     icon: 'masks',
-    color: 'text-[#ba1a1a]',
+    color: 'text-danger-ink',
     description: 'Empêcher le toxique ou les retombées d’entrer en contact avec l’organisme (voies respiratoires, conjonctives, peau intacte ou lésée).',
     tools: [
       {
@@ -702,7 +702,7 @@ export const NRBC_TOOL_CATEGORIES: NrbcToolCategory[] = [
     id: 'decontamination',
     name: '3. Décontamination & Neutralisation',
     icon: 'sanitizer',
-    color: 'text-[#005236]',
+    color: 'text-ok-ink',
     description: 'Éliminer, désactiver ou neutraliser chimiquement les agents toxiques déposés sur le personnel, le matériel ou l’environnement.',
     tools: [
       {
@@ -735,7 +735,7 @@ export const NRBC_TOOL_CATEGORIES: NrbcToolCategory[] = [
     id: 'antidotes',
     name: '4. Contre-Mesures Médicales & Antidotes Spécifiques',
     icon: 'medication',
-    color: 'text-[#6750a4]',
+    color: 'text-brand-ink',
     description: 'Traitements pharmacologiques d’urgence administrés pour contrer les effets toxiques intracellulaires ou accélérer l’élimination des radionucléides.',
     tools: [
       {

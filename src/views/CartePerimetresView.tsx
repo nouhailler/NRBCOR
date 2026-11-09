@@ -125,20 +125,20 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
   };
 
   return (
-    <div className="flex-1 w-full bg-[#f8f9ff] text-[#001126] flex flex-col pt-20 pb-24">
+    <div className="flex-1 w-full bg-canvas text-ink flex flex-col pt-20 pb-24">
       {/* Top Header & Actions */}
-      <div className="bg-[#001126] text-white px-4 pt-4 pb-5 border-b border-[#12263f]">
+      <div className="bg-navy text-white px-4 pt-4 pb-5 border-b border-ink">
         <div className="max-w-4xl mx-auto flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center gap-1.5 text-[#98f6c5] hover:text-white transition-colors font-['Space_Grotesk'] text-[13px] font-bold"
+              className="flex items-center gap-1.5 text-ok-bright hover:text-white transition-colors font-label text-[13px] font-bold"
             >
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
               <span>{t('common.back')}</span>
             </button>
-            <div className="flex items-center gap-1.5 bg-[#98f6c5]/20 text-[#98f6c5] border border-[#98f6c5]/30 px-2 py-0.5 rounded-full font-['Space_Grotesk'] text-[10px] uppercase font-bold">
+            <div className="flex items-center gap-1.5 bg-ok-soft/20 text-ok-bright border border-ok-bright/30 px-2 py-0.5 rounded-full font-label text-[10px] uppercase font-bold">
               <span className="material-symbols-outlined text-[14px]">offline_bolt</span>
               <span>{isEn ? '100% Offline • Zero-Cloud' : '100% Hors-Ligne • Zero-Cloud'}</span>
             </div>
@@ -146,12 +146,12 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#98f6c5] text-[24px]">radar</span>
+              <span className="material-symbols-outlined text-ok-bright text-[24px]">radar</span>
               <h1 className="text-[20px] font-extrabold text-white tracking-tight">
                 {t('carte.title')}
               </h1>
             </div>
-            <p className="text-[12px] text-[#dce9fd] mt-1 leading-relaxed">
+            <p className="text-[12px] text-on-navy-soft mt-1 leading-relaxed">
               {t('carte.subtitle')}
             </p>
           </div>
@@ -160,17 +160,17 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
       <div className="max-w-4xl mx-auto w-full px-3 sm:px-4 flex flex-col gap-4 mt-3">
         {/* Localisation & Détection GPS */}
-        <div className="bg-white p-3.5 rounded-xl border border-[#c4c6ce] shadow-xs flex flex-col gap-2.5">
+        <div className="bg-card p-3.5 rounded-xl border border-line-strong shadow-xs flex flex-col gap-2.5">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-[#eef4ff] text-[#0036ce] flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-subtle text-brand-ink flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-[18px]">location_on</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-['Space_Grotesk'] text-[10px] text-[#74777e] uppercase font-bold">
+                <span className="font-label text-[10px] text-ink-faint uppercase font-bold">
                   {t('carte.refPosition')}
                 </span>
-                <span className="text-[14px] font-bold text-[#001126] truncate">
+                <span className="text-[14px] font-bold text-ink truncate">
                   {userLocation.label}
                 </span>
               </div>
@@ -180,7 +180,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               type="button"
               onClick={handleLocateMe}
               disabled={isLocating}
-              className="min-h-[40px] px-3 bg-[#001126] hover:bg-[#12263f] text-white rounded-lg flex items-center gap-1.5 font-['Space_Grotesk'] text-[12px] font-bold uppercase transition-all shadow-xs cursor-pointer active:scale-95"
+              className="min-h-[40px] px-3 bg-navy hover:bg-navy-2 text-white rounded-lg flex items-center gap-1.5 font-label text-[12px] font-bold uppercase transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <span className={`material-symbols-outlined text-[16px] ${isLocating ? 'animate-spin' : ''}`}>
                 {isLocating ? 'refresh' : 'my_location'}
@@ -190,7 +190,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
           </div>
 
           {geoError && (
-            <div className="p-2 bg-[#ffdad6] text-[#93000a] rounded-lg text-[12px] flex items-center gap-1.5">
+            <div className="p-2 bg-danger-soft text-danger-ink-strong rounded-lg text-[12px] flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px] shrink-0">error</span>
               <span>{geoError}</span>
             </div>
@@ -198,7 +198,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
           {/* Raccourcis Villes Communes */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
-            <span className="text-[11px] font-['Space_Grotesk'] text-[#74777e] font-semibold shrink-0">
+            <span className="text-[11px] font-label text-ink-faint font-semibold shrink-0">
               Villes tests :
             </span>
             {AVAILABLE_COMMUNES.slice(0, 7).map((c) => (
@@ -206,10 +206,10 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 key={c.insee}
                 type="button"
                 onClick={() => handleSelectCommune(c)}
-                className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-['Space_Grotesk'] font-bold border transition-colors ${
+                className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-label font-bold border transition-colors ${
                   userLocation.label === c.name
-                    ? 'bg-[#0036ce] text-white border-[#0036ce]'
-                    : 'bg-[#f8f9ff] text-[#44474d] border-[#c4c6ce] hover:border-[#0036ce]'
+                    ? 'bg-brand text-white border-brand-ink'
+                    : 'bg-canvas text-ink-muted border-line-strong hover:border-brand-ink'
                 }`}
               >
                 {c.name.split(' ')[0]}
@@ -222,27 +222,27 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
         <div
           className={`p-4 rounded-xl border-2 transition-all ${
             diagnostic.overallStatus === 'in_reflex'
-              ? 'bg-[#ba1a1a]/10 border-[#ba1a1a]'
+              ? 'bg-danger/10 border-danger-ink'
               : diagnostic.overallStatus === 'in_ppi'
-              ? 'bg-[#6750a4]/10 border-[#6750a4]'
+              ? 'bg-[#6750a4]/10 border-brand-ink'
               : diagnostic.overallStatus === 'in_vigilance'
-              ? 'bg-[#fef3c7] border-[#d97706]'
-              : 'bg-[#eef4ff] border-[#0036ce]/40'
+              ? 'bg-warn-soft border-warn-ink'
+              : 'bg-subtle border-brand-ink/40'
           }`}
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <span
-                  className={`font-['Space_Grotesk'] text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${diagnostic.statusBadgeColor} ${diagnostic.statusBadgeTextColor}`}
+                  className={`font-label text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${diagnostic.statusBadgeColor} ${diagnostic.statusBadgeTextColor}`}
                 >
                   {diagnostic.statusTitle}
                 </span>
-                <span className="text-[11px] text-[#44474d] font-['Space_Grotesk'] font-semibold">
+                <span className="text-[11px] text-ink-muted font-label font-semibold">
                   Distance minimale : {Math.min(diagnostic.closestCnpe.distanceKm, diagnostic.closestSeveso.distanceKm)} km
                 </span>
               </div>
-              <p className="text-[13px] font-semibold text-[#001126] mt-1 leading-snug">
+              <p className="text-[13px] font-semibold text-ink mt-1 leading-snug">
                 {diagnostic.directiveSummary}
               </p>
             </div>
@@ -255,26 +255,26 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 setSelectedSiteId(diagnostic.closestCnpe.site.id);
                 triggerHaptic('light');
               }}
-              className="p-2.5 bg-white/90 rounded-lg border border-black/10 flex items-center justify-between cursor-pointer hover:border-[#0036ce] transition-colors"
+              className="p-2.5 bg-white/90 rounded-lg border border-black/10 flex items-center justify-between cursor-pointer hover:border-brand-ink transition-colors"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded bg-[#ffd8e4] text-[#31111d] flex items-center justify-center shrink-0 overflow-hidden">
-                  <NuclearPowerIcon className="w-4 h-4 text-[#31111d]" />
+                <div className="w-7 h-7 rounded bg-danger-soft text-ink flex items-center justify-center shrink-0 overflow-hidden">
+                  <NuclearPowerIcon className="w-4 h-4 text-ink" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-['Space_Grotesk'] text-[#74777e] uppercase font-bold">
+                  <span className="text-[10px] font-label text-ink-faint uppercase font-bold">
                     CNPE le plus proche
                   </span>
-                  <span className="text-[12px] font-bold text-[#001126] truncate">
+                  <span className="text-[12px] font-bold text-ink truncate">
                     {diagnostic.closestCnpe.site.shortName}
                   </span>
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <span className="font-['Space_Grotesk'] text-[13px] font-extrabold text-[#001126]">
+                <span className="font-label text-[13px] font-extrabold text-ink">
                   {diagnostic.closestCnpe.distanceKm} km
                 </span>
-                <span className="block text-[9px] uppercase font-bold text-[#6750a4]">
+                <span className="block text-[9px] uppercase font-bold text-brand-ink">
                   {diagnostic.closestCnpe.isWithinPpi ? 'DANS PPI 20km' : 'HORS PPI'}
                 </span>
               </div>
@@ -286,26 +286,26 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 setSelectedSiteId(diagnostic.closestSeveso.site.id);
                 triggerHaptic('light');
               }}
-              className="p-2.5 bg-white/90 rounded-lg border border-black/10 flex items-center justify-between cursor-pointer hover:border-[#ba1a1a] transition-colors"
+              className="p-2.5 bg-white/90 rounded-lg border border-black/10 flex items-center justify-between cursor-pointer hover:border-danger-ink transition-colors"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded bg-[#ffdad6] text-[#93000a] flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded bg-danger-soft text-danger-ink-strong flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[16px]">warning</span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-['Space_Grotesk'] text-[#74777e] uppercase font-bold">
+                  <span className="text-[10px] font-label text-ink-faint uppercase font-bold">
                     Seveso Seuil Haut
                   </span>
-                  <span className="text-[12px] font-bold text-[#001126] truncate">
+                  <span className="text-[12px] font-bold text-ink truncate">
                     {diagnostic.closestSeveso.site.shortName}
                   </span>
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <span className="font-['Space_Grotesk'] text-[13px] font-extrabold text-[#001126]">
+                <span className="font-label text-[13px] font-extrabold text-ink">
                   {diagnostic.closestSeveso.distanceKm} km
                 </span>
-                <span className="block text-[9px] uppercase font-bold text-[#ba1a1a]">
+                <span className="block text-[9px] uppercase font-bold text-danger-ink">
                   {diagnostic.closestSeveso.isWithinPpi ? 'DANS PPI 5km' : 'HORS PPI'}
                 </span>
               </div>
@@ -313,8 +313,8 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
           </div>
 
           {/* Règle sanitaire iode */}
-          <div className="mt-2.5 pt-2 flex items-start gap-1.5 text-[11px] text-[#44474d] leading-relaxed">
-            <span className="material-symbols-outlined text-[15px] text-[#ba1a1a] shrink-0 mt-0.5">
+          <div className="mt-2.5 pt-2 flex items-start gap-1.5 text-[11px] text-ink-muted leading-relaxed">
+            <span className="material-symbols-outlined text-[15px] text-danger-ink shrink-0 mt-0.5">
               medication
             </span>
             <span>
@@ -325,17 +325,17 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* Sélecteur de Mode d'Affichage : Radar Local vs Carte de France */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 bg-[#e4efff] p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-tint p-1 rounded-xl">
             <button
               type="button"
               onClick={() => {
                 setViewMode('radar');
                 triggerHaptic('light');
               }}
-              className={`px-3 py-1.5 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 rounded-lg font-label text-[12px] font-bold flex items-center gap-1.5 transition-colors ${
                 viewMode === 'radar'
-                  ? 'bg-white text-[#001126] shadow-xs'
-                  : 'text-[#44474d] hover:text-[#001126]'
+                  ? 'bg-card text-ink shadow-xs'
+                  : 'text-ink-muted hover:text-ink'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">radar</span>
@@ -347,10 +347,10 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 setViewMode('france');
                 triggerHaptic('light');
               }}
-              className={`px-3 py-1.5 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 rounded-lg font-label text-[12px] font-bold flex items-center gap-1.5 transition-colors ${
                 viewMode === 'france'
-                  ? 'bg-white text-[#001126] shadow-xs'
-                  : 'text-[#44474d] hover:text-[#001126]'
+                  ? 'bg-card text-ink shadow-xs'
+                  : 'text-ink-muted hover:text-ink'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">map</span>
@@ -358,20 +358,20 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
             </button>
           </div>
 
-          <span className="font-['Space_Grotesk'] text-[11px] text-[#74777e] font-bold hidden sm:inline">
+          <span className="font-label text-[11px] text-ink-faint font-bold hidden sm:inline">
             41 Sites référencés
           </span>
         </div>
 
         {/* 1. VUE RADAR CONCENTRIQUE */}
         {viewMode === 'radar' && (
-          <div className="bg-[#001126] rounded-2xl p-4 text-white shadow-md relative overflow-hidden flex flex-col items-center">
-            <div className="w-full flex items-center justify-between text-[11px] font-['Space_Grotesk'] text-[#dce9fd] mb-2 z-10">
+          <div className="bg-navy rounded-2xl p-4 text-white shadow-md relative overflow-hidden flex flex-col items-center">
+            <div className="w-full flex items-center justify-between text-[11px] font-label text-on-navy-soft mb-2 z-10">
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#98f6c5] animate-ping"></span>
+                <span className="w-2 h-2 rounded-full bg-ok-soft animate-ping"></span>
                 <span>Portée radar : 80 km autour de votre position</span>
               </span>
-              <span className="text-[#98f6c5] font-bold">Nord ↑</span>
+              <span className="text-ok-bright font-bold">Nord ↑</span>
             </div>
 
             <div className="relative w-full max-w-[340px] aspect-square flex items-center justify-center my-2">
@@ -478,14 +478,14 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               </svg>
             </div>
 
-            <div className="w-full flex items-center justify-between text-[11px] font-['Space_Grotesk'] text-[#dce9fd] pt-2 border-t border-white/10">
+            <div className="w-full flex items-center justify-between text-[11px] font-label text-on-navy-soft pt-2 border-t border-white/10">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#ffd8e4] border border-[#930058]"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-danger-soft border border-[#930058]"></span>
                   <span>Nucléaire (CNPE)</span>
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#ffdad6] border border-[#93000a]"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-danger-soft border border-danger-ink-strong"></span>
                   <span>Seveso Seuil Haut</span>
                 </span>
               </div>
@@ -496,10 +496,10 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* 2. VUE CARTE NATIONALE VECTORIELLE */}
         {viewMode === 'france' && (
-          <div className="bg-[#001126] rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
-            <div className="w-full flex items-center justify-between text-[11px] font-['Space_Grotesk'] text-[#dce9fd] mb-2">
+          <div className="bg-navy rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
+            <div className="w-full flex items-center justify-between text-[11px] font-label text-on-navy-soft mb-2">
               <span>Carte des 41 sites majeurs de France métropolitaine</span>
-              <span className="text-[#98f6c5] font-bold">100% Vectoriel Hors-Ligne</span>
+              <span className="text-ok-bright font-bold">100% Vectoriel Hors-Ligne</span>
             </div>
 
             <div className="relative w-full max-w-[380px] aspect-square flex items-center justify-center my-1">
@@ -555,7 +555,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               </svg>
             </div>
 
-            <p className="text-[11px] font-['Space_Grotesk'] text-[#dce9fd] text-center mt-1">
+            <p className="text-[11px] font-label text-on-navy-soft text-center mt-1">
               Touchez un point sur la carte pour afficher sa fiche PPI détaillée ci-dessous.
             </p>
           </div>
@@ -563,18 +563,18 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* Fiche d'Inspection du Site Sélectionné */}
         {selectedSite && (
-          <div className="bg-white rounded-xl border border-[#c4c6ce] shadow-sm p-4 flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-2 border-b border-[#e4efff] pb-3">
+          <div className="bg-card rounded-xl border border-line-strong shadow-sm p-4 flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-2 border-b border-line pb-3">
               <div className="flex items-center gap-2.5">
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${
                     selectedSite.site.category === 'cnpe'
-                      ? 'bg-[#ffd8e4] text-[#31111d]'
-                      : 'bg-[#ffdad6] text-[#93000a]'
+                      ? 'bg-danger-soft text-ink'
+                      : 'bg-danger-soft text-danger-ink-strong'
                   }`}
                 >
                   {selectedSite.site.category === 'cnpe' ? (
-                    <NuclearPowerIcon className="w-5 h-5 text-[#31111d]" />
+                    <NuclearPowerIcon className="w-5 h-5 text-ink" />
                   ) : (
                     <span className="material-symbols-outlined text-[22px]">factory</span>
                   )}
@@ -582,35 +582,35 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span
-                      className={`font-['Space_Grotesk'] text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
+                      className={`font-label text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
                         selectedSite.site.category === 'cnpe'
                           ? 'bg-[#6750a4] text-white'
-                          : 'bg-[#ba1a1a] text-white'
+                          : 'bg-danger text-white'
                       }`}
                     >
                       {selectedSite.site.category === 'cnpe' ? 'Nucléaire • CNPE' : 'Chimie • Seveso Seuil Haut'}
                     </span>
-                    <span className="text-[11px] font-['Space_Grotesk'] text-[#74777e] font-semibold">
+                    <span className="text-[11px] font-label text-ink-faint font-semibold">
                       {selectedSite.site.operator}
                     </span>
                   </div>
-                  <h2 className="text-[16px] font-bold text-[#001126] mt-0.5">
+                  <h2 className="text-[16px] font-bold text-ink mt-0.5">
                     {selectedSite.site.name}
                   </h2>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="font-['Space_Grotesk'] text-[18px] font-black text-[#001126]">
+                <span className="font-label text-[18px] font-black text-ink">
                   {selectedSite.distanceKm} km
                 </span>
                 <span
-                  className={`block font-['Space_Grotesk'] text-[10px] font-extrabold uppercase ${
+                  className={`block font-label text-[10px] font-extrabold uppercase ${
                     selectedSite.isWithinReflex
-                      ? 'text-[#ba1a1a]'
+                      ? 'text-danger-ink'
                       : selectedSite.isWithinPpi
-                      ? 'text-[#6750a4]'
-                      : 'text-[#3f9d73]'
+                      ? 'text-brand-ink'
+                      : 'text-ok-ink'
                   }`}
                 >
                   {selectedSite.isWithinReflex
@@ -624,20 +624,20 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               </div>
             </div>
 
-            <p className="text-[13px] text-[#44474d] leading-relaxed">
+            <p className="text-[13px] text-ink-muted leading-relaxed">
               {selectedSite.site.description}
             </p>
 
             {/* Dangers & Produits cliquables */}
             <div>
-              <span className="text-[11px] font-['Space_Grotesk'] text-[#74777e] uppercase font-bold block mb-1">
+              <span className="text-[11px] font-label text-ink-faint uppercase font-bold block mb-1">
                 Substances & Risques Dominants :
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {selectedSite.site.keyHazards.map((h, i) => (
                   <span
                     key={i}
-                    className="font-['Space_Grotesk'] text-[11px] px-2.5 py-0.5 rounded-full bg-[#f8f9ff] text-[#001126] border border-[#c4c6ce] font-semibold"
+                    className="font-label text-[11px] px-2.5 py-0.5 rounded-full bg-canvas text-ink border border-line-strong font-semibold"
                   >
                     {h}
                   </span>
@@ -646,16 +646,16 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
             </div>
 
             {/* Consigne d'alerte immédiate */}
-            <div className="p-3 bg-[#eef4ff] rounded-xl border border-[#0036ce]/20 flex flex-col gap-1.5">
-              <span className="font-['Space_Grotesk'] text-[11px] uppercase tracking-wider text-[#0036ce] font-bold flex items-center gap-1">
+            <div className="p-3 bg-subtle rounded-xl border border-brand-ink/20 flex flex-col gap-1.5">
+              <span className="font-label text-[11px] uppercase tracking-wider text-brand-ink font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-[15px]">security</span>
                 Réflexe de Sécurité Civile (PPI {selectedSite.site.ppiRadiusKm} km)
               </span>
-              <p className="text-[12px] text-[#001126] font-semibold leading-snug">
+              <p className="text-[12px] text-ink font-semibold leading-snug">
                 {selectedSite.site.officialDoctrine.immediateReflex}
               </p>
-              <div className="pt-1 text-[11px] text-[#44474d] flex items-center gap-1 border-t border-[#0036ce]/10">
-                <span className="material-symbols-outlined text-[14px] text-[#ba1a1a]">campaign</span>
+              <div className="pt-1 text-[11px] text-ink-muted flex items-center gap-1 border-t border-brand-ink/10">
+                <span className="material-symbols-outlined text-[14px] text-danger-ink">campaign</span>
                 <span>{selectedSite.site.officialDoctrine.sirenType}</span>
               </div>
             </div>
@@ -666,7 +666,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenSubScreen?.({ type: 'iode' })}
-                  className="flex-1 min-h-[42px] bg-[#ffd8e4] hover:bg-[#ffc1d7] text-[#31111d] font-['Space_Grotesk'] text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 min-h-[42px] bg-danger-soft hover:bg-danger-soft text-ink font-label text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <span className="material-symbols-outlined text-[16px]">medication</span>
                   <span>Calculateur Posologie Iode</span>
@@ -675,7 +675,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenSubScreen?.({ type: 'protocol', id: 'chimique' })}
-                  className="flex-1 min-h-[42px] bg-[#ffdad6] hover:bg-[#ffc2bb] text-[#93000a] font-['Space_Grotesk'] text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 min-h-[42px] bg-danger-soft hover:bg-danger-soft text-danger-ink-strong font-label text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <span className="material-symbols-outlined text-[16px]">warning</span>
                   <span>Protocole Risque Chimique</span>
@@ -685,7 +685,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenSubScreen?.({ type: 'confinement-guide' })}
-                className="min-h-[42px] bg-[#001126] hover:bg-[#12263f] text-white font-['Space_Grotesk'] text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                className="min-h-[42px] bg-navy hover:bg-navy-2 text-white font-label text-[12px] font-bold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
               >
                 <span className="material-symbols-outlined text-[16px]">meeting_room</span>
                 <span>Guide Calfeutrage</span>
@@ -697,10 +697,10 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
         {/* Liste Complète & Filtrage des Sites */}
         <div className="flex flex-col gap-2.5 mt-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-['Space_Grotesk'] text-[14px] font-bold text-[#001126] uppercase">
+            <h3 className="font-label text-[14px] font-bold text-ink uppercase">
               Répertoire National des Sites ({filteredSites.length})
             </h3>
-            <span className="text-[11px] text-[#74777e] font-['Space_Grotesk']">
+            <span className="text-[11px] text-ink-faint font-label">
               Classé par proximité
             </span>
           </div>
@@ -719,10 +719,10 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                   setActiveCategory(f.id as any);
                   triggerHaptic('light');
                 }}
-                className={`flex-1 min-h-[38px] px-2 rounded-lg font-['Space_Grotesk'] text-[11px] font-bold uppercase transition-all ${
+                className={`flex-1 min-h-[38px] px-2 rounded-lg font-label text-[11px] font-bold uppercase transition-all ${
                   activeCategory === f.id
-                    ? 'bg-[#001126] text-white shadow-xs'
-                    : 'bg-white text-[#44474d] border border-[#c4c6ce] hover:border-[#001126]'
+                    ? 'bg-navy text-white shadow-xs'
+                    : 'bg-card text-ink-muted border border-line-strong hover:border-ink'
                 }`}
               >
                 {f.label}
@@ -732,7 +732,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
           {/* Barre de recherche */}
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-2.5 text-[#74777e] text-[18px]">
+            <span className="material-symbols-outlined absolute left-3 top-2.5 text-ink-faint text-[18px]">
               search
             </span>
             <input
@@ -740,7 +740,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher par nom de centrale, usine, commune ou département..."
-              className="w-full h-10 pl-9 pr-4 bg-white border border-[#c4c6ce] rounded-xl text-[13px] text-[#001126] placeholder-[#74777e] focus:outline-none focus:border-[#0036ce]"
+              className="w-full h-10 pl-9 pr-4 bg-card border border-line-strong rounded-xl text-[13px] text-ink placeholder-ink-faint focus:outline-none focus:border-brand-ink"
             />
           </div>
 
@@ -757,29 +757,29 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                     setSelectedSiteId(r.site.id);
                     triggerHaptic('light');
                   }}
-                  className={`p-3 bg-white rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                  className={`p-3 bg-card rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'border-[#0036ce] ring-1 ring-[#0036ce] shadow-sm'
-                      : 'border-[#c4c6ce] hover:border-[#74777e]'
+                      ? 'border-brand-ink ring-1 ring-brand-ink shadow-sm'
+                      : 'border-line-strong hover:border-ink-faint'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden ${
-                        isNuclear ? 'bg-[#ffd8e4] text-[#31111d]' : 'bg-[#ffdad6] text-[#93000a]'
+                        isNuclear ? 'bg-danger-soft text-ink' : 'bg-danger-soft text-danger-ink-strong'
                       }`}
                     >
                       {isNuclear ? (
-                        <NuclearPowerIcon className="w-4 h-4 text-[#31111d]" />
+                        <NuclearPowerIcon className="w-4 h-4 text-ink" />
                       ) : (
                         <span className="material-symbols-outlined text-[18px]">factory</span>
                       )}
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[13px] font-bold text-[#001126] truncate">
+                      <span className="text-[13px] font-bold text-ink truncate">
                         {r.site.name}
                       </span>
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#74777e] font-['Space_Grotesk']">
+                      <div className="flex items-center gap-1.5 text-[11px] text-ink-faint font-label">
                         <span>{r.site.department}</span>
                         <span>•</span>
                         <span>PPI {r.site.ppiRadiusKm} km</span>
@@ -788,16 +788,16 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="font-['Space_Grotesk'] text-[15px] font-extrabold text-[#001126]">
+                    <span className="font-label text-[15px] font-extrabold text-ink">
                       {r.distanceKm} km
                     </span>
                     <span
-                      className={`block font-['Space_Grotesk'] text-[10px] font-bold uppercase ${
+                      className={`block font-label text-[10px] font-bold uppercase ${
                         r.isWithinReflex
-                          ? 'text-[#ba1a1a]'
+                          ? 'text-danger-ink'
                           : r.isWithinPpi
-                          ? 'text-[#6750a4]'
-                          : 'text-[#74777e]'
+                          ? 'text-brand-ink'
+                          : 'text-ink-faint'
                       }`}
                     >
                       {r.isWithinReflex ? 'Réflexe' : r.isWithinPpi ? 'Dans PPI' : 'Hors PPI'}

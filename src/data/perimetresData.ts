@@ -1021,8 +1021,8 @@ export function diagnoseUserPerimeters(
   // Détermination du statut global
   let overallStatus: OverallPpiStatus = 'outside';
   let statusTitle = 'HORS PÉRIMÈTRE IMMÉDIAT';
-  let statusBadgeColor = 'bg-[#eef4ff]';
-  let statusBadgeTextColor = 'text-[#0036ce]';
+  let statusBadgeColor = 'bg-subtle';
+  let statusBadgeTextColor = 'text-brand-ink';
   let directiveSummary = 'Vous êtes situé en dehors des zones de confinement réflexe immédiates (plus de 50 km d’un CNPE et plus de 10 km d’un site Seveso Seuil Haut majeur). Maintenez vos réflexes d’alerte générale.';
   let iodineAdvice = 'Aucun stockage préventif d’iode stable requis à votre domicile. En cas d’accident nucléaire national majeur, la distribution serait organisée par les préfets sur réquisition des stocks d’État.';
 
@@ -1033,7 +1033,7 @@ export function diagnoseUserPerimeters(
   if (isReflex) {
     overallStatus = 'in_reflex';
     statusTitle = 'ZONE RÉFLEXE IMMÉDIATE (0-5 KM)';
-    statusBadgeColor = 'bg-[#ba1a1a]';
+    statusBadgeColor = 'bg-danger';
     statusBadgeTextColor = 'text-white';
     directiveSummary = `ALERTE : Vous êtes à ${Math.min(closestCnpe.distanceKm, closestSeveso.distanceKm)} km d'un site à haut risque. En cas de sirène RNA, confinement réflexe sous 3 minutes sans attendre d'instruction téléphonique.`;
     iodineAdvice = closestCnpe.isWithinReflex
@@ -1051,8 +1051,8 @@ export function diagnoseUserPerimeters(
   } else if (isVigilance) {
     overallStatus = 'in_vigilance';
     statusTitle = 'ZONE DE VIGILANCE ÉLARGIE';
-    statusBadgeColor = 'bg-[#fef3c7]';
-    statusBadgeTextColor = 'text-[#92400e]';
+    statusBadgeColor = 'bg-warn-soft';
+    statusBadgeTextColor = 'text-warn-ink';
     directiveSummary = `Site le plus proche : ${results[0].site.shortName} à ${results[0].distanceKm} km. Vous êtes au-delà du PPI réflexe immédiat, mais dans la zone de retombées potentielles selon l'orientation des vents.`;
     iodineAdvice = closestCnpe.isWithinVigilance
       ? `Zone 20-50 km : Pas de dotation préventive individuelle obligatoire. Distribution différée par les autorités en cas de panache radioactif prolongé.`

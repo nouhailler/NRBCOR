@@ -22,7 +22,7 @@ interface ScenarioInstruction {
 const SCENARIO_DETAILS: Record<ConfinementScenario, ScenarioInstruction> = {
   chimique: {
     badge: 'RISQUE CHIMIQUE • INCIDENT INDUSTRIEL OU TRANSPORT',
-    badgeBg: 'bg-[#0036ce] text-white',
+    badgeBg: 'bg-brand text-white',
     idealLocation: 'Pièce fermée au cœur du bâti, sans ouvrant direct vers l’extérieur (selon consignes préfectorales diffusées)',
     forbiddenLocation: 'Locaux présentant des prises d’air extérieures non obturables ou sous toiture perméable',
     keyRule: 'Mise à l’abri immédiate, fermeture des ouvrants, écoute stricte des ordres diffusés en direct par les autorités.',
@@ -31,7 +31,7 @@ const SCENARIO_DETAILS: Record<ConfinementScenario, ScenarioInstruction> = {
   },
   nucleaire: {
     badge: 'RISQUE NUCLÉAIRE & RADIOLOGIQUE • RETOMBÉES & RAYONNEMENTS',
-    badgeBg: 'bg-[#ba1a1a] text-white',
+    badgeBg: 'bg-danger text-white',
     idealLocation: 'Sous-sol bétonné ou pièce centrale du rez-de-chaussée entourée de maçonnerie dense',
     forbiddenLocation: 'Pièces sous combles légers, vérandas, balcons ou pièces à simples parois vitrées',
     keyRule: 'Interposition maximale de matière dense (béton, brique pleine) pour atténuer le rayonnement ionisant.',
@@ -40,7 +40,7 @@ const SCENARIO_DETAILS: Record<ConfinementScenario, ScenarioInstruction> = {
   },
   biologique: {
     badge: 'RISQUE BIOLOGIQUE • AÉROSOLS & AGENTS PATHOGÈNES',
-    badgeBg: 'bg-[#005236] text-white',
+    badgeBg: 'bg-ok text-white',
     idealLocation: 'Pièce isolée avec point d’eau sanitaire permettant un sas d’hygiène',
     forbiddenLocation: 'Espaces partagés ventilés par une VMC collective non filtrée',
     keyRule: 'Port d’un masque FFP3/FFP2 ajusté, lavage des mains fréquent, séparation des flux d’air.',
@@ -151,16 +151,16 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
   const currentScenario = SCENARIO_DETAILS[selectedScenario];
 
   return (
-    <div className="flex flex-col w-full pt-20 pb-28 min-h-screen max-w-xl mx-auto px-4 gap-4">
+    <div className="flex flex-col w-full pt-20 pb-28 lg:pb-12 min-h-screen max-w-xl lg:max-w-3xl mx-auto px-4 sm:px-6 gap-4">
       {/* Sentinel bar */}
-      <div className="w-full bg-[#001126] text-white py-2 px-3 rounded-lg flex items-center justify-between border border-[#12263f]">
+      <div className="w-full bg-navy text-white py-2 px-3 rounded-lg flex items-center justify-between border border-ink">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="material-symbols-outlined text-[18px] text-[#98f6c5]">shield</span>
-          <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-wider truncate">
+          <span className="material-symbols-outlined text-[18px] text-ok-bright">shield</span>
+          <span className="font-label text-[11px] font-bold uppercase tracking-wider truncate">
             Protocole Confinement & Sécurité Doctrinale • DGSCGC
           </span>
         </div>
-        <span className="font-['Space_Grotesk'] text-[10px] bg-[#98f6c5] text-[#005236] px-2 py-0.5 rounded font-bold uppercase">
+        <span className="font-label text-[10px] bg-ok-soft text-ok-ink px-2 py-0.5 rounded font-bold uppercase">
           CONFORME ÉTAT
         </span>
       </div>
@@ -170,7 +170,7 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
         <button
           onClick={onBack}
           type="button"
-          className="h-12 px-3 bg-[#dce9fd] hover:bg-[#d6e4f8] text-[#001126] font-['Space_Grotesk'] text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
+          className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>RETOUR</span>
@@ -178,7 +178,7 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
         <button
           onClick={onGoToKit}
           type="button"
-          className="h-12 px-3 bg-[#eef4ff] hover:bg-[#e4efff] text-[#001126] font-['Space_Grotesk'] text-[11px] font-bold rounded flex items-center gap-1.5 transition-colors border border-[#d6e4f8]"
+          className="h-12 px-3 bg-subtle hover:bg-tint text-ink font-label text-[11px] font-bold rounded flex items-center gap-1.5 transition-colors border border-line"
         >
           <span className="material-symbols-outlined text-[18px]">inventory_2</span>
           <span>VOIR KIT 72H</span>
@@ -188,14 +188,14 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
       {/* Header title */}
       <header className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <span className="font-['Space_Grotesk'] text-[11px] px-2 py-0.5 rounded bg-[#0036ce] text-white font-bold uppercase">
+          <span className="font-label text-[11px] px-2 py-0.5 rounded bg-brand text-white font-bold uppercase">
             CONSIGNE MAJEURE DE SÉCURITÉ CIVILE
           </span>
         </div>
-        <h1 className="text-[24px] text-[#001126] font-bold tracking-tight">
+        <h1 className="text-[24px] text-ink font-bold tracking-tight">
           Guide Opérationnel du Confinement
         </h1>
-        <p className="text-[13px] text-[#44474d] leading-relaxed">
+        <p className="text-[13px] text-ink-muted leading-relaxed">
           Le confinement dans un local clos et calfeutré est la première mesure de sauvegarde face aux panaches toxiques industriels, biologiques ou aux retombées radioactives.
         </p>
       </header>
@@ -203,32 +203,32 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
       {/* AVERTISSEMENT DOCTRINAL DE PRIMAUTÉ PRÉFECTORALE (PRIORITÉ 1) */}
       <section
         role="alert"
-        className="bg-[#dee1ff] p-3.5 rounded-xl border border-[#b9c3ff] flex flex-col gap-2"
+        className="bg-tint p-3.5 rounded-xl border border-brand-bright flex flex-col gap-2"
       >
-        <div className="flex items-center gap-2 text-[#001258]">
-          <span className="material-symbols-outlined text-[22px] text-[#001258]">verified_user</span>
-          <h2 className="font-['Space_Grotesk'] text-[12px] uppercase font-bold tracking-wider">
+        <div className="flex items-center gap-2 text-brand-ink">
+          <span className="material-symbols-outlined text-[22px] text-brand-ink">verified_user</span>
+          <h2 className="font-label text-[12px] uppercase font-bold tracking-wider">
             Priorité 1 — Fiabilité des Consignes et Ordres Officiels
           </h2>
         </div>
-        <p className="text-[12px] text-[#001258] leading-relaxed">
+        <p className="text-[12px] text-brand-ink leading-relaxed">
           Les recommandations présentées ici sont issues du corpus interministériel (DGSCGC, SGDSN, IRSN, Ineris). <strong>Elles ne constituent pas un substitut aux ordres donnés en temps réel par le Préfet de département</strong> (via FR-Alert ou la radio de service public). En cas de divergence avec la situation locale sur le terrain, suivez toujours les instructions opérationnelles diffusées par les secours.
         </p>
       </section>
 
       {/* SÉLECTEUR DE SCÉNARIO PRÉCIS (CHIMIQUE vs NUCLÉAIRE vs BIOLOGIQUE) */}
-      <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-3">
+      <section className="bg-card p-4 rounded-xl shadow-sm border border-line-strong flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce] text-[20px]">tune</span>
-            <h2 className="text-[15px] font-bold text-[#001126]">Adapter au Scénario d'Accident</h2>
+            <span className="material-symbols-outlined text-brand-ink text-[20px]">tune</span>
+            <h2 className="text-[15px] font-bold text-ink">Adapter au Scénario d'Accident</h2>
           </div>
-          <span className="font-['Space_Grotesk'] text-[10px] bg-[#eef4ff] text-[#0036ce] px-2 py-0.5 rounded font-bold uppercase">
+          <span className="font-label text-[10px] bg-subtle text-brand-ink px-2 py-0.5 rounded font-bold uppercase">
             Crucial
           </span>
         </div>
 
-        <p className="text-[12px] text-[#44474d]">
+        <p className="text-[12px] text-ink-muted">
           La consigne d'emplacement varie radicalement selon la nature du risque :
         </p>
 
@@ -238,11 +238,11 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
             onClick={() => setSelectedScenario('chimique')}
             className={`p-2 rounded-lg text-center transition-all border ${
               selectedScenario === 'chimique'
-                ? 'bg-[#0036ce] text-white border-[#0036ce] shadow-sm font-bold'
-                : 'bg-[#f8f9ff] text-[#001126] border-[#d6e4f8] hover:bg-[#eef4ff]'
+                ? 'bg-brand text-white border-brand-ink shadow-sm font-bold'
+                : 'bg-canvas text-ink border-line hover:bg-subtle'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] block uppercase">Chimique</span>
+            <span className="font-label text-[11px] block uppercase">Chimique</span>
             <span className="text-[9px] block opacity-80 truncate">Fuite / Usine</span>
           </button>
 
@@ -251,11 +251,11 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
             onClick={() => setSelectedScenario('nucleaire')}
             className={`p-2 rounded-lg text-center transition-all border ${
               selectedScenario === 'nucleaire'
-                ? 'bg-[#ba1a1a] text-white border-[#ba1a1a] shadow-sm font-bold'
-                : 'bg-[#f8f9ff] text-[#001126] border-[#d6e4f8] hover:bg-[#eef4ff]'
+                ? 'bg-danger text-white border-danger-ink shadow-sm font-bold'
+                : 'bg-canvas text-ink border-line hover:bg-subtle'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] block uppercase">Nucléaire</span>
+            <span className="font-label text-[11px] block uppercase">Nucléaire</span>
             <span className="text-[9px] block opacity-80 truncate">Retombées RN</span>
           </button>
 
@@ -264,68 +264,68 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
             onClick={() => setSelectedScenario('biologique')}
             className={`p-2 rounded-lg text-center transition-all border ${
               selectedScenario === 'biologique'
-                ? 'bg-[#005236] text-white border-[#005236] shadow-sm font-bold'
-                : 'bg-[#f8f9ff] text-[#001126] border-[#d6e4f8] hover:bg-[#eef4ff]'
+                ? 'bg-ok text-white border-ok-ink shadow-sm font-bold'
+                : 'bg-canvas text-ink border-line hover:bg-subtle'
             }`}
           >
-            <span className="font-['Space_Grotesk'] text-[11px] block uppercase">Biologique</span>
+            <span className="font-label text-[11px] block uppercase">Biologique</span>
             <span className="text-[9px] block opacity-80 truncate">Pathogène</span>
           </button>
         </div>
 
         {/* Détails du scénario actif */}
-        <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#c4c6ce] flex flex-col gap-2">
+        <div className="bg-canvas p-3 rounded-lg border border-line-strong flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className={`font-['Space_Grotesk'] text-[10px] px-2 py-0.5 rounded font-bold uppercase ${currentScenario.badgeBg}`}>
+            <span className={`font-label text-[10px] px-2 py-0.5 rounded font-bold uppercase ${currentScenario.badgeBg}`}>
               {currentScenario.badge}
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
-            <div className="p-2 bg-white rounded border border-[#98f6c5] flex flex-col gap-0.5">
-              <span className="text-[#005236] font-bold text-[11px] flex items-center gap-1">
+            <div className="p-2 bg-card rounded border border-ok-bright flex flex-col gap-0.5">
+              <span className="text-ok-ink font-bold text-[11px] flex items-center gap-1">
                 <span className="material-symbols-outlined text-[15px]">check_circle</span>
                 Localisation Recommandée :
               </span>
-              <span className="text-[#001126] font-semibold">{currentScenario.idealLocation}</span>
+              <span className="text-ink font-semibold">{currentScenario.idealLocation}</span>
             </div>
 
-            <div className="p-2 bg-white rounded border border-[#ffdad6] flex flex-col gap-0.5">
-              <span className="text-[#ba1a1a] font-bold text-[11px] flex items-center gap-1">
+            <div className="p-2 bg-card rounded border border-danger-bright flex flex-col gap-0.5">
+              <span className="text-danger-ink font-bold text-[11px] flex items-center gap-1">
                 <span className="material-symbols-outlined text-[15px]">cancel</span>
                 Endroit Strictement Proscrit :
               </span>
-              <span className="text-[#93000a] font-semibold">{currentScenario.forbiddenLocation}</span>
+              <span className="text-danger-ink-strong font-semibold">{currentScenario.forbiddenLocation}</span>
             </div>
           </div>
 
-          <div className="p-2 bg-white rounded border border-[#d6e4f8] text-[11px] text-[#0f1c2b]">
-            <span className="font-bold text-[#0036ce] block mb-0.5">Pourquoi cette consigne ?</span>
+          <div className="p-2 bg-card rounded border border-line text-[11px] text-ink">
+            <span className="font-bold text-brand-ink block mb-0.5">Pourquoi cette consigne ?</span>
             <p className="leading-snug">{currentScenario.rationale}</p>
           </div>
 
-          <div className="p-2 bg-[#eef4ff] rounded border border-[#d6e4f8] text-[11px] text-[#0036ce] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px] text-[#0036ce] shrink-0">air</span>
+          <div className="p-2 bg-subtle rounded border border-line text-[11px] text-brand-ink flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px] text-brand-ink shrink-0">air</span>
             <span className="font-medium">{currentScenario.airRenewalWarning}</span>
           </div>
         </div>
       </section>
 
       {/* Checklist étanchéité */}
-      <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-3">
+      <section className="bg-card p-4 rounded-xl shadow-sm border border-line-strong flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#0036ce] text-[22px]">fact_check</span>
-            <h2 className="text-[16px] font-bold text-[#001126]">Checklist Étanchéité Immédiate</h2>
+            <span className="material-symbols-outlined text-brand-ink text-[22px]">fact_check</span>
+            <h2 className="text-[16px] font-bold text-ink">Checklist Étanchéité Immédiate</h2>
           </div>
-          <span className="font-['Space_Grotesk'] text-[14px] font-bold text-[#0036ce]">
+          <span className="font-label text-[14px] font-bold text-brand-ink">
             {completedCount} / {CONFINEMENT_STEPS.length}
           </span>
         </div>
 
-        <div className="w-full bg-[#f1f3f9] rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-subtle rounded-full h-2 overflow-hidden">
           <div
-            className="bg-[#0036ce] h-full rounded-full transition-all duration-300"
+            className="bg-brand h-full rounded-full transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           ></div>
         </div>
@@ -338,31 +338,31 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
                 key={step.id}
                 className={`p-3 rounded-xl border flex items-start gap-3 cursor-pointer transition-colors ${
                   isChecked
-                    ? 'bg-[#f0f8ff] border-[#0036ce]'
-                    : 'bg-[#f8f9ff] border-[#e0e2eb] hover:bg-white'
+                    ? 'bg-subtle border-brand-ink'
+                    : 'bg-canvas border-line hover:bg-card'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => toggleCheck(step.id)}
-                  className="w-5 h-5 mt-0.5 rounded text-[#0036ce] accent-[#0036ce] cursor-pointer shrink-0"
+                  className="w-5 h-5 mt-0.5 rounded text-brand-ink accent-brand-ink cursor-pointer shrink-0"
                 />
                 <div className="flex flex-col min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[18px] text-[#001126]">
+                    <span className="material-symbols-outlined text-[18px] text-ink">
                       {step.icon}
                     </span>
-                    <span className="text-[14px] font-bold text-[#001126]">
+                    <span className="text-[14px] font-bold text-ink">
                       {step.order}. {step.title}
                     </span>
                   </div>
-                  <p className="text-[12px] text-[#44474d] mt-1 leading-snug">{step.desc}</p>
-                  <p className="text-[11px] text-[#0036ce] mt-1 font-medium bg-white/80 p-1.5 rounded border border-[#d6e4f8]">
+                  <p className="text-[12px] text-ink-muted mt-1 leading-snug">{step.desc}</p>
+                  <p className="text-[11px] text-brand-ink mt-1 font-medium bg-white/80 p-1.5 rounded border border-line">
                     💡 {step.tip}
                   </p>
                   {step.scenarioNote && (
-                    <span className="text-[10px] text-[#555962] font-semibold mt-1">
+                    <span className="text-[10px] text-ink-muted font-semibold mt-1">
                       📌 {step.scenarioNote}
                     </span>
                   )}
@@ -374,11 +374,11 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
       </section>
 
       {/* VIGILANCE SUR LE RENOUVELLEMENT D'AIR & DANGERS D'ATMOSPHÈRE APPAUVRIE (PRIORITÉ 1) */}
-      <section className="bg-white p-4 rounded-xl shadow-sm border border-[#c4c6ce] flex flex-col gap-3">
+      <section className="bg-card p-4 rounded-xl shadow-sm border border-line-strong flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <h2 className="text-[15px] font-bold text-[#001126] flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#ba1a1a]">air</span>
+            <h2 className="text-[15px] font-bold text-ink flex items-center gap-2">
+              <span className="material-symbols-outlined text-danger-ink">air</span>
               <span>Vigilance Respiratoire & Renouvellement d'Air</span>
             </h2>
             <Tooltip
@@ -386,14 +386,14 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
               content="Un local clos protège des toxiques extérieurs mais piège l'air vicié. Il ne doit être maintenu que le temps strictement nécessaire au passage du panache."
             />
           </div>
-          <span className="font-['Space_Grotesk'] text-[11px] bg-[#fff0ed] text-[#ba1a1a] px-2 py-0.5 rounded font-bold uppercase border border-[#ffdad6]">
+          <span className="font-label text-[11px] bg-danger-soft text-danger-ink px-2 py-0.5 rounded font-bold uppercase border border-danger-bright">
             Sécurité Vitale
           </span>
         </div>
 
         {/* Encadré d'avertissement doctrinal strict */}
-        <div className="p-3.5 bg-[#fff0ed] rounded-xl border-2 border-[#ffdad6] text-[#93000a] text-[12px] flex items-start gap-2.5">
-          <span className="material-symbols-outlined text-[22px] text-[#ba1a1a] shrink-0 mt-0.5">warning</span>
+        <div className="p-3.5 bg-danger-soft rounded-xl border-2 border-danger-bright text-danger-ink-strong text-[12px] flex items-start gap-2.5">
+          <span className="material-symbols-outlined text-[22px] text-danger-ink shrink-0 mt-0.5">warning</span>
           <div className="flex flex-col gap-1 leading-relaxed">
             <span className="font-bold text-[13px] uppercase tracking-wide">
               Mise en garde doctrinale : aucun calcul ne garantit votre sécurité respiratoire
@@ -406,74 +406,74 @@ export const ConfinementGuideView: React.FC<ConfinementGuideViewProps> = ({
 
         {/* 3 Principes de Sauvegarde DGSCGC */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-[12px]">
-          <div className="p-3 bg-[#eef4ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] font-bold">
-              <span className="material-symbols-outlined text-[18px] text-[#0036ce]">timer</span>
+          <div className="p-3 bg-subtle rounded-lg border border-line flex flex-col gap-1">
+            <div className="flex items-center gap-1.5 text-ink font-label font-bold">
+              <span className="material-symbols-outlined text-[18px] text-brand-ink">timer</span>
               <span>1. Durée Temporaire</span>
             </div>
-            <p className="text-[#44474d] text-[11px] leading-snug">
+            <p className="text-ink-muted text-[11px] leading-snug">
               Le confinement civil d'urgence est conçu pour une fenêtre maximale de <strong>2 à 4 heures</strong> (temps de passage du pic du panache toxique).
             </p>
           </div>
 
-          <div className="p-3 bg-[#eef4ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] font-bold">
-              <span className="material-symbols-outlined text-[18px] text-[#3f9d73]">air</span>
+          <div className="p-3 bg-subtle rounded-lg border border-line flex flex-col gap-1">
+            <div className="flex items-center gap-1.5 text-ink font-label font-bold">
+              <span className="material-symbols-outlined text-[18px] text-ok-ink">air</span>
               <span>2. Aérer dès la Fin d'Alerte</span>
             </div>
-            <p className="text-[#44474d] text-[11px] leading-snug">
+            <p className="text-ink-muted text-[11px] leading-snug">
               Dès l’ordre officiel de fin de crise diffusé par la Préfecture (sirène continue ou radio), <strong>ouvrez en grand tous les ouvrants</strong> pour assainir l'habitat.
             </p>
           </div>
 
-          <div className="p-3 bg-[#eef4ff] rounded-lg border border-[#d6e4f8] flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-[#001126] font-['Space_Grotesk'] font-bold">
-              <span className="material-symbols-outlined text-[18px] text-[#ba1a1a]">do_not_disturb</span>
+          <div className="p-3 bg-subtle rounded-lg border border-line flex flex-col gap-1">
+            <div className="flex items-center gap-1.5 text-ink font-label font-bold">
+              <span className="material-symbols-outlined text-[18px] text-danger-ink">do_not_disturb</span>
               <span>3. Zéro Flamme Nue</span>
             </div>
-            <p className="text-[#44474d] text-[11px] leading-snug">
+            <p className="text-ink-muted text-[11px] leading-snug">
               N'allumez aucune bougie ni briquet : une flamme consume l'oxygène résiduel à grande vitesse et produit du monoxyde de carbone mortel.
             </p>
           </div>
         </div>
 
         {/* Signes d'alerte vitale en milieu confiné */}
-        <div className="bg-[#f8f9ff] p-3 rounded-lg border border-[#c4c6ce] flex flex-col gap-1 text-[12px]">
-          <span className="font-['Space_Grotesk'] font-bold text-[#001126] flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[16px] text-[#ba1a1a]">emergency</span>
+        <div className="bg-canvas p-3 rounded-lg border border-line-strong flex flex-col gap-1 text-[12px]">
+          <span className="font-label font-bold text-ink flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[16px] text-danger-ink">emergency</span>
             Signes d'intoxication au CO2 ou de manque d'oxygène :
           </span>
-          <p className="text-[#44474d] leading-relaxed">
+          <p className="text-ink-muted leading-relaxed">
             Maux de tête battants, étourdissements, respiration accélérée et involontaire, sueurs froides ou confusion. En présence de ces symptômes : restez immobiles pour minimiser la consommation d'air, calmez votre respiration et contactez immédiatement les secours (15/18/112) si vous disposez d'un réseau disponible.
           </p>
         </div>
       </section>
 
       {/* Règles strictes pendant le confinement */}
-      <section className="bg-[#12263f] text-white p-4 rounded-xl shadow-sm border border-[#001126] flex flex-col gap-2.5">
+      <section className="bg-navy-2 text-white p-4 rounded-xl shadow-sm border border-ink flex flex-col gap-2.5">
         <h2 className="text-[15px] font-bold flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#ffdad6]">do_not_disturb_on</span>
+          <span className="material-symbols-outlined text-danger-bright">do_not_disturb_on</span>
           <span>Interdictions Formelles Pendant le Confinement</span>
         </h2>
-        <div className="flex flex-col gap-2 text-[12px] text-[#d4e3ff]">
+        <div className="flex flex-col gap-2 text-[12px] text-brand-bright">
           <div className="flex items-center gap-2">
-            <span className="text-[#ffb4ab] font-bold">✕</span>
+            <span className="text-danger-bright font-bold">✕</span>
             <span><strong>Ne fumez jamais</strong> et n’allumez aucune bougie ou allumette (consomme l’air et risque d’inflammation).</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[#ffb4ab] font-bold">✕</span>
+            <span className="text-danger-bright font-bold">✕</span>
             <span><strong>Ne sortez pas chercher vos enfants à l’école</strong> : ils sont protégés et confinés sous protocole PPMS par les enseignants.</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[#ffb4ab] font-bold">✕</span>
+            <span className="text-danger-bright font-bold">✕</span>
             <span><strong>N’ouvrez pas la porte</strong> sans vérification préalable d'absence de contamination.</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[#ffb4ab] font-bold">✕</span>
+            <span className="text-danger-bright font-bold">✕</span>
             <span><strong>Ne buvez pas l’eau du robinet</strong> si un avis de coupure ou d'alerte sur le réseau public d'eau a été émis.</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[#ffb4ab] font-bold">✕</span>
+            <span className="text-danger-bright font-bold">✕</span>
             <span><strong>Ne prenez pas de comprimés d’iode de votre propre initiative</strong> sans ordre formel du Préfet de département.</span>
           </div>
         </div>

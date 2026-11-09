@@ -1,10 +1,14 @@
 // NRBCOR Service Worker - Cache-First App Shell & Offline Sentinel
-const CACHE_NAME = 'nrbcor-cache-v1';
+const CACHE_NAME = 'nrbcor-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/fonts/material-symbols-outlined.woff2'
+  '/fonts/material-symbols-outlined.woff2',
+  '/fonts/inter-latin-var.woff2',
+  '/fonts/inter-latin-ext-var.woff2',
+  '/icon.svg',
+  '/logo.svg'
 ];
 
 self.addEventListener('install', (event) => {

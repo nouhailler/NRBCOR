@@ -11,9 +11,21 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#001126" />
-    <link rel="apple-touch-icon" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="preload" href="/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Applique le thème avant le premier rendu (évite le flash clair/sombre)
+      (function () {
+        try {
+          var m = localStorage.getItem('nrbcor_theme_mode');
+          var dark = m === 'dark' || (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.add(dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-[#f8f9ff] text-[#0f1c2b] antialiased">
+  <body class="antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
