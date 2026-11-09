@@ -42,8 +42,12 @@ jobs:
             echo "❌ Erreur : dist/index.html absent de la compilation !"
             exit 1
           fi
-          if [ ! -f public/manifest.json ] && [ ! -f dist/manifest.json ]; then
+          if [ ! -f public/manifest.webmanifest ] && [ ! -f dist/manifest.webmanifest ]; then
             echo "❌ Erreur : Web App Manifest introuvable !"
+            exit 1
+          fi
+          if [ ! -f dist/sw.js ] || [ ! -f dist/fonts/inter-latin-var.woff2 ]; then
+            echo "❌ Erreur : Service Worker ou polices locales absents du build !"
             exit 1
           fi
           echo "✅ Audit CI NRBCOR réussi : PWA autonome et corpus certifiés conformes."
