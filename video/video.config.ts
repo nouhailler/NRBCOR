@@ -1,7 +1,7 @@
-import { defineConfig } from '@nouhailler/video-studio';
-import { tutorielFr } from './scenarios/tutoriel-fr';
+import { defineVideoConfig } from '@nouhailler/video-studio';
+import tutorielFr from './scenarios/tutoriel-fr';
 
-export default defineConfig({
+export default defineVideoConfig({
   name: 'NRBCOR',
   app: {
     build: 'npm run build',
@@ -20,11 +20,33 @@ export default defineConfig({
     sourceDirs: ['src'],
   },
   theme: {
-    primary: '#0b1d36',
-    accent: '#15803d',
-    bg: '#f4f7fb',
-    logo: '/logo.svg',
+    brand: 'NRBCOR',
     url: 'https://nrbcor.pages.dev',
+    logo: '../public/logo.svg',
+    colors: {
+      bg: '#040a14',
+      bgTop: '#0b1d36',
+      bgMid: '#071226',
+      surface: '#0d2240',
+      line: 'rgba(148,184,230,0.22)',
+      text: '#f4f7fb',
+      dim: '#b3c4dc',
+      faint: '#7f98b8',
+      accent: '#15803d',
+      accentLight: '#22c55e',
+      accentDark: '#166534',
+      accentSoft: 'rgba(21,128,61,0.16)',
+      accentLine: 'rgba(34,197,94,0.38)',
+      accentInk: '#ffffff',
+      glowA: 'rgba(21,128,61,0.18)',
+      glowB: 'rgba(14,116,144,0.16)',
+    },
+    labels: {
+      chapter: 'Chapitre',
+      tutorial: 'Tutoriel',
+      intro: 'Introduction',
+      outro: 'Conclusion',
+    },
   },
   preseed: () => ({
     nrbc_settings: JSON.stringify({
@@ -99,27 +121,49 @@ export default defineConfig({
     }),
   }),
   network: {
-    fixtures: {
-      'https://geo.api.gouv.fr/communes*': './fixtures/network/geo-communes.json',
-      'https://georisques.gouv.fr/api/v1/gaspar/risques*': './fixtures/network/georisques-lyon.json',
-      'https://api-lannuaire.service-public.fr/*': './fixtures/network/mairie-lyon.json',
-    },
+    mode: 'replay',
+    fixtures: [
+      {
+        id: 'geo-communes',
+        match: /^https:\/\/geo\.api\.gouv\.fr\/communes/,
+        file: 'geo-communes.json',
+        contentType: 'application/json',
+        nature: 'simulé',
+      },
+      {
+        id: 'georisques-lyon',
+        match: /^https:\/\/georisques\.gouv\.fr\/api\/v1\/gaspar\/risques/,
+        file: 'georisques-lyon.json',
+        contentType: 'application/json',
+        nature: 'simulé',
+      },
+      {
+        id: 'mairie-lyon',
+        match: /^https:\/\/api-lannuaire\.service-public\.fr\//,
+        file: 'mairie-lyon.json',
+        contentType: 'application/json',
+        nature: 'simulé',
+      },
+    ],
   },
   pronunciations: {
-    NRBC: 'N R B C',
-    NRBCOR: 'N R B Cor',
-    FFP3: 'F F P 3',
-    PPI: 'P P I',
-    VMC: 'V M C',
-    CNPE: 'C N P E',
-    Seveso: 'Sévézo',
-    PWA: 'P W A',
-    KI: 'K I',
-    RNA: 'R N A',
-    ALARA: 'Alara',
-    JSON: 'jison',
-    PDF: 'P D F',
-    'QR Code': 'ku-ère code',
+    fr: [
+      [/\bNRBCOR\b/g, 'N R B Cor'],
+      [/\bNRBC\b/g, 'N R B C'],
+      [/\bFFP3\b/g, 'F F P 3'],
+      [/\bPPI\b/g, 'P P I'],
+      [/\bVMC\b/g, 'V M C'],
+      [/\bCNPE\b/g, 'C N P E'],
+      [/\bSeveso\b/gi, 'Sévézo'],
+      [/\bPWA\b/g, 'P W A'],
+      [/\bKI\b/g, 'K I'],
+      [/\bRNA\b/g, 'R N A'],
+      [/\bALARA\b/g, 'Alara'],
+      [/\bJSON\b/g, 'jison'],
+      [/\bPDF\b/g, 'P D F'],
+      [/QR Code/gi, 'ku-ère code'],
+      [/nrbcor\.pages\.dev/g, 'n r b c o r point pages point dev'],
+    ],
   },
   scenarios: [tutorielFr],
 });
