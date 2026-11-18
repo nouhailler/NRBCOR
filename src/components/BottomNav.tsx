@@ -39,6 +39,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, i
           return (
             <button
               key={tab.id}
+              data-demo-id={`nav-${tab.id}`}
               onClick={() => onSelectTab(tab.id)}
               type="button"
               aria-current={isActive ? 'page' : undefined}

@@ -245,6 +245,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
       {/* Return Action & Quick Shopping List */}
       <div className="flex items-center justify-between gap-2">
         <button
+          data-demo-id="inventory-back-btn"
           onClick={onBack}
           type="button"
           className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
@@ -254,6 +255,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
         </button>
 
         <button
+          data-demo-id="inventory-shopping-btn"
           onClick={() => setShowShoppingListModal(true)}
           type="button"
           className="h-12 px-3.5 bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold rounded flex items-center gap-1.5 shadow-sm transition-colors"
@@ -274,7 +276,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
       </header>
 
       {/* TABLEAU DE BORD INTELLIGENT : BESOINS CALCULÉS VS STOCKS RÉELS */}
-      <section className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
+      <section data-demo-id="inventory-balance-card" className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-brand-ink text-[22px]">balance</span>
@@ -458,7 +460,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
       </div>
 
       {/* Synthèse Alertes Péremptions */}
-      <div className="grid grid-cols-2 gap-2">
+      <div data-demo-id="inventory-expiry-summary" className="grid grid-cols-2 gap-2">
         <div className={`p-3 rounded-xl border flex flex-col gap-1 ${
           expiredCount > 0 ? 'bg-danger-soft/50 border-danger-line' : 'bg-subtle border-line'
         }`}>
@@ -506,6 +508,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
 
         <div className="grid grid-cols-3 gap-1.5">
           <button
+            data-demo-id="inventory-sort-expiry"
             onClick={() => setSortBy('expiry')}
             type="button"
             className={`min-h-[40px] rounded-lg font-label text-[11px] font-bold uppercase transition-colors ${
@@ -515,6 +518,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
             Péremption
           </button>
           <button
+            data-demo-id="inventory-sort-status"
             onClick={() => setSortBy('status')}
             type="button"
             className={`min-h-[40px] rounded-lg font-label text-[11px] font-bold uppercase transition-colors ${
@@ -780,6 +784,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onBack }) => {
                 <h3 className="font-bold text-[16px]">Liste de Courses d'Urgence</h3>
               </div>
               <button
+                data-demo-id="inventory-shopping-close"
                 type="button"
                 onClick={() => setShowShoppingListModal(false)}
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"

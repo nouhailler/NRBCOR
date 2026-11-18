@@ -1,0 +1,13 @@
+[
+  {
+    "nom": "Lyon 3e Arrondissement",
+    "code": "69383",
+    "codeDepartement": "69",
+    "codesPostaux": ["69003"],
+    "population": 101302,
+    "centre": {
+      "type": "Point",
+      "coordinates": [4.8565, 45.7568]
+    }
+  }
+]

@@ -7,3 +7,10 @@ coverage/
 .env*
 !.env.example
 .wrangler/
+
+# video-studio generated artifacts
+video/audio/
+video/cache/
+video/recordings/
+video/build/
+video/output/

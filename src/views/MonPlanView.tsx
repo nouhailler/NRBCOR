@@ -303,7 +303,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </div>
 
       {/* Privacy Statement Card with Discreet Mode Toggle */}
-      <section data-tour="plan-privacy" className="bg-card p-4 rounded-xl shadow-sm space-y-3 border border-line-strong">
+      <section data-tour="plan-privacy" data-demo-id="plan-privacy-card" className="bg-card p-4 rounded-xl shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-start justify-between gap-2">
           <div className="flex gap-2.5">
             <div className="w-9 h-9 rounded-full bg-tint flex items-center justify-center shrink-0 text-ink">
@@ -330,6 +330,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
             </span>
           </div>
           <button
+            data-demo-id="plan-discreet-btn"
             type="button"
             onClick={() => setIsDiscreet(!isDiscreet)}
             className="min-h-[44px] px-3 py-1 bg-tint hover:bg-tint text-ink rounded flex items-center gap-1.5 transition-colors font-label text-[11px] uppercase font-bold"
@@ -361,7 +362,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </header>
 
       {/* Section: Foyer & Vulnérabilités */}
-      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
+      <section data-demo-id="plan-members-section" className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-center justify-between pb-1 border-b border-line">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-brand-ink text-[22px]">
@@ -460,7 +461,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
       </section>
 
       {/* Section: Lieux de Rassemblement & Ralliement */}
-      <section className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
+      <section data-demo-id="plan-assembly-section" className="bg-card rounded-xl p-4 shadow-sm space-y-3 border border-line-strong">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-brand-ink text-[22px]">pin_drop</span>
@@ -597,7 +598,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
 
         {/* Out-of-zone Contact Relay */}
         {outZoneContact ? (
-          <div className="bg-navy text-white p-4 rounded-xl space-y-2 border border-ink">
+          <div data-demo-id="plan-outzone-card" className="bg-navy text-white p-4 rounded-xl space-y-2 border border-ink">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
@@ -871,6 +872,7 @@ export const MonPlanView: React.FC<MonPlanViewProps> = ({
         {/* Actions de partage et export */}
         <div className="space-y-2.5">
           <button
+            data-demo-id="plan-qr-btn"
             onClick={() => setShowQrModal(true)}
             type="button"
             className="w-full min-h-[48px] bg-brand hover:bg-[#0028a3] text-white font-label text-[13px] uppercase font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"

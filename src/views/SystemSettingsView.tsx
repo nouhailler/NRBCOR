@@ -99,6 +99,7 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
       {/* Return button & install shortcut */}
       <div className="flex items-center justify-between gap-2">
         <button
+          data-demo-id="system-back-btn"
           onClick={onBack}
           type="button"
           className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
@@ -108,6 +109,7 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
         </button>
         {onInstallClick && (
           <button
+            data-demo-id="system-install-btn"
             onClick={onInstallClick}
             type="button"
             className="h-12 px-3.5 bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold rounded flex items-center gap-1.5 shadow-sm transition-colors"
@@ -137,7 +139,7 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
       )}
 
       {/* SECTION 1 : TABLEAU DE BORD DE TRANSPARENCE HORS-LIGNE */}
-      <section className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
+      <section data-demo-id="system-offline-board" className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-bold text-ink flex items-center gap-2">
             <span className="material-symbols-outlined text-brand-ink">signal_wifi_statusbar_not_connected</span>
@@ -214,6 +216,7 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
         {/* Bouton de Diagnostic Interactif */}
         <div className="pt-2">
           <button
+            data-demo-id="system-audit-btn"
             type="button"
             onClick={handleRunAudit}
             disabled={auditRunning}

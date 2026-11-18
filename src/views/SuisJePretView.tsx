@@ -225,7 +225,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
       </div>
 
       {/* CARTE HERO : Score Global de Préparation */}
-      <section data-tour="prep-score" className="w-full bg-navy text-white rounded-2xl p-5 shadow-lg border border-ink flex flex-col gap-4 relative overflow-hidden">
+      <section data-tour="prep-score" data-demo-id="prep-score-hero" className="w-full bg-navy text-white rounded-2xl p-5 shadow-lg border border-ink flex flex-col gap-4 relative overflow-hidden">
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-brand/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -536,7 +536,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div data-demo-id="prep-autonomy-grid" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* JAUGE 1 : Eau */}
               <div className="bg-card p-4 rounded-xl shadow-sm border border-line-strong flex flex-col justify-between gap-3">
                 <div className="flex items-start justify-between gap-2">
@@ -780,7 +780,7 @@ export const SuisJePretView: React.FC<SuisJePretViewProps> = ({
 
           {/* SECTION : Top 3 Actions Prioritaires à plus fort impact vital */}
           {topThreeActions.length > 0 && (
-            <section className="bg-gradient-to-br from-navy to-[#00224d] text-white p-4 sm:p-5 rounded-2xl shadow-md border border-brand-ink/40 flex flex-col gap-3">
+            <section data-demo-id="prep-top3-actions" className="bg-gradient-to-br from-navy to-[#00224d] text-white p-4 sm:p-5 rounded-2xl shadow-md border border-brand-ink/40 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-warn-bright text-[22px]">

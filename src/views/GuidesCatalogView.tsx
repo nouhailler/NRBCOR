@@ -67,7 +67,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
       </header>
 
       {/* Printable Crisis Binder Card */}
-      <div data-tour="guides-pack" className="bg-gradient-to-r from-navy to-navy-2 text-white p-4 rounded-xl shadow-md border border-ink flex flex-col gap-3">
+      <div data-tour="guides-pack" data-demo-id="guides-pack-card" className="bg-gradient-to-r from-navy to-navy-2 text-white p-4 rounded-xl shadow-md border border-ink flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-lg bg-brand text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -133,6 +133,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
         </p>
         <div className="grid grid-cols-2 gap-2 pt-0.5">
           <button
+            data-demo-id="guides-encyclo-histoire-btn"
             type="button"
             onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'histoire' })}
             className="p-2.5 rounded-lg bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
@@ -141,6 +142,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
             <span>Histoire & Doctrines</span>
           </button>
           <button
+            data-demo-id="guides-encyclo-glossaire-btn"
             type="button"
             onClick={() => onOpenSubScreen({ type: 'encyclopedie', tab: 'glossaire' })}
             className="p-2.5 rounded-lg bg-subtle hover:bg-tint text-brand-ink font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 transition-colors border border-line cursor-pointer"
@@ -185,6 +187,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
         ].map((f) => (
           <button
             key={f.id}
+            data-demo-id={`guides-filter-${f.id}`}
             type="button"
             onClick={() => setSelectedFilter(f.id as any)}
             className={`flex-shrink-0 min-h-[44px] px-3.5 py-1.5 rounded-full font-label text-[12px] font-bold transition-all ${
@@ -307,6 +310,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
 
           {/* Fiche Iode */}
           <div
+            data-demo-id="guides-card-iode"
             onClick={() => onOpenSubScreen({ type: 'iode' })}
             role="button"
             tabIndex={0}
@@ -407,6 +411,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
 
           {/* Carte Hors-Ligne des Périmètres */}
           <div
+            data-demo-id="guides-card-radar"
             onClick={() => onOpenSubScreen({ type: 'carte-perimetres' })}
             role="button"
             tabIndex={0}
@@ -449,6 +454,7 @@ export const GuidesCatalogView: React.FC<GuidesCatalogViewProps> = ({
         </button>
 
         <button
+          data-demo-id="guides-btn-formation"
           type="button"
           onClick={() => onOpenSubScreen({ type: 'formation' })}
           className="p-3 bg-card rounded-xl shadow-sm border border-line-strong text-left hover:bg-subtle transition-colors flex items-center gap-2 min-h-[52px]"

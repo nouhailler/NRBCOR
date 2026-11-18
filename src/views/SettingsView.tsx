@@ -156,6 +156,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Return button */}
       <div className="flex items-center justify-between gap-2">
         <button
+          data-demo-id="settings-back-btn"
           onClick={onBack}
           type="button"
           className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -183,7 +184,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </header>
 
       {/* Section 0 : Langue de l'application (Internationalisation FR / EN) */}
-      <section className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
+      <section data-demo-id="settings-lang-section" className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
         <div className="flex items-center justify-between pb-1 border-b border-line">
           <h2 className="text-[16px] font-bold text-ink flex items-center gap-2">
             <span className="material-symbols-outlined text-brand-ink">language</span>
@@ -202,7 +203,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </section>
 
       {/* Section 1 : Configuration du foyer */}
-      <section className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
+      <section data-demo-id="settings-profile-section" className="bg-card p-4 rounded-xl border border-line-strong shadow-sm flex flex-col gap-3">
         <h2 className="text-[16px] font-bold text-ink flex items-center gap-2">
           <span className="material-symbols-outlined text-brand-ink">family_restroom</span>
           <span>{t('settings.household')}</span>
@@ -437,6 +438,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </p>
           <div className="grid grid-cols-3 gap-1.5">
             <button
+              data-demo-id="settings-theme-light"
               type="button"
               onClick={() => onChangeTheme('light')}
               className={`min-h-[44px] rounded-lg font-label text-[12px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -449,6 +451,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <span>{language === 'fr' ? 'Clair' : 'Light'}</span>
             </button>
             <button
+              data-demo-id="settings-theme-dark"
               type="button"
               onClick={() => onChangeTheme('dark')}
               className={`min-h-[44px] rounded-lg font-label text-[12px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -576,6 +579,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
         <div className="grid grid-cols-2 gap-2">
           <button
+            data-demo-id="settings-export-json-btn"
             onClick={handleExportJSON}
             type="button"
             className="min-h-[46px] rounded-lg bg-navy hover:bg-navy-2 text-white font-label text-[11px] font-bold uppercase flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"

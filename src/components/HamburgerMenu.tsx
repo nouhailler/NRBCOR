@@ -86,6 +86,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </div>
           </div>
           <button
+            data-demo-id="drawer-close-btn"
             onClick={onClose}
             aria-label={t('common.close')}
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
@@ -343,6 +344,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <span>{t('menu.georisques')}</span>
               </button>
               <button
+                data-demo-id="drawer-radar-btn"
                 onClick={() => handleSelectSub({ type: 'carte-perimetres' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left bg-subtle hover:bg-tint text-brand-ink font-bold transition-colors border border-line-strong cursor-pointer"
               >
@@ -360,6 +362,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </span>
             <div className="flex flex-col gap-1 bg-card rounded-xl p-1.5 border border-line-strong shadow-xs">
               <button
+                data-demo-id="drawer-formation-btn"
                 onClick={() => handleSelectSub({ type: 'formation' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-subtle text-ink transition-colors cursor-pointer"
               >
@@ -391,6 +394,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 </div>
               </button>
               <button
+                data-demo-id="drawer-system-btn"
                 onClick={() => handleSelectSub({ type: 'system-settings' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-subtle text-brand-ink font-bold transition-colors cursor-pointer"
               >
@@ -398,6 +402,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 <span>{t('menu.systemSettings')}</span>
               </button>
               <button
+                data-demo-id="drawer-settings-btn"
                 onClick={() => handleSelectSub({ type: 'settings' })}
                 className="flex items-center gap-2.5 p-2 rounded-lg text-left hover:bg-subtle text-ink transition-colors cursor-pointer"
               >

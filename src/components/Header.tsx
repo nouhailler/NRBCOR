@@ -60,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 lg:flex-none">
           {showBack && onBack ? (
             <button
+              data-demo-id="header-back-btn"
               aria-label={t('common.back')}
               onClick={onBack}
               className="ds-icon-btn shrink-0 -ml-1.5"
@@ -69,6 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           ) : (
             <button
+              data-demo-id="header-menu-btn"
               aria-label={t('nav.openMenu')}
               onClick={onOpenMenu}
               className="ds-icon-btn shrink-0 -ml-1.5"
@@ -172,6 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {onOpenModeCrise && (
             <button
+              data-demo-id="header-crisis-btn"
               onClick={onOpenModeCrise}
               title={t('crisis.subtitle')}
               className="h-10 px-3 sm:px-3.5 rounded-xl bg-danger hover:bg-danger-strong text-white inline-flex items-center gap-1.5 text-[13px] font-extrabold tracking-wide uppercase transition-colors shadow-sm cursor-pointer"

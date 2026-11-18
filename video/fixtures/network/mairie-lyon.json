@@ -1,0 +1,12 @@
+{
+  "total_count": 1,
+  "results": [
+    {
+      "nom": "Mairie du 3e arrondissement de Lyon",
+      "telephone": "[{\"valeur\":\"04 78 95 83 50\",\"description\":\"Accueil général\"}]",
+      "site_internet": "[{\"valeur\":\"https://mairie3.lyon.fr\"}]",
+      "adresse": "[{\"numero_voie\":\"215\",\"complement1\":\"Rue Duguesclin\",\"code_postal\":\"69003\",\"nom_commune\":\"Lyon\"}]",
+      "url_service_public": "https://lannuaire.service-public.fr/auvergne-rhone-alpes/rhone/mairie-69383-01"
+    }
+  ]
+}

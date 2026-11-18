@@ -1,0 +1,27 @@
+{
+  "results": 1,
+  "data": [
+    {
+      "code_insee": "69383",
+      "libelle_commune": "Lyon 3e Arrondissement",
+      "risques_detail": [
+        {
+          "num_risque": "13",
+          "libelle_risque_long": "Risque industriel (établissements Seveso seuil haut de la vallée de la chimie)"
+        },
+        {
+          "num_risque": "14",
+          "libelle_risque_long": "Transport de marchandises dangereuses (axes routiers, ferroviaires et fluviaux)"
+        },
+        {
+          "num_risque": "11",
+          "libelle_risque_long": "Inondation par débordement du Rhône et de la Saône"
+        },
+        {
+          "num_risque": "134",
+          "libelle_risque_long": "Risque nucléaire (rayon de vigilance CNPE du Bugey à 34 km)"
+        }
+      ]
+    }
+  ]
+}

@@ -277,6 +277,7 @@ export const FamilyPlanQrModal: React.FC<FamilyPlanQrModalProps> = ({
             </div>
           </div>
           <button
+            data-demo-id="plan-qr-close-btn"
             onClick={() => {
               stopCamera();
               onClose();

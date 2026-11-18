@@ -136,6 +136,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
       {/* Barre de contrôle Stress & Accessibilité 1-Tap */}
       <div className="flex items-center justify-between gap-2">
         <button
+          data-demo-id="reagir-stress-btn"
           onClick={toggleStressMode}
           type="button"
           className={`min-h-[48px] px-3.5 rounded-xl font-label text-[12px] font-bold uppercase flex items-center gap-2 border transition-all ${
@@ -152,6 +153,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
         </button>
 
         <button
+          data-demo-id="reagir-speech-btn"
           onClick={() => toggleSpeechSynthesis(getEmergencySpeechText())}
           type="button"
           className={`min-h-[48px] px-3.5 rounded-xl font-label text-[12px] font-bold uppercase flex items-center gap-2 border transition-all ${
@@ -196,6 +198,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
       {/* Raccourci d'Urgence Immédiate 1-Tap : Que faire maintenant ? + Mode Crise */}
       <div data-tour="reagir-triage" className="flex flex-col gap-3">
         <button
+          data-demo-id="reagir-triage-btn"
           type="button"
           onClick={() => {
             triggerHaptic('warning');
@@ -235,6 +238,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
 
           <div className="grid grid-cols-2 min-[480px]:grid-cols-[1fr_auto_auto] gap-2 w-full lg:w-auto shrink-0">
             <button
+              data-demo-id="reagir-mode-crise-btn"
               type="button"
               onClick={() => onOpenSubScreen({ type: 'mode-crise' })}
               className="col-span-2 min-[480px]:col-span-1 min-h-[44px] px-3.5 bg-danger hover:bg-danger-strong text-white rounded-xl font-label text-[12px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
@@ -453,7 +457,7 @@ export const ReagirView: React.FC<ReagirViewProps> = ({
       </section>
 
       {/* 3. Les 4 parcours réflexes guidés */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 lg:items-start gap-3">
+      <section data-demo-id="reagir-reflex-grid" className="grid grid-cols-1 lg:grid-cols-2 lg:items-start gap-3">
         <div className="flex items-baseline justify-between px-1 lg:col-span-2">
           <h2 className="text-[18px] text-ink font-bold tracking-tight">
             4 Parcours Réflexes Immédiats

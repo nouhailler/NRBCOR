@@ -1,0 +1,29 @@
+TITRE YOUTUBE :
+NRBCOR — Tutoriel complet de l'application citoyenne de préparation aux risques NRBC (PWA hors-ligne)
+
+DESCRIPTION YOUTUBE :
+Découvrez NRBCOR, l'application citoyenne gratuite, bilingue (FR/EN), 100 % hors-ligne et zéro-serveur dédiée à la prévention et à la préparation face aux risques nucléaires, radiologiques, biologiques et chimiques (NRBC) ainsi qu'aux accidents technologiques majeurs.
+
+Dans ce tutoriel pas-à-pas (~4 minutes), explorez toutes les fonctionnalités de l'application sur mobile :
+• Tableau de bord de préparation du foyer et score de résilience transparent (/100)
+• Réagir dans l'urgence : mode lisibilité extrême, synthèse vocale et Mode Crise à très gros boutons (minuteur de décontamination 15 min, lampe torche d'urgence)
+• Guides réflexes, classeur papier PDF A4, calculateur d'iode stable (KI 65 mg) et Encyclopédie NRBC
+• Suivi du Kit d'urgence 72h, calculateur d'eau potable et gestion des stocks & péremptions
+• Plan familial zéro-serveur, mode discret, partage hors réseau par QR Code, Radar PPI (41 sites CNPE & Seveso) et mode Formateur
+• Sauvegarde JSON locale, diagnostic hors-ligne et installation PWA
+
+🔗 Accéder à l'application : https://nrbcor.pages.dev
+💻 Code source & documentation (GitHub) : https://github.com/nouhailler/NRBCOR
+
+CHAPITRES (repères indicatifs — les horodatages exacts calculés à l'image près seront générés dans video/output/tutoriel-fr.chapters.txt lors du rendu) :
+0:00 Introduction
+0:15 Chapitre 1 — Découverte & Tableau de bord
+0:50 Chapitre 2 — Réagir dans l'urgence & Mode Crise
+1:35 Chapitre 3 — Guides réflexes & Encyclopédie NRBC
+2:15 Chapitre 4 — Préparation du foyer, Kit 72h & Inventaire
+3:00 Chapitre 5 — Plan Familial, Risques Locaux & Entraînement
+3:45 Chapitre 6 — Réglages, Sauvegarde & Installation PWA
+
+⚠️ Rappel d'autorité : NRBCOR est un outil de préparation et d'information citoyenne. En situation d'urgence réelle, suivez toujours en priorité les consignes des autorités publiques, les sirènes du Réseau National d'Alerte (RNA), FR-Alert et la radio locale (France Bleu / France Info).
+
+#NRBCOR #ProtectionCivile #SécuritéCivile #PréparationUrgence #Kit72h #NRBC #PWA

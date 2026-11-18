@@ -235,7 +235,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <h1 className="ds-page-title">{t('dash.title')}</h1>
           <p className="text-[14px] text-ink-muted max-w-2xl">{t('dash.subtitle')}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div data-demo-id="home-status-badges" className="flex flex-wrap items-center gap-2">
           <span className={`ds-badge ${isOnline ? 'ds-badge-ok' : 'ds-badge-warn'}`}>
             <Icon name={isOnline ? 'wifi' : 'wifi_off'} className="text-[14px]" />
             {isOnline ? t('dash.online') : t('dash.offline')}
@@ -255,6 +255,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
         <section
           data-tour="urgent-alert"
+          data-demo-id="home-urgent-card"
           aria-labelledby="urgent-title"
           className="lg:col-span-7 xl:col-span-8 rounded-[var(--radius-card)] border border-danger-line bg-danger-soft p-4 sm:p-5 flex flex-col gap-4"
         >
@@ -302,7 +303,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </p>
         </section>
 
-        <section aria-labelledby="score-title" className="lg:col-span-5 xl:col-span-4 ds-card p-4 sm:p-5 flex flex-col gap-4">
+        <section data-demo-id="home-score-card" aria-labelledby="score-title" className="lg:col-span-5 xl:col-span-4 ds-card p-4 sm:p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
             <h2 id="score-title" className="ds-section-title flex items-center gap-2">
               <Icon name="speed" className="text-[20px] text-ink-muted" />
@@ -339,7 +340,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ================= Indicateurs de préparation ================= */}
       <section aria-labelledby="indicators-title">
         <SectionHeader icon="monitoring" title={t('dash.indicators')} id="indicators-title" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4">
+        <div data-demo-id="home-indicators-grid" className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4">
           <StatCard
             icon="backpack"
             label={t('dash.kitLabel')}
@@ -402,7 +403,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       {/* ================= Protocoles, gestes, contexte ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        <section data-tour="cbrn-cards" aria-labelledby="cbrn-title" className="ds-card p-3 sm:p-4">
+        <section data-tour="cbrn-cards" data-demo-id="home-cbrn-cards" aria-labelledby="cbrn-title" className="ds-card p-3 sm:p-4">
           <div className="px-1">
             <SectionHeader
               icon="shield"

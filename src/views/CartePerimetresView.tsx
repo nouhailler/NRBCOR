@@ -131,6 +131,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
         <div className="max-w-4xl mx-auto flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <button
+              data-demo-id="perimetres-back-btn"
               type="button"
               onClick={onBack}
               className="flex items-center gap-1.5 text-ok-bright hover:text-white transition-colors font-label text-[13px] font-bold"
@@ -220,6 +221,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* Diagnostic Territorial Instantané */}
         <div
+          data-demo-id="perimetres-diagnostic"
           className={`p-4 rounded-xl border-2 transition-all ${
             diagnostic.overallStatus === 'in_reflex'
               ? 'bg-danger/10 border-danger-ink'
@@ -327,6 +329,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1 bg-tint p-1 rounded-xl">
             <button
+              data-demo-id="perimetres-view-radar"
               type="button"
               onClick={() => {
                 setViewMode('radar');
@@ -342,6 +345,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
               <span>Radar Concentrique (50 km)</span>
             </button>
             <button
+              data-demo-id="perimetres-view-france"
               type="button"
               onClick={() => {
                 setViewMode('france');
@@ -365,7 +369,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* 1. VUE RADAR CONCENTRIQUE */}
         {viewMode === 'radar' && (
-          <div className="bg-navy rounded-2xl p-4 text-white shadow-md relative overflow-hidden flex flex-col items-center">
+          <div data-demo-id="perimetres-radar-svg" className="bg-navy rounded-2xl p-4 text-white shadow-md relative overflow-hidden flex flex-col items-center">
             <div className="w-full flex items-center justify-between text-[11px] font-label text-on-navy-soft mb-2 z-10">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-ok-soft animate-ping"></span>
@@ -496,7 +500,7 @@ export const CartePerimetresView: React.FC<CartePerimetresViewProps> = ({
 
         {/* 2. VUE CARTE NATIONALE VECTORIELLE */}
         {viewMode === 'france' && (
-          <div className="bg-navy rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
+          <div data-demo-id="perimetres-france-svg" className="bg-navy rounded-2xl p-4 text-white shadow-md flex flex-col items-center">
             <div className="w-full flex items-center justify-between text-[11px] font-label text-on-navy-soft mb-2">
               <span>Carte des 41 sites majeurs de France métropolitaine</span>
               <span className="text-ok-bright font-bold">100% Vectoriel Hors-Ligne</span>

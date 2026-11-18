@@ -109,6 +109,7 @@ export const EmergencyReflexModal: React.FC<EmergencyReflexModalProps> = ({
             </div>
           </div>
           <button
+            data-demo-id="reflex-modal-close"
             type="button"
             onClick={() => {
               triggerHaptic('light');

@@ -98,6 +98,7 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
       {/* Return button */}
       <div className="flex items-center justify-between gap-2">
         <button
+          data-demo-id="iode-back-btn"
           onClick={onBack}
           type="button"
           className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
@@ -288,6 +289,7 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
               {DOSES.map((d) => (
                 <button
                   key={d.id}
+                  data-demo-id={`iode-profile-${d.id}`}
                   onClick={() => setSelectedProfileId(d.id)}
                   type="button"
                   className={`p-2.5 rounded-lg text-left transition-all border ${
@@ -307,7 +309,9 @@ export const FicheIodeView: React.FC<FicheIodeViewProps> = ({ onBack }) => {
             </div>
 
             {/* Fiche posologique détaillée du profil sélectionné */}
-            <div className={`p-4 rounded-xl border flex flex-col gap-2.5 ${
+            <div
+              data-demo-id="iode-dose-result"
+              className={`p-4 rounded-xl border flex flex-col gap-2.5 ${
               selectedDose.isWarning
                 ? 'bg-danger-soft border-danger-bright text-danger-ink-strong'
                 : 'bg-subtle border-brand-ink text-ink'

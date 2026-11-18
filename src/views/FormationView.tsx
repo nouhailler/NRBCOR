@@ -139,6 +139,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
         {/* Hub d'urgence return button */}
         <div className="flex items-center justify-between gap-2">
           <button
+            data-demo-id="formation-back-btn"
             onClick={onBack}
             type="button"
             className="h-12 px-3 bg-tint hover:bg-tint text-ink font-label text-[12px] font-bold rounded flex items-center gap-1.5 transition-colors"
@@ -203,7 +204,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
                 </span>
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <label data-demo-id="formation-trainer-toggle" className="relative inline-flex items-center cursor-pointer shrink-0">
               <input
                 type="checkbox"
                 checked={trainerMode}
@@ -357,6 +358,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
 
           <div className="grid grid-cols-2 gap-2 pt-1">
             <button
+              data-demo-id="formation-siren-btn"
               onClick={() => handleToggleSiren('alerte')}
               type="button"
               className={`min-h-[48px] rounded-lg font-label text-[12px] font-bold uppercase flex items-center justify-center gap-2 transition-all shadow-sm ${
@@ -420,7 +422,7 @@ export const FormationView: React.FC<FormationViewProps> = ({
         </nav>
 
         {/* ACTIVE EXERCISE CARD: Interactive Simulation Question in Progress */}
-        <section className="rounded-xl bg-card p-4 shadow-md flex flex-col gap-3 border border-line-strong">
+        <section data-demo-id="formation-scenario-card" className="rounded-xl bg-card p-4 shadow-md flex flex-col gap-3 border border-line-strong">
           <div className="flex items-center justify-between gap-1 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="font-label text-[10px] px-2 py-0.5 rounded bg-tint text-brand-ink font-bold uppercase tracking-wider">

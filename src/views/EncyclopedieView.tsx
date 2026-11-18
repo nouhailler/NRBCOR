@@ -84,6 +84,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
         <div className="max-w-4xl mx-auto flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <button
+              data-demo-id="encyclo-back-btn"
               type="button"
               onClick={onBack}
               className="flex items-center gap-1.5 text-ok-bright hover:text-white transition-colors font-label text-[13px] font-bold cursor-pointer"
@@ -119,6 +120,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
             ].map((tab) => (
               <button
                 key={tab.key}
+                data-demo-id={`encyclo-tab-${tab.key}`}
                 type="button"
                 onClick={() => handleTabChange(tab.key as TabKey)}
                 className={`min-h-[38px] px-3.5 py-1.5 rounded-lg font-label text-[12px] font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
@@ -148,6 +150,7 @@ export const EncyclopedieView: React.FC<EncyclopedieViewProps> = ({
                   search
                 </span>
                 <input
+                  data-demo-id="encyclo-search-input"
                   type="text"
                   value={glossarySearch}
                   onChange={(e) => setGlossarySearch(e.target.value)}

@@ -220,6 +220,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           </span>
         </div>
         <button
+          data-demo-id="crise-torch-close-btn"
           type="button"
           onClick={() => setIsTorchActive(false)}
           className="w-full max-w-sm h-14 bg-black text-white rounded-2xl font-label font-bold text-[16px] uppercase tracking-wider"
@@ -252,6 +253,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         <div className="flex items-center gap-2">
           {/* Bouton Lampe Torche Écran */}
           <button
+            data-demo-id="crise-torch-btn"
             type="button"
             onClick={() => {
               setIsTorchActive(true);
@@ -266,6 +268,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
 
           {/* Bouton Quitter */}
           <button
+            data-demo-id="crise-quit-btn"
             type="button"
             onClick={() => {
               triggerHaptic('light');
@@ -310,6 +313,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           <button
+            data-demo-id="crise-scenario-inconnu"
             type="button"
             onClick={() => {
               setSelectedScenario('inconnu');
@@ -331,6 +335,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           </button>
 
           <button
+            data-demo-id="crise-scenario-chimique"
             type="button"
             onClick={() => {
               setSelectedScenario('chimique');
@@ -352,6 +357,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
           </button>
 
           <button
+            data-demo-id="crise-scenario-nucleaire"
             type="button"
             onClick={() => {
               setSelectedScenario('nucleaire');
@@ -400,6 +406,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         {/* BOUTON 1 : CONFINER IMMÉDIATEMENT */}
         <div className="flex flex-col">
           <button
+            data-demo-id="crise-action-confiner"
             type="button"
             onClick={() => {
               triggerHaptic('warning');
@@ -570,6 +577,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         {/* BOUTON 3 : DÉCONTAMINATION D'URGENCE */}
         <div className="flex flex-col">
           <button
+            data-demo-id="crise-action-decon"
             type="button"
             onClick={() => {
               triggerHaptic('warning');
@@ -652,6 +660,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
 
                 {deconTimer === null ? (
                   <button
+                    data-demo-id="crise-decon-timer-start"
                     type="button"
                     onClick={handleStartDeconTimer}
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-label text-[12px] font-bold uppercase transition-colors"
@@ -660,6 +669,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
                   </button>
                 ) : (
                   <button
+                    data-demo-id="crise-decon-timer-stop"
                     type="button"
                     onClick={handleStopDeconTimer}
                     className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg font-label text-[12px] font-bold uppercase transition-colors"
@@ -684,6 +694,7 @@ export const ModeCriseView: React.FC<ModeCriseViewProps> = ({
         {/* BOUTON 4 : APPELER LES SECOURS (ADAPTÉ AU PAYS CHOISI) */}
         <div className="flex flex-col">
           <button
+            data-demo-id="crise-action-appeler"
             type="button"
             onClick={() => {
               triggerHaptic('warning');

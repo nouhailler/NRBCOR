@@ -76,6 +76,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
   const switcher = (
     <div className="flex items-center gap-1.5 bg-subtle p-1.5 rounded-xl border border-line-strong">
       <button
+        data-demo-id="prep-view-switch-readiness"
         type="button"
         onClick={() => setViewMode('suis-je-pret')}
         className={`flex-1 min-h-[42px] px-3 rounded-lg font-label text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all ${
@@ -89,6 +90,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
       </button>
 
       <button
+        data-demo-id="prep-view-switch-kit"
         type="button"
         onClick={() => setViewMode('kit')}
         className={`flex-1 min-h-[42px] px-3 rounded-lg font-label text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all ${
@@ -240,7 +242,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
         </div>
 
         {/* Rations Calculées */}
-        <div className="grid grid-cols-1 gap-2 pt-1">
+        <div data-demo-id="prep-kit-calculator" className="grid grid-cols-1 gap-2 pt-1">
           <div className="p-3 bg-subtle rounded-lg flex items-center gap-3 border border-line">
             <div className="w-10 h-10 rounded-lg bg-tint text-brand-ink flex items-center justify-center flex-shrink-0">
               <span className="material-symbols-outlined text-[22px]">water_drop</span>
@@ -294,7 +296,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
       </section>
 
       {/* Barre de Progression Globale Dynamique */}
-      <section className="bg-navy-2 p-4 rounded-xl text-white shadow-sm border border-ink">
+      <section data-demo-id="prep-kit-progress" className="bg-navy-2 p-4 rounded-xl text-white shadow-sm border border-ink">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span
@@ -330,6 +332,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
       {/* Raccourci vers Écran G : Inventaire & Péremptions */}
       {onOpenInventory && (
         <button
+          data-demo-id="prep-open-inventory-btn"
           onClick={onOpenInventory}
           type="button"
           className="p-3 bg-subtle hover:bg-tint rounded-xl border border-line flex items-center justify-between gap-2 transition-colors text-left"
@@ -412,6 +415,7 @@ export const PreparationView: React.FC<PreparationViewProps> = ({
               {categoryItems.map((item) => (
                 <label
                   key={item.id}
+                  data-demo-id={`prep-kit-item-${item.id}`}
                   className="flex items-start gap-3 p-3 bg-card rounded-xl shadow-sm min-h-[56px] cursor-pointer border border-line-strong hover:bg-canvas transition-colors"
                 >
                   <input
